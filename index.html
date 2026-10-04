@@ -1,0 +1,1448 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Upstream</title>
+<meta name="description" content="Type what could go wrong. See which of your stocks it hits.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' fill='%230A0A0C'/%3E%3Cpath d='M7 24 L16 8 L25 24' fill='none' stroke='%23F7931E' stroke-width='3.5'/%3E%3Cpath d='M12 24 L16 17 L20 24' fill='none' stroke='%23E8445A' stroke-width='3'/%3E%3C/svg%3E">
+<style>
+:root{
+  --bg:#09090B;--bg2:#0D0D10;--panel:#111115;--panel2:#16161B;--panel3:#1C1C22;
+  --line:#22222A;--line2:#2E2E37;--line3:#3D3D48;
+  --text:#F1ECE4;--text2:#C9C4BC;--muted:#8B8993;--dim:#5D5C66;
+  --accent:#F7931E;--accent2:#FFB45C;--accentbg:rgba(247,147,30,.12);
+  --danger:#E8445A;--dangerbg:rgba(232,68,90,.13);
+  --sans:'Inter Tight',ui-sans-serif,system-ui,-apple-system,'Segoe UI',sans-serif;
+  --mono:'JetBrains Mono',ui-monospace,'SF Mono',Menlo,monospace;
+  --drawer-h:31vh;
+}
+*{box-sizing:border-box}
+html,body{margin:0;background:var(--bg);color:var(--text);font-family:var(--sans);font-size:13px;line-height:1.4;-webkit-font-smoothing:antialiased}
+body{font-variant-numeric:tabular-nums}
+.mono,.num{font-family:var(--mono);font-variant-numeric:tabular-nums}
+button{font:inherit;color:inherit;background:none;border:0;cursor:pointer;padding:0}
+button:focus-visible,input:focus-visible,select:focus-visible,a:focus-visible{outline:1px solid var(--accent);outline-offset:1px}
+a{color:var(--accent);text-decoration:none}
+a:hover{text-decoration:underline}
+.lbl{font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);font-weight:600}
+.hide{display:none!important}
+
+/* ---------- app grid ---------- */
+.app{display:grid;grid-template-rows:auto auto minmax(0,1fr) auto;min-height:100vh}
+@media (min-width:1100px){ .app{height:100vh} }
+
+/* ---------- top bar ---------- */
+.top{display:grid;grid-template-columns:260px minmax(0,1fr) auto;align-items:center;gap:20px;padding:0 16px;height:52px;border-bottom:1px solid var(--line);background:var(--bg)}
+.brand{display:flex;align-items:center;gap:10px;font-weight:800;font-size:17px;letter-spacing:-.01em;cursor:pointer;user-select:none}
+.brand svg{flex:none}
+.brand small{font-weight:500;font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);border-left:1px solid var(--line2);padding-left:10px}
+.cmd{position:relative;max-width:720px;width:100%;justify-self:center}
+.cmd .box{display:flex;align-items:center;gap:10px;height:34px;border:1px solid var(--line2);background:var(--panel);padding:0 10px}
+.cmd .box:focus-within{border-color:var(--accent)}
+.cmd input{flex:1;min-width:0;background:none;border:0;color:var(--text);font:500 13px var(--sans);outline:none}
+.cmd input::placeholder{color:var(--dim)}
+kbd{font:500 10px var(--mono);color:var(--muted);border:1px solid var(--line2);padding:1px 5px}
+.menu{position:absolute;left:0;right:0;top:37px;background:var(--panel2);border:1px solid var(--line3);z-index:40;box-shadow:0 12px 32px rgba(0,0,0,.6)}
+.menu button{display:flex;width:100%;gap:10px;align-items:center;padding:8px 12px;text-align:left;border-bottom:1px solid var(--line)}
+.menu button:last-child{border-bottom:0}
+.menu button:hover,.menu button.on{background:var(--panel3)}
+.menu .k{font:600 10px var(--mono);color:var(--muted);letter-spacing:.06em;min-width:74px;text-transform:uppercase}
+.menu .run .k{color:var(--danger)}
+.snap{display:flex;align-items:center;gap:8px;font:500 10.5px var(--mono);color:var(--text2);border:1px solid var(--line2);padding:5px 9px;white-space:nowrap}
+.snap i{width:6px;height:6px;background:var(--accent);display:inline-block}
+
+/* ---------- ticker ---------- */
+.ticker{display:flex;overflow-x:auto;border-bottom:1px solid var(--line);background:var(--bg2);scrollbar-width:none}
+.ticker::-webkit-scrollbar{display:none}
+.tk{flex:none;display:flex;align-items:baseline;gap:8px;padding:7px 14px;border-right:1px solid var(--line);font-family:var(--mono);font-size:11px;white-space:nowrap}
+.tk:hover{background:var(--panel)}
+.tk b{font-weight:700;color:var(--text)}
+.tk span{color:var(--muted)}
+.tk em{font-style:normal;color:var(--accent)}
+.tk em.hi{color:var(--danger)}
+
+/* ---------- main 3 columns ---------- */
+.main{display:grid;grid-template-columns:250px minmax(0,1fr) 330px;min-height:0}
+.col{min-height:0;overflow:auto;scrollbar-width:thin;scrollbar-color:var(--line3) transparent}
+.left{border-right:1px solid var(--line);padding:14px 14px 18px}
+.right{border-left:1px solid var(--line);padding:14px 16px 18px;background:var(--bg2)}
+.sec{margin-bottom:16px}
+.sec-h{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}
+
+/* portfolio */
+.chips{display:grid;grid-template-columns:1fr 1fr;gap:4px}
+.chip{display:flex;flex-direction:column;align-items:flex-start;gap:1px;padding:6px 8px;border:1px solid var(--line2);background:var(--panel);text-align:left;position:relative}
+.chip b{font:700 11.5px var(--mono)}
+.chip span{font-size:10.5px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%}
+.chip[aria-pressed=true]{border-color:var(--accent);background:var(--accentbg)}
+.chip[aria-pressed=true] b{color:var(--accent2)}
+.chip[aria-pressed=true]::after{content:"";position:absolute;right:6px;top:7px;width:6px;height:6px;background:var(--accent)}
+.chip:hover{border-color:var(--line3)}
+.chip .hit{font:600 10px var(--mono);color:var(--danger)}
+.headline{font-size:19px;line-height:1.22;font-weight:700;letter-spacing:-.015em;margin:4px 0 10px}
+.headline em{font-style:normal;color:var(--accent)}
+.hold{display:grid;grid-template-columns:62px 1fr 52px;align-items:center;gap:8px;padding:5px 0;border-bottom:1px solid var(--line);font-family:var(--mono);font-size:11px;cursor:pointer}
+.hold:hover b{color:var(--accent2)}
+.hold .bar{height:4px;background:var(--line);position:relative}
+.hold .bar i{position:absolute;left:0;top:0;bottom:0}
+.hold .v{text-align:right;color:var(--text2)}
+.note{color:var(--muted);font-size:11px;line-height:1.45}
+.pfimpact{border:1px solid var(--danger);background:var(--dangerbg);padding:10px;margin-top:10px}
+.pfimpact .big{font:700 22px var(--mono);color:var(--danger);letter-spacing:-.02em}
+
+/* ---------- center / map ---------- */
+.center{display:flex;flex-direction:column;min-height:0;min-width:0;background:
+  radial-gradient(ellipse at 76% 50%,rgba(247,147,30,.05),transparent 55%),var(--bg)}
+.mapbar{display:flex;align-items:center;gap:8px;flex-wrap:wrap;padding:8px 12px;border-bottom:1px solid var(--line)}
+.mapbar h1{font-size:13px;font-weight:700;margin:0 8px 0 0;letter-spacing:-.005em}
+.mapbar .meta{font:500 11px var(--mono);color:var(--muted)}
+.sp{flex:1}
+.btn{display:inline-flex;align-items:center;gap:6px;height:28px;padding:0 10px;border:1px solid var(--line2);background:var(--panel);font-size:11.5px;font-weight:600;white-space:nowrap}
+.btn:hover{border-color:var(--line3);background:var(--panel2)}
+.btn[aria-pressed=true]{border-color:var(--accent);color:var(--accent2);background:var(--accentbg)}
+.btn.primary{border-color:var(--danger);background:var(--danger);color:#fff}
+.btn.primary:hover{background:#f05a6e}
+.btn.ghost{background:none}
+.btn svg{flex:none}
+.loopcount{font:600 11px var(--mono);color:var(--accent)}
+.mapwrap{position:relative;flex:1;min-height:0}
+#map{position:absolute;inset:0;width:100%;height:100%;display:block}
+.hud{display:flex;align-items:center;gap:14px;flex-wrap:wrap;padding:8px 12px;border-bottom:1px solid var(--line);background:linear-gradient(90deg,rgba(232,68,90,.08),transparent 60%);min-height:50px}
+.hud.cta{background:linear-gradient(90deg,rgba(247,147,30,.07),transparent 60%)}
+.hud .q{font-size:15px;font-weight:700;letter-spacing:-.01em;line-height:1.2}
+.hud .qq{display:flex;flex-direction:column;gap:2px;min-width:0}
+.hud .pips{display:flex;gap:3px;width:90px}
+.hud .pips i{flex:1;height:3px;background:var(--line2)}
+.hud .pips i.on{background:var(--danger)}
+.hud .st{display:flex;flex-direction:column;font-family:var(--mono);font-size:10px;color:var(--muted);letter-spacing:.06em;text-transform:uppercase;padding-left:14px;border-left:1px solid var(--line2)}
+.hud .st b{color:var(--text);font-size:15px;letter-spacing:-.01em;text-transform:none}
+.hud .st b.d{color:var(--danger);font-size:18px}
+.hud .st b.a{color:var(--accent2)}
+.hud .acts{display:flex;gap:6px;margin-left:auto}
+.legend{display:flex;flex-wrap:wrap;gap:4px 16px;align-items:center;font:500 10px var(--mono);color:var(--muted);padding:6px 12px;border-top:1px solid var(--line)}
+.legend span{display:inline-flex;align-items:center;gap:6px}
+.loopcap{position:absolute;right:12px;bottom:10px;width:min(430px,calc(100% - 24px));background:rgba(13,13,16,.94);border:1px solid var(--accent);padding:10px 12px}
+.loopcap .t{font-weight:700;font-size:13.5px;margin:3px 0 4px}
+.loopcap .p{font:500 11px var(--mono);color:var(--accent2);margin-bottom:5px;word-break:break-word}
+.loopcap .nav{display:flex;gap:6px;margin-top:8px;align-items:center}
+
+/* svg */
+.lane-t{font:600 9.5px var(--sans);letter-spacing:.18em;fill:#6b6a74;text-transform:uppercase}
+.node{cursor:pointer}
+.node .tick{font:700 11px var(--mono);fill:var(--text)}
+.node .rev{font:500 9.5px var(--mono);fill:var(--muted)}
+.node.pf .tick{fill:var(--accent2)}
+.node.dim{opacity:.18}
+.node .selring{fill:none;stroke:var(--text);stroke-width:1.2;opacity:0}
+.node.sel .selring{opacity:1}
+.node.match .selring{opacity:1;stroke:var(--accent);stroke-dasharray:3 3}
+.node:hover .core{filter:brightness(1.35)}
+.edge{fill:none;transition:opacity .25s}
+.edge.dim{opacity:.07}
+.ehit{fill:none;stroke:transparent;stroke-width:12;cursor:pointer}
+.edge.flow{animation:flow 1s linear infinite}
+@keyframes flow{to{stroke-dashoffset:-20}}
+.badge-t{font:700 10.5px var(--mono);fill:var(--danger)}
+.badge-r{fill:#140a0c;stroke:var(--danger);stroke-width:.8}
+.pulse{fill:none;stroke:var(--danger)}
+
+/* tooltip */
+.tip{position:fixed;z-index:60;pointer-events:none;background:var(--panel2);border:1px solid var(--line3);padding:7px 9px;font-size:11.5px;max-width:280px;box-shadow:0 8px 24px rgba(0,0,0,.6)}
+.tip b{font-family:var(--mono)}
+.tip .s{color:var(--muted);font-family:var(--mono);font-size:10.5px;margin-top:2px}
+
+/* ---------- detail panel ---------- */
+.dh{display:flex;align-items:flex-start;justify-content:space-between;gap:8px;margin-bottom:10px}
+.dh h2{margin:2px 0 0;font-size:20px;letter-spacing:-.02em;line-height:1.1}
+.dh .tkr{font:700 11px var(--mono);color:var(--accent2)}
+.kpis{display:grid;grid-template-columns:1fr 1fr;border:1px solid var(--line);margin-bottom:12px}
+.kpi{padding:8px 10px;border-right:1px solid var(--line);border-bottom:1px solid var(--line)}
+.kpi:nth-child(2n){border-right:0}
+.kpi:nth-last-child(-n+2){border-bottom:0}
+.kpi .v{font:700 17px var(--mono);letter-spacing:-.02em;margin-top:2px}
+.kpi .v.d{color:var(--danger)}
+.kpi .v.a{color:var(--accent)}
+.kpi .s{font:500 10px var(--mono);color:var(--muted)}
+.ll{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:2px 8px;padding:6px 6px;border-bottom:1px solid var(--line);cursor:pointer;align-items:center}
+.ll:hover{background:var(--panel2)}
+.ll .n{font-size:12px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ll .n small{color:var(--muted);font-weight:500}
+.ll .a{font:600 11.5px var(--mono);text-align:right}
+.ll .m{grid-column:1/-1;display:flex;gap:6px;align-items:center;font:500 10px var(--mono);color:var(--muted)}
+.tag{display:inline-block;font:700 9px var(--mono);letter-spacing:.08em;padding:1px 5px;border:1px solid}
+.tag.DISCLOSED{color:var(--text);border-color:var(--text2)}
+.tag.REPORTED{color:var(--accent2);border-color:var(--accent)}
+.tag.ESTIMATED{color:var(--muted);border-color:var(--line3);border-style:dashed}
+.tag.lev{color:var(--danger);border-color:var(--danger);background:var(--dangerbg)}
+.tag.pf{color:var(--accent2);border-color:var(--accent);background:var(--accentbg)}
+.quote{border-left:2px solid var(--accent);padding:6px 10px;margin:10px 0;background:var(--panel);font-size:13px;line-height:1.45}
+.quote small{display:block;font:600 9.5px var(--mono);color:var(--muted);letter-spacing:.1em;text-transform:uppercase;margin-bottom:3px}
+.kv{display:grid;grid-template-columns:96px 1fr;gap:6px 10px;font-size:12px;margin:8px 0}
+.kv dt{color:var(--muted);font-size:10px;letter-spacing:.12em;text-transform:uppercase;font-weight:600;padding-top:2px}
+.kv dd{margin:0;font-family:var(--mono);font-size:11.5px;word-break:break-word}
+.flow{display:flex;align-items:center;gap:8px;font:700 13px var(--mono);margin:8px 0 6px;flex-wrap:wrap}
+.flow button{border:1px solid var(--line2);padding:3px 7px;background:var(--panel)}
+.flow button:hover{border-color:var(--accent)}
+.flow .rel{font:600 10px var(--sans);letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
+.facts{margin:0;padding:0;list-style:none}
+.facts li{padding:4px 0 4px 12px;position:relative;font-size:12px;color:var(--text2)}
+.facts li::before{content:"";position:absolute;left:0;top:10px;width:5px;height:1px;background:var(--accent)}
+.bar2{height:5px;background:var(--line);margin-top:6px;position:relative}
+.bar2 i{position:absolute;left:0;top:0;bottom:0}
+.stat-grid{display:grid;grid-template-columns:1fr 1fr;gap:1px;background:var(--line);border:1px solid var(--line);margin:10px 0 14px}
+.stat-grid>div{background:var(--bg2);padding:9px 10px}
+.stat-grid .v{font:700 18px var(--mono)}
+.mini{width:100%;border-collapse:collapse;font-size:11.5px}
+.mini td{padding:5px 4px;border-bottom:1px solid var(--line)}
+.mini td.r{text-align:right;font-family:var(--mono)}
+
+/* ---------- drawer ---------- */
+.drawer{border-top:1px solid var(--line2);background:var(--bg2);display:flex;flex-direction:column;min-height:0}
+@media (min-width:1100px){ .drawer{height:var(--drawer-h)} .drawer.closed{height:37px} }
+.tabs{display:flex;align-items:stretch;border-bottom:1px solid var(--line);height:37px;flex:none;overflow-x:auto;scrollbar-width:none}
+.tab{padding:0 16px;font-size:11px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);border-right:1px solid var(--line);display:flex;align-items:center;gap:8px;white-space:nowrap;position:relative}
+.tab:hover{color:var(--text)}
+.tab[aria-selected=true]{color:var(--text);background:var(--bg)}
+.tab[aria-selected=true]::before{content:"";position:absolute;left:0;right:0;top:0;height:2px;background:var(--accent)}
+.tab .c{font:600 10px var(--mono);color:var(--dim);letter-spacing:0}
+.tab .live{width:6px;height:6px;background:var(--danger)}
+.pane{flex:1;min-height:0;overflow:auto;scrollbar-width:thin;scrollbar-color:var(--line3) transparent}
+.drawer.closed .pane{display:none}
+
+/* filings */
+.ftools{display:flex;gap:8px;align-items:center;padding:8px 12px;border-bottom:1px solid var(--line);flex-wrap:wrap;position:sticky;top:0;background:var(--bg2);z-index:2}
+.ftools input{height:28px;border:1px solid var(--line2);background:var(--panel);color:var(--text);padding:0 9px;font:500 12px var(--sans);width:280px;max-width:100%}
+.ftools input:focus{border-color:var(--accent);outline:none}
+.seg{display:flex;flex-wrap:wrap}
+.seg button{height:28px;padding:0 9px;border:1px solid var(--line2);margin-left:-1px;font:600 10.5px var(--mono);color:var(--muted);background:var(--panel)}
+.seg button[aria-pressed=true]{color:var(--accent2);border-color:var(--accent);position:relative;z-index:1;background:var(--accentbg)}
+table.grid{width:100%;border-collapse:collapse;font-size:12px}
+table.grid th{position:sticky;top:0;background:var(--bg2);text-align:left;font:600 9.5px var(--sans);letter-spacing:.13em;text-transform:uppercase;color:var(--muted);padding:7px 10px;border-bottom:1px solid var(--line2);white-space:nowrap}
+.ftools + table.grid th{top:45px}
+table.grid td{padding:6px 10px;border-bottom:1px solid var(--line);vertical-align:middle}
+table.grid tr.click{cursor:pointer}
+table.grid tr.click:hover td{background:var(--panel)}
+table.grid tr.selr td{background:var(--panel2)}
+table.grid td.n{font-family:var(--mono);text-align:right;white-space:nowrap}
+table.grid th.n{text-align:right}
+td.mono{font-family:var(--mono);white-space:nowrap}
+.typ{font:600 10px var(--mono);color:var(--text2);border:1px solid var(--line2);padding:1px 5px;white-space:nowrap}
+.empty{padding:22px;color:var(--muted);text-align:center}
+
+/* scenario */
+.scen{display:grid;grid-template-columns:330px minmax(0,1fr);min-height:100%}
+.scen-l{border-right:1px solid var(--line);padding:12px}
+.scen-r{min-width:0;display:flex;flex-direction:column}
+.sinput{display:flex;border:1px solid var(--line2);background:var(--panel)}
+.sinput:focus-within{border-color:var(--danger)}
+.sinput input{flex:1;min-width:0;background:none;border:0;color:var(--text);padding:0 10px;height:34px;font:600 12.5px var(--sans);outline:none}
+.sinput .btn{height:34px;border:0}
+.presets{display:flex;flex-direction:column;gap:4px;margin:8px 0 12px}
+.preset{text-align:left;padding:6px 9px;border:1px solid var(--line2);font-size:12px;background:var(--panel);display:flex;justify-content:space-between;gap:8px}
+.preset:hover{border-color:var(--line3)}
+.preset.on{border-color:var(--danger);background:var(--dangerbg)}
+.preset small{font:600 9.5px var(--mono);color:var(--muted)}
+.interp{border:1px solid var(--line2);padding:10px;background:var(--panel)}
+.interp .row{display:grid;grid-template-columns:76px 1fr;gap:8px;align-items:center;margin:6px 0}
+.interp label{font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);font-weight:600}
+.interp select{width:100%;height:28px;background:var(--bg2);border:1px solid var(--line2);color:var(--text);font:500 12px var(--sans);padding:0 6px}
+.rng{display:flex;align-items:center;gap:8px}
+.rng input{flex:1;accent-color:var(--danger);min-width:0}
+.rng output{font:700 12px var(--mono);min-width:44px;text-align:right}
+.interp .why{font:500 10.5px var(--mono);color:var(--muted);margin-top:8px;line-height:1.5}
+.sumbar{padding:12px 14px;border-bottom:1px solid var(--line);display:flex;gap:16px;align-items:center;flex-wrap:wrap}
+.sumbar .txt{font-size:15px;font-weight:600;letter-spacing:-.01em;flex:1;min-width:240px}
+.sumbar .txt b{color:var(--danger);font-family:var(--mono)}
+.sumbar .txt em{font-style:normal;color:var(--accent2)}
+.tbl-wrap{overflow:auto;min-width:0}
+.pctbar{display:inline-block;width:56px;height:5px;background:var(--line);vertical-align:middle;margin-right:7px;position:relative}
+.pctbar i{position:absolute;left:0;top:0;bottom:0;background:var(--danger)}
+.yes{color:var(--accent2);font-weight:700}
+.path{font:500 11px var(--mono);color:var(--text2);white-space:nowrap}
+
+/* trace */
+.trace{display:grid;grid-template-columns:minmax(0,1.25fr) minmax(0,1fr);min-height:100%}
+.trace-l{border-right:1px solid var(--line);padding:10px 12px}
+.trace-r{padding:12px 14px}
+.call{border:1px solid var(--line);margin-bottom:6px;background:var(--panel);opacity:1;transition:opacity .3s}
+.call.pending{opacity:.25}
+.call .h{display:flex;gap:10px;align-items:center;padding:6px 9px;font:600 11.5px var(--mono);cursor:pointer}
+.call .h .i{color:var(--dim);width:16px}
+.call .h .fn{color:var(--accent2)}
+.call .h .ms{margin-left:auto;color:var(--muted);font-weight:500;font-size:10.5px}
+.call pre{margin:0;padding:7px 10px 9px 35px;border-top:1px solid var(--line);font:500 10.5px/1.5 var(--mono);color:var(--text2);white-space:pre-wrap;word-break:break-word;max-height:160px;overflow:auto}
+.call.closed pre{display:none}
+.rec{display:inline-flex;align-items:center;gap:6px;font:700 10px var(--mono);letter-spacing:.1em;color:var(--danger);border:1px solid var(--danger);padding:2px 7px}
+.rec i{width:6px;height:6px;border-radius:50%;background:var(--danger)}
+.explain{font-size:14px;line-height:1.6;color:var(--text);margin-top:10px}
+.explain b{font-family:var(--mono);color:var(--danger);font-weight:600}
+
+/* modal */
+.modal{position:fixed;inset:0;background:rgba(0,0,0,.65);z-index:80;display:flex;align-items:center;justify-content:center;padding:16px}
+.modal .card{background:var(--panel);border:1px solid var(--line3);max-width:620px;width:100%;max-height:86vh;overflow:auto;padding:18px 20px}
+.modal h3{margin:0 0 4px;font-size:18px}
+.modal ol{padding-left:18px;margin:10px 0}
+.modal li{margin:7px 0;color:var(--text2);line-height:1.5}
+.modal li b{color:var(--text)}
+
+/* ---------- responsive ---------- */
+@media (max-width:1280px){ .main{grid-template-columns:220px minmax(0,1fr) 290px} .top{grid-template-columns:200px minmax(0,1fr) auto} }
+@media (max-width:1099px){
+  .top{grid-template-columns:1fr;height:auto;padding:10px 16px;gap:8px}
+  .snap{white-space:normal;justify-self:start}
+  .main{grid-template-columns:1fr}
+  .center{order:-1}
+  .mapwrap{height:auto;aspect-ratio:1100/640;flex:none}
+  .left,.right{border:0;border-top:1px solid var(--line);overflow:visible}
+  .col{overflow:visible}
+  .scen,.trace{grid-template-columns:1fr}
+  .scen-l,.trace-l{border-right:0;border-bottom:1px solid var(--line)}
+  .pane{max-height:none;overflow:visible}
+  .drawer.closed .pane{display:none}
+}
+@media (max-width:700px){
+  .mapwrap{aspect-ratio:auto;height:auto}
+  #map{position:static;height:auto;aspect-ratio:1100/640}
+  .loopcap{position:static;width:auto;margin:8px 12px}
+  .hud .st{padding-left:0;border-left:0}
+  .hud .acts{margin-left:0}
+  .brand small{display:none}
+  .cmd kbd{display:none}
+  .ftools input{width:100%}
+}
+</style>
+</head>
+<body>
+<div class="app" id="app">
+  <header class="top">
+    <div class="brand" id="brand" title="Reset view" role="button" tabindex="0">
+      <svg width="22" height="22" viewBox="0 0 32 32" aria-hidden="true"><path d="M5 26 L16 6 L27 26" fill="none" stroke="#F7931E" stroke-width="3.5"/><path d="M11 26 L16 17 L21 26" fill="none" stroke="#E8445A" stroke-width="3"/></svg>
+      Upstream <small>AI circular economy</small>
+    </div>
+    <div class="cmd" id="cmdWrap">
+      <div class="box">
+        <svg width="14" height="14" viewBox="0 0 16 16" aria-hidden="true"><circle cx="7" cy="7" r="5" fill="none" stroke="#8B8993" stroke-width="1.5"/><path d="M11 11 L15 15" stroke="#8B8993" stroke-width="1.5"/></svg>
+        <input id="cmd" type="text" autocomplete="off" spellcheck="false" placeholder="Search companies, filings, deals... or type a scenario" aria-label="Search or type a scenario">
+        <kbd>/</kbd>
+      </div>
+      <div class="menu hide" id="cmdMenu" role="listbox"></div>
+    </div>
+    <div class="snap" title="All figures were checked by hand against the cited documents."><i></i>Snapshot: hand-verified from filings and press releases, Oct 2026</div>
+  </header>
+
+  <div class="ticker" id="ticker" aria-label="Companies"></div>
+
+  <main class="main">
+    <aside class="col left" id="left">
+      <div class="sec">
+        <div class="sec-h"><span class="lbl">Your portfolio</span><span class="lbl mono" id="pfCount"></span></div>
+        <div class="chips" id="chips"></div>
+      </div>
+      <div class="sec">
+        <div class="headline" id="headline"></div>
+        <div id="holdings"></div>
+        <div class="note" style="margin-top:8px">Bar = share of revenue that traces back to OpenAI's spending, through every supply link in the map.</div>
+        <div id="pfImpact"></div>
+      </div>
+    </aside>
+
+    <section class="center">
+      <div class="mapbar">
+        <h1>Who depends on whom</h1>
+        <span class="meta" id="mapMeta"></span>
+        <span class="sp"></span>
+        <span class="loopcount" id="loopCount"></span>
+        <button class="btn" id="loopBtn" aria-pressed="false">
+          <svg width="13" height="13" viewBox="0 0 16 16" aria-hidden="true"><path d="M3 8a5 5 0 0 1 9-3M13 8a5 5 0 0 1-9 3" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M12 1v4H8M4 15v-4h4" fill="none" stroke="currentColor" stroke-width="1.6"/></svg>
+          Show money loops</button>
+        <button class="btn ghost" id="howBtn">How it works</button>
+      </div>
+      <div class="hud" id="hud"></div>
+      <div class="mapwrap" id="mapwrap">
+        <svg id="map" viewBox="0 0 1100 640" preserveAspectRatio="xMidYMid meet" role="img" aria-label="Network map of AI company deals"></svg>
+        <div class="loopcap hide" id="loopCap"></div>
+      </div>
+      <div class="legend" id="legend">
+          <span><svg width="26" height="8"><path d="M1 4H25" stroke="#C9C4BC" stroke-width="2.5"/></svg>sells to</span>
+          <span><svg width="26" height="8"><path d="M1 4H25" stroke="#F7931E" stroke-width="1.6" stroke-dasharray="5 3"/></svg>invests in</span>
+          <span><svg width="26" height="8"><path d="M2 4H25" stroke="#C9C4BC" stroke-width="2" stroke-dasharray="0.1 4" stroke-linecap="round"/></svg>undisclosed / est.</span>
+          <span><svg width="44" height="8"><defs><linearGradient id="lg"><stop offset="0" stop-color="#4A4952"/><stop offset=".5" stop-color="#F7931E"/><stop offset="1" stop-color="#E8445A"/></linearGradient></defs><rect width="44" height="5" y="1.5" fill="url(#lg)"/></svg>ring = OpenAI exposure</span>
+          <span>size = revenue</span>
+          <span class="sp"></span><span>click any node or arrow for the source</span>
+      </div>
+    </section>
+
+    <aside class="col right" id="detail" aria-live="polite"></aside>
+  </main>
+
+  <section class="drawer" id="drawer">
+    <div class="tabs" role="tablist">
+      <button class="tab" role="tab" data-tab="filings" aria-selected="false">Filings <span class="c" id="fCount"></span></button>
+      <button class="tab" role="tab" data-tab="scenario" aria-selected="true">Scenario <span class="live hide" id="scenLive"></span></button>
+      <button class="tab" role="tab" data-tab="trace" aria-selected="false">Agent trace</button>
+      <span class="sp"></span>
+      <button class="tab" id="drawerToggle" aria-label="Collapse drawer" title="Collapse / expand">
+        <svg width="12" height="12" viewBox="0 0 12 12" aria-hidden="true"><path id="dtIcon" d="M2 4 L6 8 L10 4" fill="none" stroke="currentColor" stroke-width="1.6"/></svg>
+      </button>
+    </div>
+
+    <div class="pane hide" id="pane-filings">
+      <div class="ftools">
+        <input id="fq" type="search" placeholder="Filter documents..." aria-label="Filter filings">
+        <div class="seg" id="fType"></div>
+        <span class="sp"></span>
+        <span class="note mono" id="fInfo"></span>
+      </div>
+      <table class="grid" id="fTable"><thead><tr><th>Date</th><th>Type</th><th>Company</th><th>Document</th><th class="n">Links</th><th>Source</th></tr></thead><tbody></tbody></table>
+    </div>
+
+    <div class="pane" id="pane-scenario">
+      <div class="scen">
+        <div class="scen-l">
+          <div class="sec-h"><span class="lbl">What could go wrong?</span><button class="btn ghost" id="howBtn2" style="height:22px;padding:0 6px;font-size:10.5px">Assumptions</button></div>
+          <form class="sinput" id="sForm">
+            <input id="sText" type="text" autocomplete="off" aria-label="Scenario" value="OpenAI cuts compute spending 40%">
+            <button class="btn primary" type="submit"><svg width="10" height="10" viewBox="0 0 10 10" aria-hidden="true"><path d="M1 0 L9 5 L1 10Z" fill="currentColor"/></svg>Run</button>
+          </form>
+          <div class="presets" id="presets"></div>
+          <div class="interp">
+            <div class="sec-h" style="margin:0"><span class="lbl">AI interpretation</span><span class="lbl mono" style="color:var(--dim)">editable</span></div>
+            <div class="row"><label for="iOrigin">Company</label><select id="iOrigin"></select></div>
+            <div class="row"><label for="iTarget">Applies to</label><select id="iTarget"></select></div>
+            <div class="row"><label for="iKind">Type</label><select id="iKind"><option value="demand">Demand shock (buyer cuts spending)</option><option value="supply">Supply shock (seller can't deliver)</option></select></div>
+            <div class="row"><label for="iSev">Severity</label><div class="rng"><input type="range" id="iSev" min="0" max="100" step="5"><output id="oSev"></output></div></div>
+            <div class="row"><label for="iEq">Valuation x</label><div class="rng"><input type="range" id="iEq" min="0.5" max="3" step="0.1" value="1.5"><output id="oEq"></output></div></div>
+            <div class="row"><label for="iDamp">Hop damping</label><div class="rng"><input type="range" id="iDamp" min="0.2" max="1" step="0.05" value="0.6"><output id="oDamp"></output></div></div>
+            <div class="why" id="iWhy"></div>
+          </div>
+        </div>
+        <div class="scen-r">
+          <div class="sumbar" id="sumbar"></div>
+          <div class="tbl-wrap">
+            <table class="grid" id="rTable"><thead><tr><th>Company</th><th>Ticker</th><th>In portfolio</th><th class="n">Revenue at risk</th><th>% of revenue</th><th class="n">Equity hit</th><th>Path</th><th>Confidence</th></tr></thead><tbody></tbody></table>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="pane hide" id="pane-trace">
+      <div class="trace">
+        <div class="trace-l">
+          <div class="sec-h"><span class="rec"><i></i>RECORDED RUN</span><span class="note mono" id="trMeta"></span><button class="btn ghost" id="trReplay" style="height:24px">Replay trace</button></div>
+          <div id="calls"></div>
+        </div>
+        <div class="trace-r">
+          <span class="lbl">explain() output</span>
+          <div class="explain" id="explain"></div>
+          <p class="note" style="margin-top:14px">Recorded run: the tool calls the production agent makes. Returned values are computed live in this page from the snapshot data; the summary is a template filled with those numbers, not generated text.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+</div>
+
+<div class="modal hide" id="how" role="dialog" aria-modal="true" aria-labelledby="howT">
+  <div class="card">
+    <div class="sec-h"><h3 id="howT">How the shock math works</h3><button class="btn" id="howClose">Close</button></div>
+    <p class="note">Everything below runs in your browser on the data in this page. Only the extraction of deals from documents was done ahead of time.</p>
+    <ol>
+      <li><b>Hop 1, the shock.</b> A demand shock flows upstream, from buyer to seller. Seller's revenue lost = shock x annual value of what the buyer buys from it. Shown as % of the seller's revenue.</li>
+      <li><b>Next hops.</b> Each hit company cuts its own purchases in proportion to its % revenue hit, times a damping factor (default <span class="mono" id="hDamp">0.6</span> per hop, adjustable). Clouds cut GPU orders, chip makers cut TSMC and SK Hynix orders.</li>
+      <li><b>Loops.</b> The graph has cycles, so we iterate up to 4 hops and stop early when no company moves by more than 0.1% of revenue.</li>
+      <li><b>Equity hit</b> (separate from revenue). Investor's stake value x valuation drop. Drop = <span class="mono" id="hEq">1.5</span> x shock (for the company in trouble) or x its % revenue hit (for others), capped at 100%. ESTIMATED, adjustable.</li>
+      <li><b>Annual values.</b> Multi-year contracts are spread evenly over their term. Undisclosed amounts use a stated placeholder (dotted arrows). Each link says how it was estimated.</li>
+      <li><b>Leverage flag.</b> Oracle (free cash flow -$23.7B, $43B debt raised in FY26) and CoreWeave (debt-funded buildout) carry a "Leverage amplifies this" chip: the same revenue gap hurts more when it services debt.</li>
+      <li><b>Supply shock.</b> Flows downstream instead: buyers lose the share of their business that depends on the seller's deliveries, with the same damping.</li>
+    </ol>
+    <p class="note">Not investment advice. A first-order model to show where exposure sits, not a price forecast.</p>
+  </div>
+</div>
+<div class="tip hide" id="tip"></div>
+
+<script>
+/*DATA:BEGIN*/
+const DATA = {"companies":[{"id":"openai","name":"OpenAI","ticker":"PRIVATE","type":"ai_lab","listed":false,"revenue_usd_b":22.8,"fiscal_year":"Q1 2026 annualised","revenue_confidence":"ESTIMATED","revenue_source":"Motley Fool, Jun 2026: Q1 2026 revenue $5.7B (x4 = $22.8B, our annualisation)","revenue_source_id":"fool-openai","sells":"ChatGPT subscriptions, API access","facts":["Q1 2026 revenue $5.7B","2025 net loss $38.5B","Biggest single buyer of AI compute in this map"],"leverage_flag":null},{"id":"msft","name":"Microsoft","ticker":"MSFT","type":"cloud","listed":true,"revenue_usd_b":331.8,"fiscal_year":"FY2026 (to Jun 2026)","revenue_confidence":"DISCLOSED","revenue_source":"Microsoft FY26 Q4 earnings release, Jul 29 2026","revenue_source_id":"msft-fy26q4","sells":"Azure cloud compute, software","facts":["Azure passed $100B annual revenue","Owns ~27% of OpenAI","CoreWeave's largest customer"],"leverage_flag":null},{"id":"nvda","name":"Nvidia","ticker":"NVDA","type":"chips","listed":true,"revenue_usd_b":215.9,"fiscal_year":"FY2026 (to Jan 2026)","revenue_confidence":"DISCLOSED","revenue_source":"Nvidia FY2026 10-K (nvda-20260125)","revenue_source_id":"nvda-10k","sells":"GPUs (GB200, HBM-based accelerators), networking","facts":["One direct customer = 22% of revenue, another = 14%","10-K: an AI research company bought meaningful volume via Nvidia's cloud customers","Invested $30B in OpenAI, owns ~13% of CoreWeave"],"leverage_flag":null},{"id":"orcl","name":"Oracle","ticker":"ORCL","type":"cloud","listed":true,"revenue_usd_b":67.4,"fiscal_year":"FY2026 (to May 2026)","revenue_confidence":"DISCLOSED","revenue_source":"Oracle Q4 FY26 earnings release, Jun 10 2026","revenue_source_id":"orcl-q4fy26","sells":"Oracle Cloud Infrastructure (OCI), databases","facts":["Remaining performance obligations $638B, >$300B from OpenAI","Raised $43B of debt in FY26","Free cash flow -$23.7B"],"leverage_flag":"FCF -$23.7B and $43B new debt in FY26"},{"id":"crwv","name":"CoreWeave","ticker":"CRWV","type":"cloud","listed":true,"revenue_usd_b":5.13,"fiscal_year":"FY2025","revenue_confidence":"DISCLOSED","revenue_source":"CoreWeave FY2025 10-K","revenue_source_id":"crwv-10k","sells":"GPU cloud capacity","facts":["Microsoft ~67% of FY2025 revenue","Backlog $99.4B at Mar 31 2026","Largest customer 45% of Q1 2026 revenue"],"leverage_flag":"GPU buildout funded largely with debt"},{"id":"amzn","name":"Amazon (AWS)","ticker":"AMZN","type":"cloud","listed":true,"revenue_usd_b":128.7,"fiscal_year":"2025 (AWS segment)","revenue_confidence":"DISCLOSED","revenue_source":"Amazon Q4 2025 results: AWS quarters summed, Q4 $35.6B","revenue_source_id":"amzn-q425","sells":"AWS cloud compute","facts":["AWS backlog $244B","Invested $50B in OpenAI (~5%)","Revenue here = AWS segment only"],"leverage_flag":null},{"id":"googl","name":"Alphabet","ticker":"GOOGL","type":"cloud","listed":true,"revenue_usd_b":402.8,"fiscal_year":"2025","revenue_confidence":"DISCLOSED","revenue_source":"Alphabet Q4 2025 earnings release, Feb 4 2026","revenue_source_id":"googl-q425","sells":"Google Cloud, search ads, TPUs","facts":["Google Cloud revenue $58.7B","Resells CoreWeave capacity to OpenAI (reported)"],"leverage_flag":null},{"id":"amd","name":"AMD","ticker":"AMD","type":"chips","listed":true,"revenue_usd_b":34.6,"fiscal_year":"2025","revenue_confidence":"DISCLOSED","revenue_source":"AMD Q4 2025 earnings release, Feb 3 2026","revenue_source_id":"amd-q425","sells":"GPUs (Instinct MI series), CPUs","facts":["6 GW GPU deal with OpenAI, first 1 GW in 2H 2026","Gave OpenAI a warrant for up to 160M AMD shares"],"leverage_flag":null},{"id":"avgo","name":"Broadcom","ticker":"AVGO","type":"chips","listed":true,"revenue_usd_b":64,"fiscal_year":"FY2025","revenue_confidence":"DISCLOSED","revenue_source":"Broadcom Q4 FY25 earnings release, Dec 11 2025","revenue_source_id":"avgo-q4fy25","sells":"Custom AI accelerators, networking chips","facts":["AI revenue $20B in FY2025","10 GW custom accelerator deal with OpenAI to end-2029"],"leverage_flag":null},{"id":"tsm","name":"TSMC","ticker":"TSM","type":"supplier","listed":true,"revenue_usd_b":122,"fiscal_year":"2025","revenue_confidence":"DISCLOSED","revenue_source":"TSMC 2025 annual report via Taiwan News, Mar 2026 (USD derived: Nvidia NT$726.9B = 19%)","revenue_source_id":"tsm-ar","sells":"Chip manufacturing (foundry)","facts":["Nvidia = 19% of 2025 revenue (NT$726.9B)","Makes chips for Nvidia, AMD and Broadcom"],"leverage_flag":null},{"id":"skh","name":"SK Hynix","ticker":"000660.KS","type":"supplier","listed":true,"revenue_usd_b":67.9,"fiscal_year":"2025","revenue_confidence":"DISCLOSED","revenue_source":"SK Hynix FY25 results, Jan 2026 (KRW 97.15T)","revenue_source_id":"skh-fy25","sells":"HBM memory, DRAM, NAND","facts":["Revenue KRW 97.15T","~70% of Nvidia's 2026 HBM4 demand (reported)"],"leverage_flag":null},{"id":"sb","name":"SoftBank","ticker":"9984.T","type":"investor","listed":true,"revenue_usd_b":null,"fiscal_year":null,"revenue_confidence":null,"revenue_source":"Investor node: revenue not modelled","revenue_source_id":null,"sells":"Investment holding company","facts":["Put $30B into OpenAI's Feb 2026 round","Round: $110B at $730B pre-money, later $122B"],"leverage_flag":null}],"links":[{"id":"S01","from":"msft","to":"openai","type":"supply","label":"Azure compute","amount_usd_b":250,"annual_usd_b":36,"amount_confidence":"ESTIMATED","period":"Oct 2025 - 2032","date":"2025-10-28","confidence":"DISCLOSED","source_id":"msft-10q","source_title":"Microsoft 10-Q, quarter to Sep 30 2025, Note 17","source_url":"https://www.sec.gov/Archives/edgar/data/789019/000119312525256321/msft-20250930.htm","quote":"OpenAI contracted an incremental $250B of Azure services.","quote_kind":"paraphrase","estimate_note":"Annual value is our estimate: $250B spread over ~7 years to 2032 = ~$36B/yr."},{"id":"S02","from":"orcl","to":"openai","type":"supply","label":"OCI compute (Stargate)","amount_usd_b":300,"annual_usd_b":60,"amount_confidence":"REPORTED","period":"5 years from 2027","date":"2025-09-10","confidence":"REPORTED","source_id":"wsj-orcl","source_title":"WSJ: OpenAI signs ~$300B Oracle compute deal (Sep 2025)","source_url":"https://www.datacenterdynamics.com/en/news/oracle-may-need-to-borrow-100bn-for-openai-efforts-says-keybanc-capital-markets/","quote":"About $300B of compute over roughly five years, starting 2027.","quote_kind":"paraphrase","estimate_note":"$300B / 5 years = ~$60B/yr. Oracle RPO is $638B, of which >$300B is OpenAI."},{"id":"S03","from":"amzn","to":"openai","type":"supply","label":"AWS compute","amount_usd_b":138,"annual_usd_b":17,"amount_confidence":"ESTIMATED","period":"Nov 2025 - ~2034","date":"2026-02-27","confidence":"DISCLOSED","source_id":"geekwire-amzn","source_title":"GeekWire: Amazon invests $50B in OpenAI, expands AWS deal by $100B","source_url":"https://www.geekwire.com/2026/amazon-invests-50b-in-openai-deepens-aws-partnership-with-expanded-100b-cloud-deal/","quote":"$38B deal (Nov 2025) plus $100B over eight years.","quote_kind":"paraphrase","estimate_note":"~$17B/yr is William Blair's estimate, used as-is."},{"id":"S04","from":"crwv","to":"openai","type":"supply","label":"GPU cloud capacity","amount_usd_b":22.4,"annual_usd_b":4.5,"amount_confidence":"ESTIMATED","period":"2025 - ~2030","date":"2025-09-25","confidence":"DISCLOSED","source_id":"dcd-keybanc","source_title":"DCD: contract values for OpenAI compute (CoreWeave $11.9B + $4B + $6.5B)","source_url":"https://www.datacenterdynamics.com/en/news/oracle-may-need-to-borrow-100bn-for-openai-efforts-says-keybanc-capital-markets/","quote":"Three contracts: $11.9B, $4B and $6.5B, up to $22.4B total.","quote_kind":"paraphrase","estimate_note":"~$4.5B/yr is our estimate: $22.4B over ~5 years."},{"id":"S05","from":"googl","to":"openai","type":"supply","label":"Google Cloud capacity","amount_usd_b":null,"annual_usd_b":2,"amount_confidence":"ESTIMATED","period":"from mid-2025","date":"2025-06-10","confidence":"REPORTED","source_id":"reuters-googl","source_title":"Reuters: OpenAI taps Google Cloud for extra capacity (Jun 2025)","source_url":"https://www.reuters.com/site-search/?query=OpenAI+Google+cloud+deal","quote":"OpenAI added Google Cloud to meet its compute needs.","quote_kind":"paraphrase","estimate_note":"Amount undisclosed. $2B/yr is our placeholder so the link counts in the math; small vs Azure/AWS deals."},{"id":"S06","from":"crwv","to":"googl","type":"supply","label":"Capacity resold to OpenAI","amount_usd_b":null,"annual_usd_b":1,"amount_confidence":"ESTIMATED","period":"from 2025","date":"2025-07-15","confidence":"REPORTED","source_id":"dcd-crwv-googl","source_title":"DCD (citing Reuters): CoreWeave to provide compute for Google's OpenAI deal","source_url":"https://www.datacenterdynamics.com/en/news/coreweave-to-provide-compute-capacity-for-googles-openai-deal-report/","quote":"Google resells CoreWeave capacity to OpenAI.","quote_kind":"paraphrase","estimate_note":"Amount undisclosed. $1B/yr is our placeholder."},{"id":"S07","from":"crwv","to":"msft","type":"supply","label":"GPU cloud capacity","amount_usd_b":3.44,"annual_usd_b":3.44,"amount_confidence":"DISCLOSED","period":"FY2025","date":"2026-03-02","confidence":"DISCLOSED","source_id":"crwv-10k","source_title":"CoreWeave FY2025 10-K, risk factors","source_url":"https://www.sec.gov/cgi-bin/browse-edgar?action=getcompany&CIK=0001769628&type=10-K","quote":"Microsoft accounted for about 67% of FY2025 revenue.","quote_kind":"paraphrase","estimate_note":"67% x $5.13B = $3.44B."},{"id":"S08","from":"amd","to":"openai","type":"supply","label":"6 GW of Instinct GPUs","amount_usd_b":null,"annual_usd_b":10,"amount_confidence":"ESTIMATED","period":"first 1 GW in 2H 2026","date":"2025-10-06","confidence":"DISCLOSED","source_id":"amd-openai","source_title":"AMD and OpenAI announce strategic partnership (6 GW)","source_url":"https://newsroom.amd.com/news/amd-and-openai-announce-strategic-partnership-to-d/","quote":"tens of billions of dollars in revenue","quote_kind":"verbatim","estimate_note":"Deal is disclosed; dollar value is not. ~$10B/yr is our estimate from the CFO's 'tens of billions'."},{"id":"S09","from":"avgo","to":"openai","type":"supply","label":"10 GW custom accelerators","amount_usd_b":null,"annual_usd_b":5,"amount_confidence":"ESTIMATED","period":"deploy to end-2029","date":"2025-10-13","confidence":"DISCLOSED","source_id":"openai-avgo","source_title":"OpenAI and Broadcom announce strategic collaboration (10 GW)","source_url":"https://openai.com/index/openai-and-broadcom-announce-strategic-collaboration/","quote":"10 GW of OpenAI-designed accelerators, deployed through end of 2029.","quote_kind":"paraphrase","estimate_note":"Amount undisclosed. ~$5B/yr early run-rate is our assumption."},{"id":"S10","from":"nvda","to":"orcl","type":"supply","label":"GB200 chips for Stargate Abilene","amount_usd_b":40,"annual_usd_b":20,"amount_confidence":"ESTIMATED","period":"2025 - 2026","date":"2025-05-23","confidence":"REPORTED","source_id":"dcd-orcl-nvda","source_title":"DCD (citing FT): Oracle to spend $40B on Nvidia chips for OpenAI Texas site","source_url":"https://www.datacenterdynamics.com/en/news/oracle-to-spend-40bn-on-nvidia-chips-for-openai-texas-data-center/","quote":"About $40B of GB200 chips for the Abilene data center.","quote_kind":"paraphrase","estimate_note":"$40B over ~2 years = ~$20B/yr, our estimate."},{"id":"S11","from":"nvda","to":"msft","type":"supply","label":"GPU sales","amount_usd_b":null,"annual_usd_b":30,"amount_confidence":"ESTIMATED","period":"FY2026","date":"2026-02-25","confidence":"ESTIMATED","source_id":"nvda-10k","source_title":"Nvidia FY2026 10-K, concentration of revenue","source_url":"https://www.sec.gov/cgi-bin/browse-edgar?action=getcompany&CIK=0001045810&type=10-K","quote":"Two direct customers made up 22% and 14% of revenue.","quote_kind":"paraphrase","estimate_note":"Nvidia names no customers. Split of the 22% + 14% across clouds is our assumption."},{"id":"S12","from":"nvda","to":"amzn","type":"supply","label":"GPU sales","amount_usd_b":null,"annual_usd_b":20,"amount_confidence":"ESTIMATED","period":"FY2026","date":"2026-02-25","confidence":"ESTIMATED","source_id":"nvda-10k","source_title":"Nvidia FY2026 10-K, concentration of revenue","source_url":"https://www.sec.gov/cgi-bin/browse-edgar?action=getcompany&CIK=0001045810&type=10-K","quote":"Two direct customers made up 22% and 14% of revenue.","quote_kind":"paraphrase","estimate_note":"Nvidia names no customers. $20B/yr is our assumption."},{"id":"S13","from":"nvda","to":"googl","type":"supply","label":"GPU sales","amount_usd_b":null,"annual_usd_b":20,"amount_confidence":"ESTIMATED","period":"FY2026","date":"2026-02-25","confidence":"ESTIMATED","source_id":"nvda-10k","source_title":"Nvidia FY2026 10-K, concentration of revenue","source_url":"https://www.sec.gov/cgi-bin/browse-edgar?action=getcompany&CIK=0001045810&type=10-K","quote":"Two direct customers made up 22% and 14% of revenue.","quote_kind":"paraphrase","estimate_note":"Nvidia names no customers. $20B/yr is our assumption."},{"id":"S14","from":"nvda","to":"crwv","type":"supply","label":"GPU sales","amount_usd_b":null,"annual_usd_b":10,"amount_confidence":"ESTIMATED","period":"FY2026","date":"2026-02-25","confidence":"ESTIMATED","source_id":"nvda-10k","source_title":"Nvidia FY2026 10-K, concentration of revenue","source_url":"https://www.sec.gov/cgi-bin/browse-edgar?action=getcompany&CIK=0001045810&type=10-K","quote":"Two direct customers made up 22% and 14% of revenue.","quote_kind":"paraphrase","estimate_note":"Nvidia names no customers. $10B/yr is our assumption, sized to CoreWeave's debt-funded GPU buildout."},{"id":"S15","from":"crwv","to":"nvda","type":"supply","label":"Unsold capacity, bought back","amount_usd_b":6.3,"annual_usd_b":1.05,"amount_confidence":"ESTIMATED","period":"through Apr 2032","date":"2025-09-15","confidence":"DISCLOSED","source_id":"dcd-nvda-crwv","source_title":"DCD: Nvidia invests another $2B in CoreWeave","source_url":"https://www.datacenterdynamics.com/en/news/nvidia-invests-another-2bn-in-coreweave/","quote":"Nvidia agreed to buy $6.3B of CoreWeave's unsold capacity.","quote_kind":"paraphrase","estimate_note":"$6.3B over ~6 years = ~$1.05B/yr, our estimate."},{"id":"S16","from":"tsm","to":"nvda","type":"supply","label":"Chip manufacturing","amount_usd_b":23.2,"annual_usd_b":23.2,"amount_confidence":"DISCLOSED","period":"2025","date":"2026-03-10","confidence":"DISCLOSED","source_id":"tsm-ar","source_title":"Taiwan News: TSMC 2025 annual report, client A = 19% of revenue","source_url":"https://www.taiwannews.com.tw/news/6310676","quote":"Client A was 19% of revenue, NT$726.9B.","quote_kind":"paraphrase","estimate_note":"Client A is unnamed; Jensen Huang confirmed Nvidia is TSMC's top customer. NT$726.9B = ~US$23.2B."},{"id":"S17","from":"tsm","to":"amd","type":"supply","label":"Chip manufacturing","amount_usd_b":null,"annual_usd_b":7,"amount_confidence":"ESTIMATED","period":"2025","date":"2026-03-10","confidence":"ESTIMATED","source_id":"tsm-ar","source_title":"TSMC 2025 annual report (customer amounts not named)","source_url":"https://www.taiwannews.com.tw/news/6310676","quote":"TSMC manufactures AMD's leading-edge GPUs and CPUs.","quote_kind":"paraphrase","estimate_note":"Amount undisclosed. $7B/yr is our assumption (~20% of AMD revenue)."},{"id":"S18","from":"tsm","to":"avgo","type":"supply","label":"Chip manufacturing","amount_usd_b":null,"annual_usd_b":8,"amount_confidence":"ESTIMATED","period":"2025","date":"2026-03-10","confidence":"ESTIMATED","source_id":"tsm-ar","source_title":"TSMC 2025 annual report (customer amounts not named)","source_url":"https://www.taiwannews.com.tw/news/6310676","quote":"TSMC manufactures Broadcom's custom accelerators.","quote_kind":"paraphrase","estimate_note":"Amount undisclosed. $8B/yr is our assumption."},{"id":"S19","from":"skh","to":"nvda","type":"supply","label":"HBM4 memory","amount_usd_b":null,"annual_usd_b":18,"amount_confidence":"ESTIMATED","period":"2026","date":"2026-01-20","confidence":"REPORTED","source_id":"yonhap-hbm","source_title":"Yonhap: SK Hynix to supply ~70% of Nvidia's 2026 HBM4","source_url":"https://en.yna.co.kr/search/index?query=SK%20hynix%20HBM4%20Nvidia","quote":"SK Hynix to supply about 70% of Nvidia's 2026 HBM4 needs.","quote_kind":"paraphrase","estimate_note":"Dollar amount undisclosed. $18B/yr is our assumption (~27% of SK Hynix revenue)."},{"id":"E01","from":"msft","to":"openai","type":"equity","label":"~27% stake","amount_usd_b":135,"stake_value_usd_b":135,"annual_usd_b":null,"amount_confidence":"DISCLOSED","period":"since 2019","date":"2025-10-28","confidence":"DISCLOSED","source_id":"msft-10q","source_title":"Microsoft 10-Q, quarter to Sep 30 2025, Note 17","source_url":"https://www.sec.gov/Archives/edgar/data/789019/000119312525256321/msft-20250930.htm","quote":"~27% stake valued ~$135B after the Oct 2025 recapitalisation.","quote_kind":"paraphrase","estimate_note":"Microsoft has put $13B of funding in total.","consideration":"cash"},{"id":"E02","from":"amzn","to":"openai","type":"equity","label":"$50B, ~5% stake","amount_usd_b":50,"stake_value_usd_b":50,"annual_usd_b":null,"amount_confidence":"DISCLOSED","period":"completed Feb 2026","date":"2026-02-27","confidence":"DISCLOSED","source_id":"geekwire-amzn","source_title":"GeekWire: Amazon invests $50B in OpenAI, expands AWS deal by $100B","source_url":"https://www.geekwire.com/2026/amazon-invests-50b-in-openai-deepens-aws-partnership-with-expanded-100b-cloud-deal/","quote":"Amazon completed a $50B investment for about 5% of OpenAI.","quote_kind":"paraphrase","estimate_note":null,"consideration":"cash"},{"id":"E03","from":"nvda","to":"openai","type":"equity","label":"$30B equity","amount_usd_b":30,"stake_value_usd_b":30,"annual_usd_b":null,"amount_confidence":"REPORTED","period":"Feb 2026 round","date":"2026-02-20","confidence":"REPORTED","source_id":"dcd-nvda-openai","source_title":"DCD (citing FT, CNBC): Nvidia plans $30B investment in OpenAI round","source_url":"https://www.datacenterdynamics.com/en/news/nvidia-plans-30bn-investment-in-upcoming-openai-funding-round/","quote":"$30B equity, replacing the Sep 2025 'up to $100B' letter of intent.","quote_kind":"paraphrase","estimate_note":null,"consideration":"cash"},{"id":"E04","from":"sb","to":"openai","type":"equity","label":"$30B equity","amount_usd_b":30,"stake_value_usd_b":30,"annual_usd_b":null,"amount_confidence":"REPORTED","period":"Feb 2026 round","date":"2026-02-20","confidence":"REPORTED","source_id":"sb-openai","source_title":"Reports: SoftBank puts $30B into OpenAI's $110B round","source_url":"https://www.reuters.com/site-search/?query=SoftBank+OpenAI+30+billion","quote":"$110B round at $730B pre-money, later raised to $122B.","quote_kind":"paraphrase","estimate_note":null,"consideration":"cash"},{"id":"E05","from":"nvda","to":"crwv","type":"equity","label":"~13% stake","amount_usd_b":2,"stake_value_usd_b":5.7,"annual_usd_b":null,"amount_confidence":"ESTIMATED","period":"extra $2B Jan 2026","date":"2026-01-26","confidence":"DISCLOSED","source_id":"dcd-nvda-crwv","source_title":"DCD: Nvidia invests another $2B in CoreWeave","source_url":"https://www.datacenterdynamics.com/en/news/nvidia-invests-another-2bn-in-coreweave/","quote":"Another $2B at $87.20 per share, taking the stake to ~13%.","quote_kind":"paraphrase","estimate_note":"Stake value ~$5.7B is our estimate: 13% x ~$44B market cap.","consideration":"cash"},{"id":"E06","from":"openai","to":"crwv","type":"equity","label":"$350M stake","amount_usd_b":0.35,"stake_value_usd_b":0.35,"annual_usd_b":null,"amount_confidence":"REPORTED","period":"Mar 2025","date":"2025-03-10","confidence":"REPORTED","source_id":"reuters-crwv","source_title":"Reuters: OpenAI takes $350M CoreWeave stake with $11.9B deal","source_url":"https://www.reuters.com/site-search/?query=OpenAI+CoreWeave+350+million+stake","quote":"CoreWeave issued $350M of stock to OpenAI alongside the contract.","quote_kind":"paraphrase","estimate_note":"Stock issued as part of the compute deal, so value flows CoreWeave to OpenAI.","consideration":"issued_in_deal"},{"id":"E07","from":"openai","to":"amd","type":"equity","label":"Warrant, up to ~10% of AMD","amount_usd_b":null,"stake_value_usd_b":null,"annual_usd_b":null,"amount_confidence":"DISCLOSED","period":"vests with GW milestones","date":"2025-10-06","confidence":"DISCLOSED","source_id":"amd-openai","source_title":"AMD and OpenAI announce strategic partnership (6 GW)","source_url":"https://newsroom.amd.com/news/amd-and-openai-announce-strategic-partnership-to-d/","quote":"Warrant for up to 160M AMD shares at $0.01, vesting by milestones.","quote_kind":"paraphrase","estimate_note":"AMD issues the shares, so value flows AMD to OpenAI. Dollar value depends on AMD's share price; not modelled.","consideration":"issued_in_deal"}],"sources":[{"id":"msft-10q","title":"Microsoft Form 10-Q, quarter ended Sep 30 2025 (Note 17: OpenAI)","company":"msft","date":"2025-10-29","type":"10-Q","url":"https://www.sec.gov/Archives/edgar/data/789019/000119312525256321/msft-20250930.htm","used_for":"$250B incremental Azure commitment from OpenAI; ~27% stake valued ~$135B; $13B total funding."},{"id":"msft-fy26q4","title":"Microsoft FY26 Q4 earnings release","company":"msft","date":"2026-07-29","type":"press release","url":"https://www.microsoft.com/en-us/investor","used_for":"FY2026 revenue $331.8B; Azure passed $100B."},{"id":"nvda-10k","title":"Nvidia Form 10-K, fiscal year ended Jan 25 2026 (nvda-20260125)","company":"nvda","date":"2026-02-25","type":"10-K","url":"https://www.sec.gov/cgi-bin/browse-edgar?action=getcompany&CIK=0001045810&type=10-K","used_for":"FY2026 revenue $215.9B; direct customers at 22% and 14%; AI research company buying via cloud customers."},{"id":"orcl-q4fy26","title":"Oracle Q4 FY26 earnings release","company":"orcl","date":"2026-06-10","type":"press release","url":"https://investor.oracle.com/","used_for":"FY2026 revenue $67.4B; RPO $638B; $43B debt raised; FCF -$23.7B."},{"id":"wsj-orcl","title":"WSJ: OpenAI signs ~$300B, five-year Oracle compute deal","company":"orcl","date":"2025-09-10","type":"news","url":"https://www.wsj.com/search?query=Oracle%20OpenAI%20300%20billion","used_for":"~$300B over 5 years from 2027 (REPORTED)."},{"id":"dcd-keybanc","title":"DCD: Oracle may need to borrow $100B for OpenAI efforts, says KeyBanc","company":"orcl","date":"2025-09-25","type":"news","url":"https://www.datacenterdynamics.com/en/news/oracle-may-need-to-borrow-100bn-for-openai-efforts-says-keybanc-capital-markets/","used_for":"OpenAI compute contract values incl. CoreWeave $11.9B + $4B + $6.5B; Oracle funding pressure."},{"id":"crwv-10k","title":"CoreWeave Form 10-K, fiscal year 2025","company":"crwv","date":"2026-03-02","type":"10-K","url":"https://www.sec.gov/cgi-bin/browse-edgar?action=getcompany&CIK=0001769628&type=10-K","used_for":"FY2025 revenue $5.13B; Microsoft ~67% of revenue; debt-funded buildout."},{"id":"crwv-10q","title":"CoreWeave Form 10-Q, quarter ended Mar 31 2026","company":"crwv","date":"2026-05-12","type":"10-Q","url":"https://www.sec.gov/cgi-bin/browse-edgar?action=getcompany&CIK=0001769628&type=10-Q","used_for":"Backlog $99.4B; largest customer 45% of Q1 2026 revenue."},{"id":"amzn-q425","title":"Amazon Q4 2025 financial results","company":"amzn","date":"2026-02-05","type":"press release","url":"https://ir.aboutamazon.com/","used_for":"AWS revenue 2025 ~$128.7B (Q4 $35.6B); AWS backlog $244B."},{"id":"geekwire-amzn","title":"GeekWire: Amazon invests $50B in OpenAI, expands AWS deal by $100B","company":"amzn","date":"2026-02-27","type":"news","url":"https://www.geekwire.com/2026/amazon-invests-50b-in-openai-deepens-aws-partnership-with-expanded-100b-cloud-deal/","used_for":"$50B equity (~5%); $38B + $100B AWS commitments; ~$17B/yr (William Blair)."},{"id":"googl-q425","title":"Alphabet Q4 2025 earnings release","company":"googl","date":"2026-02-04","type":"press release","url":"https://abc.xyz/investor/","used_for":"2025 revenue $402.8B; Google Cloud $58.7B."},{"id":"reuters-googl","title":"Reuters: OpenAI taps Google Cloud for more computing capacity","company":"googl","date":"2025-06-10","type":"news","url":"https://www.reuters.com/site-search/?query=OpenAI+Google+cloud+deal","used_for":"Google sells cloud capacity to OpenAI; amount undisclosed."},{"id":"dcd-crwv-googl","title":"DCD: CoreWeave to provide compute capacity for Google's OpenAI deal","company":"crwv","date":"2025-07-15","type":"news","url":"https://www.datacenterdynamics.com/en/news/coreweave-to-provide-compute-capacity-for-googles-openai-deal-report/","used_for":"CoreWeave capacity resold by Google to OpenAI (REPORTED)."},{"id":"amd-q425","title":"AMD Q4 2025 financial results","company":"amd","date":"2026-02-03","type":"press release","url":"https://ir.amd.com/","used_for":"2025 revenue $34.6B."},{"id":"amd-openai","title":"AMD and OpenAI announce strategic partnership to deploy 6 GW of AMD GPUs","company":"amd","date":"2025-10-06","type":"press release","url":"https://newsroom.amd.com/news/amd-and-openai-announce-strategic-partnership-to-d/","used_for":"6 GW deal, first 1 GW 2H 2026; warrant up to 160M shares; CFO 'tens of billions'."},{"id":"avgo-q4fy25","title":"Broadcom Q4 FY25 financial results","company":"avgo","date":"2025-12-11","type":"press release","url":"https://investors.broadcom.com/","used_for":"FY2025 revenue ~$64B; AI revenue $20B."},{"id":"openai-avgo","title":"OpenAI and Broadcom announce strategic collaboration (10 GW)","company":"avgo","date":"2025-10-13","type":"press release","url":"https://openai.com/index/openai-and-broadcom-announce-strategic-collaboration/","used_for":"10 GW custom accelerators to end-2029; amount undisclosed."},{"id":"dcd-orcl-nvda","title":"DCD: Oracle to spend $40B on Nvidia chips for OpenAI Texas data center","company":"nvda","date":"2025-05-23","type":"news","url":"https://www.datacenterdynamics.com/en/news/oracle-to-spend-40bn-on-nvidia-chips-for-openai-texas-data-center/","used_for":"~$40B of GB200 chips for Stargate Abilene (REPORTED, FT)."},{"id":"dcd-nvda-crwv","title":"DCD: Nvidia invests another $2B in CoreWeave","company":"crwv","date":"2026-01-26","type":"news","url":"https://www.datacenterdynamics.com/en/news/nvidia-invests-another-2bn-in-coreweave/","used_for":"$2B at $87.20/share; ~13% stake; $6.3B capacity backstop through Apr 2032."},{"id":"dcd-nvda-openai","title":"DCD: Nvidia plans $30B investment in upcoming OpenAI funding round","company":"nvda","date":"2026-02-20","type":"news","url":"https://www.datacenterdynamics.com/en/news/nvidia-plans-30bn-investment-in-upcoming-openai-funding-round/","used_for":"$30B equity replacing the 'up to $100B' LOI (REPORTED, FT/CNBC)."},{"id":"tsm-ar","title":"Taiwan News: TSMC 2025 annual report, client A = 19% of revenue","company":"tsm","date":"2026-03-10","type":"news","url":"https://www.taiwannews.com.tw/news/6310676","used_for":"Nvidia NT$726.9B = 19% of revenue; TSMC revenue ~US$122B derived."},{"id":"skh-fy25","title":"SK Hynix FY2025 earnings results","company":"skh","date":"2026-01-22","type":"press release","url":"https://www.skhynix.com/ir/","used_for":"2025 revenue KRW 97.15T (~$67.9B)."},{"id":"yonhap-hbm","title":"Yonhap: SK Hynix to supply ~70% of Nvidia's 2026 HBM4","company":"skh","date":"2026-01-20","type":"news","url":"https://en.yna.co.kr/search/index?query=SK%20hynix%20HBM4%20Nvidia","used_for":"~70% share of Nvidia HBM4 demand (REPORTED)."},{"id":"reuters-crwv","title":"Reuters: OpenAI signs $11.9B CoreWeave deal, takes $350M stake","company":"crwv","date":"2025-03-10","type":"news","url":"https://www.reuters.com/site-search/?query=OpenAI+CoreWeave+350+million+stake","used_for":"$350M of CoreWeave stock to OpenAI (REPORTED)."},{"id":"sb-openai","title":"Reports: SoftBank commits $30B to OpenAI's $110B round","company":"sb","date":"2026-02-20","type":"news","url":"https://www.reuters.com/site-search/?query=SoftBank+OpenAI+30+billion","used_for":"$30B; round $110B at $730B pre-money, later $122B (REPORTED)."},{"id":"fool-openai","title":"Motley Fool: OpenAI revenue and losses","company":"openai","date":"2026-06-15","type":"news","url":"https://www.fool.com/search/?q=OpenAI%20revenue","used_for":"Q1 2026 revenue $5.7B; 2025 net loss $38.5B."}]};
+/*DATA:END*/
+</script>
+<script>
+'use strict';
+// ============================================================
+//  Lookups
+// ============================================================
+const C = Object.fromEntries(DATA.companies.map(c => [c.id, c]));
+const L = Object.fromEntries(DATA.links.map(l => [l.id, l]));
+const SRC = Object.fromEntries(DATA.sources.map(s => [s.id, s]));
+const SUP = DATA.links.filter(l => l.type === 'supply');
+const EQ = DATA.links.filter(l => l.type === 'equity');
+const IDS = DATA.companies.map(c => c.id);
+const CONF_RANK = { ESTIMATED: 0, REPORTED: 1, DISCLOSED: 2 };
+const CONF_TXT = {
+  DISCLOSED: 'Company filing or company press release with an amount.',
+  REPORTED: 'Credible media (WSJ, FT, Reuters, CNBC, Yonhap).',
+  ESTIMATED: 'Our assumption. See how it was estimated below.'
+};
+const $ = s => document.querySelector(s);
+const $$ = s => Array.from(document.querySelectorAll(s));
+const esc = s => String(s ?? '').replace(/[&<>"']/g, ch => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[ch]));
+const fB = v => v == null ? 'undisclosed' : '$' + (Math.abs(v) >= 100 ? v.toFixed(0) : Math.abs(v) >= 10 ? v.toFixed(1) : v.toFixed(2)) + 'B';
+const fP = (p, d = 1) => (p * 100).toFixed(d) + '%';
+const tick = id => C[id].listed ? C[id].ticker : C[id].name;
+const short = id => ({ openai: 'OpenAI', msft: 'Microsoft', nvda: 'Nvidia', orcl: 'Oracle', crwv: 'CoreWeave', amzn: 'Amazon', googl: 'Google', amd: 'AMD', avgo: 'Broadcom', tsm: 'TSMC', skh: 'SK Hynix', sb: 'SoftBank' }[id] || C[id].name);
+const sleep = ms => new Promise(r => setTimeout(r, ms));
+const isDotted = l => l.confidence === 'ESTIMATED' || l.amount_usd_b == null;
+const tagHTML = c => c ? `<span class="tag ${c}">${c}</span>` : '';
+
+// ============================================================
+//  Exposure: share of each company's revenue that traces back to OpenAI
+//  tied(seller) = sum(annual(seller->buyer) * tied(buyer)) / revenue(seller); tied(OpenAI)=1
+// ============================================================
+function computeTied() {
+  const t = Object.fromEntries(IDS.map(id => [id, 0])); t.openai = 1;
+  for (let it = 0; it < 30; it++) {
+    for (const id of IDS) {
+      if (id === 'openai' || !C[id].revenue_usd_b) continue;
+      let s = 0;
+      for (const l of SUP) if (l.from === id) s += l.annual_usd_b * t[l.to];
+      t[id] = Math.min(1, s / C[id].revenue_usd_b);
+    }
+  }
+  return t;
+}
+const TIED = computeTied();
+const DEPEND_T = 0.05; // "depends on OpenAI" threshold: >=5% of revenue traces back to OpenAI
+
+// ============================================================
+//  Money loops: simple cycle search (DFS) over the money-flow graph
+//  supply: buyer pays seller; equity (cash): investor -> investee;
+//  equity issued in a deal (warrants / stock): issuer -> holder.
+// ============================================================
+function moneyEdges() {
+  const adj = {};
+  const add = (a, b, id) => { (adj[a] ||= {}); (adj[a][b] ||= []).push(id); };
+  for (const l of SUP) add(l.to, l.from, l.id);
+  for (const l of EQ) l.consideration === 'issued_in_deal' ? add(l.to, l.from, l.id) : add(l.from, l.to, l.id);
+  return adj;
+}
+const LOOP_META = {
+  E03: { n: 'L1', t: 'Nvidia funds its own customers', c: 'Nvidia puts $30B into OpenAI. OpenAI pays Oracle, Microsoft, Amazon, Google and CoreWeave for compute. They buy Nvidia GPUs.' },
+  E02: { n: 'L2', t: 'Amazon\'s $50B comes back as AWS revenue', c: 'Amazon invests $50B in OpenAI. OpenAI commits $138B to AWS.' },
+  E01: { n: 'L3', t: 'Microsoft owns the customer', c: 'Microsoft owns ~27% of OpenAI. OpenAI commits $250B to Azure.' },
+  E05: { n: 'L4', t: 'Nvidia backstops its own buyer', c: 'Nvidia owns ~13% of CoreWeave and buys $6.3B of its unused capacity. CoreWeave buys Nvidia GPUs.' },
+  E07: { n: 'L5', t: 'AMD pays in shares to win the order', c: 'AMD gives OpenAI warrants for up to ~10% of AMD. OpenAI buys 6 GW of AMD GPUs.' },
+  E06: { n: 'L6', t: 'CoreWeave\'s customer is also its shareholder', c: 'CoreWeave issued $350M of stock to OpenAI with the contract. OpenAI buys CoreWeave capacity.' }
+};
+const LOOP_PRIORITY = ['E07', 'E06', 'E02', 'E01', 'E05', 'E03', 'E04'];
+function findLoops() {
+  const adj = moneyEdges(), order = IDS, idx = Object.fromEntries(order.map((id, i) => [id, i]));
+  const cycles = [];
+  for (const s of order) {
+    const stack = [s], seen = new Set([s]);
+    const dfs = v => {
+      for (const w of Object.keys(adj[v] || {})) {
+        if (w === s && stack.length > 1) cycles.push([...stack]);
+        else if (idx[w] > idx[s] && !seen.has(w)) { seen.add(w); stack.push(w); dfs(w); stack.pop(); seen.delete(w); }
+      }
+    };
+    dfs(s);
+  }
+  // group each cycle by the investment / share-issue edge that closes it
+  const groups = {};
+  for (const cyc of cycles) {
+    const pairs = cyc.map((a, i) => [a, cyc[(i + 1) % cyc.length]]);
+    const ids = pairs.flatMap(([a, b]) => adj[a][b]);
+    const anchor = LOOP_PRIORITY.find(e => ids.includes(e)) || 'trade';
+    (groups[anchor] ||= []).push({ nodes: cyc, pairs, ids });
+  }
+  const list = Object.entries(groups).map(([anchor, cs]) => {
+    const minLen = Math.min(...cs.map(c => c.nodes.length));
+    const core = cs.filter(c => c.nodes.length === minLen);
+    // rotate each core cycle to start at the anchor's money source
+    const a = L[anchor]; const src = a ? (a.consideration === 'issued_in_deal' ? a.to : a.from) : null;
+    const pathStr = core.map(c => { const k = Math.max(0, c.nodes.indexOf(src)); const r = [...c.nodes.slice(k), ...c.nodes.slice(0, k)]; return [...r, r[0]].map(short).join(' > '); });
+    return { anchor, meta: LOOP_META[anchor] || { n: 'L?', t: 'Trade loop', c: '' }, cycles: cs, core, pathStr, links: new Set(core.flatMap(c => c.ids)) };
+  }).sort((x, y) => x.meta.n.localeCompare(y.meta.n));
+  return { loops: list, paths: cycles.length };
+}
+const LOOPS = findLoops();
+
+// ============================================================
+//  Scenario parsing. In the UI this is "AI interpretation".
+//  replace parseScenario() with Amazon Bedrock call in production
+// ============================================================
+const ALIASES = [
+  ['openai', /\b(openai|open ai|chatgpt|stargate)\b/], ['msft', /\b(microsoft|msft|azure)\b/], ['orcl', /\b(oracle|orcl|oci)\b/],
+  ['crwv', /\b(coreweave|core weave|crwv)\b/], ['amzn', /\b(amazon|aws|amzn)\b/], ['googl', /\b(google|alphabet|googl|goog)\b/],
+  ['nvda', /\b(nvidia|nvda)\b/], ['amd', /\b(amd|advanced micro)\b/], ['avgo', /\b(broadcom|avgo)\b/], ['tsm', /\b(tsmc|tsm|taiwan semi\w*)\b/],
+  ['skh', /\b(sk ?hynix|hynix|000660)\b/], ['sb', /\b(softbank|9984)\b/]
+];
+function parseScenario(text) {
+  const t = ' ' + text.toLowerCase() + ' ';
+  const hits = [];
+  for (const [id, re] of ALIASES) { const m = t.match(re); if (m) hits.push({ id, at: m.index }); }
+  hits.sort((a, b) => a.at - b.at);
+  const notes = [];
+  let origin = hits[0]?.id || 'openai';
+  if (!hits.length) notes.push('no company found, defaulted to OpenAI');
+  let target = hits.find(h => h.id !== origin)?.id || '';
+  const supplyWords = /(shortage|outage|can'?t deliver|cannot deliver|halts? (production|shipments)|supply (shock|cut|disruption)|fab|production (cut|halt)|delay(s|ed)? (shipments|deliveries))/;
+  let kind = supplyWords.test(t) ? 'supply' : 'demand';
+  let sev; const pm = t.match(/(\d+(?:\.\d+)?)\s*(%|percent|pc\b)/);
+  if (pm) sev = Math.min(100, parseFloat(pm[1]));
+  else if (/\b(halves|halve|half)\b/.test(t)) sev = 50;
+  else if (/\b(miss(es|ed)?|default(s|ed)?|stops? paying|fails? to pay|cancel(s|led)?|collapse(s|d)?|walks? away)\b/.test(t)) sev = 100;
+  else { sev = 40; notes.push('no size given, assumed 40%'); }
+  // validate: a demand shock needs the origin to buy from the target
+  if (kind === 'demand' && target && !SUP.some(l => l.to === origin && l.from === target)) {
+    if (SUP.some(l => l.to === target && l.from === origin)) { [origin, target] = [target, origin]; notes.push('read as ' + short(origin) + ' cutting purchases from ' + short(target)); }
+    else { notes.push(short(origin) + ' does not buy from ' + short(target) + ' in this map; applied to all its suppliers'); target = ''; }
+  }
+  if (kind === 'demand' && !SUP.some(l => l.to === origin)) { kind = 'supply'; notes.push(short(origin) + ' buys nothing in this map, read as a supply shock'); }
+  if (kind === 'supply' && !SUP.some(l => l.from === origin)) { kind = 'demand'; notes.push(short(origin) + ' sells nothing in this map, read as a demand shock'); }
+  if (kind === 'supply' && target && !SUP.some(l => l.from === origin && l.to === target)) target = '';
+  return { text, origin, target, kind, severity: sev / 100, notes };
+}
+
+// ============================================================
+//  Shock engine (deterministic, runs in the browser)
+// ============================================================
+function runShock(sc, eqMult = 1.5, damp = 0.6, maxHops = 4) {
+  const demand = sc.kind === 'demand';
+  // for a demand shock money stops flowing buyer -> seller, so the hit lands on the seller (upstream)
+  const src = l => demand ? l.to : l.from;   // who cuts
+  const dst = l => demand ? l.from : l.to;   // who is hit
+  const loss = {}, pct = {}, contrib = {}, hops = [];
+  let cut = { [sc.origin]: sc.severity };
+  for (let h = 1; h <= maxHops; h++) {
+    const fired = [], add = {};
+    for (const l of SUP) {
+      const d = cut[src(l)]; if (!d) continue;
+      if (h === 1 && sc.target && dst(l) !== sc.target) continue;
+      const v = dst(l); if (v === sc.origin) continue;
+      const usd = d * l.annual_usd_b; if (usd < 1e-6) continue;
+      add[v] = (add[v] || 0) + usd;
+      fired.push({ link: l.id, from: src(l), to: v, usd });
+      (contrib[v] ||= []).push({ from: src(l), link: l.id, usd, hop: h });
+    }
+    const next = {}; let maxChange = 0;
+    for (const [v, usd] of Object.entries(add)) {
+      const rev = C[v].revenue_usd_b; if (!rev) continue;
+      const before = pct[v] || 0;
+      loss[v] = (loss[v] || 0) + usd;
+      pct[v] = Math.min(1, loss[v] / rev);
+      const dlt = pct[v] - before;
+      next[v] = damp * dlt; maxChange = Math.max(maxChange, dlt);
+    }
+    hops.push({ fired, pct: { ...pct }, loss: { ...loss } });
+    cut = next;
+    if (maxChange < 0.001) break;
+  }
+  // origin distress: share of its purchases (or sales) the scenario removes
+  const own = SUP.filter(l => src(l) === sc.origin);
+  const tot = own.reduce((s, l) => s + l.annual_usd_b, 0);
+  const aff = own.filter(l => !sc.target || dst(l) === sc.target).reduce((s, l) => s + l.annual_usd_b, 0);
+  const distress = tot ? sc.severity * aff / tot : sc.severity;
+  // equity hit: stake value x valuation drop (separate from revenue)
+  const eq = {};
+  for (const l of EQ) {
+    const val = l.stake_value_usd_b; if (!val) continue;
+    const base = l.to === sc.origin ? distress : (pct[l.to] || 0);
+    const drop = Math.min(1, eqMult * base); if (drop <= 0) continue;
+    (eq[l.from] ||= []).push({ link: l.id, usd: val * drop, drop });
+  }
+  // strongest path back to the origin + weakest confidence along it
+  const parent = {};
+  for (const [v, cs] of Object.entries(contrib)) {
+    const by = {}; for (const c of cs) by[c.from] = (by[c.from] || 0) + c.usd;
+    parent[v] = Object.entries(by).sort((a, b) => b[1] - a[1])[0][0];
+  }
+  const pathOf = v => { const p = [v]; let cur = v; for (let i = 0; i < 8 && cur !== sc.origin && parent[cur]; i++) { cur = parent[cur]; if (p.includes(cur)) break; p.unshift(cur); } return p; };
+  const confOf = p => {
+    let r = 2;
+    for (let i = 0; i < p.length - 1; i++) {
+      const ls = SUP.filter(l => src(l) === p[i] && dst(l) === p[i + 1]);
+      for (const l of ls) r = Math.min(r, CONF_RANK[l.confidence]);
+    }
+    return Object.keys(CONF_RANK).find(k => CONF_RANK[k] === r);
+  };
+  const rows = IDS.filter(id => id !== sc.origin && ((loss[id] || 0) > 0 || eq[id])).map(id => {
+    const p = loss[id] ? pathOf(id) : [sc.origin, id];
+    const eqUsd = (eq[id] || []).reduce((s, e) => s + e.usd, 0);
+    const firstHop = (contrib[id] || []).reduce((m, c) => Math.min(m, c.hop), 9);
+    return { id, loss: loss[id] || 0, pct: pct[id] || 0, eq: eqUsd, path: p, conf: loss[id] ? confOf(p) : (eq[id] ? L[eq[id][0].link].confidence : null), hop: firstHop, viaEquity: !loss[id] };
+  }).sort((a, b) => b.pct - a.pct || b.eq - a.eq);
+  const total = rows.reduce((s, r) => s + r.loss, 0);
+  const eqTotal = rows.reduce((s, r) => s + r.eq, 0);
+  return { sc, eqMult, damp, hops, loss, pct, contrib, eq, rows, total, eqTotal, distress, parent };
+}
+
+// simple paths in the shock direction (used by the agent trace)
+function allPaths(from, to, kind = 'demand', max = 5) {
+  const out = [];
+  const nxt = v => kind === 'demand' ? SUP.filter(l => l.to === v).map(l => l.from) : SUP.filter(l => l.from === v).map(l => l.to);
+  const go = (v, p) => { if (p.length > max) return; if (v === to) { out.push(p); return; } for (const w of new Set(nxt(v))) if (!p.includes(w)) go(w, [...p, w]); };
+  go(from, [from]);
+  return out;
+}
+
+// ============================================================
+//  App state
+// ============================================================
+const S = {
+  pf: new Set(['nvda', 'msft', 'orcl', 'crwv', 'amd']),
+  sel: null,              // {kind:'node'|'link'|'source', id}
+  q: '', fType: 'All',
+  loops: false, loopIdx: 0,
+  sc: null, res: null,    // scenario + result
+  shown: null, hot: new Set(), hop: 0, animating: false, animToken: 0,
+  tab: 'scenario', drawerOpen: true
+};
+
+// ============================================================
+//  Network map (fixed layered layout, hand-built SVG)
+// ============================================================
+const NS = 'http://www.w3.org/2000/svg';
+const POS = {
+  tsm: [95, 235], skh: [95, 445],
+  amd: [315, 120], nvda: [315, 330], avgo: [315, 530],
+  msft: [590, 110], crwv: [590, 222], orcl: [590, 330], googl: [590, 432], amzn: [590, 545],
+  openai: [845, 330], sb: [1025, 330]
+};
+const LANES = [['Suppliers', 95], ['Chips', 315], ['Clouds', 590], ['Buyer', 845], ['Investor', 1025]];
+const R = Object.fromEntries(IDS.map(id => [id, C[id].revenue_usd_b ? 8 + 1.2 * Math.sqrt(C[id].revenue_usd_b) : 13]));
+// explicit control points / bends so arrows never pile up
+const CTRL = { S08: [560, -40], E07: [600, -100], S09: [600, 760], E03: [585, 262], S06: [668, 330] };
+const BEND = { S01: 0.05, E01: -0.16, S03: -0.05, E02: 0.16, S14: 0, S15: 0.2, E05: 0.2, S04: 0.07, E06: 0.07, S07: 0.5, S16: 0.03, S19: 0.03, S10: 0, S11: -0.05, S12: 0.05, S13: 0.02, S17: -0.03, S18: 0.03, E04: 0, S02: 0, S05: -0.06 };
+const exposureColor = t => {
+  const lerp = (a, b, k) => a.map((x, i) => Math.round(x + (b[i] - x) * k));
+  const g = [74, 73, 82], o = [247, 147, 30], r = [232, 68, 90];
+  const k = Math.max(0, Math.min(1, t / 0.6));
+  const c = k < 0.5 ? lerp(g, o, k / 0.5) : lerp(o, r, (k - 0.5) / 0.5);
+  return `rgb(${c.join(',')})`;
+};
+const el = (tag, attrs = {}, parent) => { const e = document.createElementNS(NS, tag); for (const k in attrs) e.setAttribute(k, attrs[k]); if (parent) parent.appendChild(e); return e; };
+const NODE = {}, EDGE = {};
+let gParticles, gPulse;
+
+function edgeGeom(l) {
+  const [ax, ay] = POS[l.from], [bx, by] = POS[l.to];
+  let cx, cy;
+  if (CTRL[l.id]) [cx, cy] = CTRL[l.id];
+  else { const b = BEND[l.id] ?? 0.1; cx = (ax + bx) / 2 - (by - ay) * b; cy = (ay + by) / 2 + (bx - ax) * b; }
+  const toward = (x, y, tx, ty, d) => { const L2 = Math.hypot(tx - x, ty - y) || 1; return [x + (tx - x) / L2 * d, y + (ty - y) / L2 * d]; };
+  const [sx, sy] = toward(ax, ay, cx, cy, R[l.from] + 3);
+  const [ex, ey] = toward(bx, by, cx, cy, R[l.to] + 4);
+  return `M${sx.toFixed(1)},${sy.toFixed(1)} Q${cx.toFixed(1)},${cy.toFixed(1)} ${ex.toFixed(1)},${ey.toFixed(1)}`;
+}
+const edgeW = l => l.type === 'supply' ? 1.1 + 1.05 * Math.sqrt(l.annual_usd_b || 0.5) : 1.2 + 0.3 * Math.sqrt(l.stake_value_usd_b || 1);
+const EDGE_BASE = l => l.type === 'supply' ? 'rgba(225,219,210,.34)' : 'rgba(247,147,30,.62)';
+
+function buildMap() {
+  const svg = $('#map');
+  const defs = el('defs', {}, svg);
+  const glow = el('filter', { id: 'glow', x: '-50%', y: '-50%', width: '200%', height: '200%' }, defs);
+  el('feGaussianBlur', { stdDeviation: '4', result: 'b' }, glow);
+  const fm = el('feMerge', {}, glow); el('feMergeNode', { in: 'b' }, fm); el('feMergeNode', { in: 'SourceGraphic' }, fm);
+  // lanes
+  const gl = el('g', {}, svg);
+  LANES.forEach(([t, x], i) => {
+    el('line', { x1: x, x2: x, y1: 36, y2: 625, stroke: '#17171c', 'stroke-width': 1 }, gl);
+    const tx = el('text', { x, y: 22, 'text-anchor': 'middle', class: 'lane-t' }, gl); tx.textContent = t;
+    if (i < LANES.length - 1) { const ax = el('text', { x: (x + LANES[i + 1][1]) / 2, y: 22, 'text-anchor': 'middle', class: 'lane-t', style: 'fill:#3a3942' }, gl); ax.textContent = '>'; }
+  });
+  const gE = el('g', {}, svg), gH = el('g', {}, svg);
+  gParticles = el('g', {}, svg);
+  const gN = el('g', {}, svg);
+  gPulse = el('g', {}, svg);
+  // edges: draw thick first
+  [...DATA.links].sort((a, b) => edgeW(b) - edgeW(a)).forEach(l => {
+    const w = edgeW(l);
+    const mk = el('marker', { id: 'm-' + l.id, viewBox: '0 0 10 10', refX: 8.5, refY: 5, markerUnits: 'userSpaceOnUse', markerWidth: Math.max(8, Math.min(15, w * 1.9)), markerHeight: Math.max(8, Math.min(15, w * 1.9)), orient: 'auto-start-reverse' }, defs);
+    const mp = el('path', { d: 'M0,1 L10,5 L0,9 Z', fill: EDGE_BASE(l) }, mk);
+    const d = edgeGeom(l);
+    const p = el('path', { d, class: 'edge', stroke: EDGE_BASE(l), 'stroke-width': w.toFixed(2), 'marker-end': `url(#m-${l.id})` }, gE);
+    if (isDotted(l)) { p.setAttribute('stroke-dasharray', l.type === 'equity' ? '1 5' : '0.1 ' + Math.max(4, w * 1.6).toFixed(1)); p.setAttribute('stroke-linecap', 'round'); }
+    else if (l.type === 'equity') p.setAttribute('stroke-dasharray', '6 4');
+    const h = el('path', { d, class: 'ehit' }, gH);
+    h.addEventListener('click', e => { e.stopPropagation(); select('link', l.id); });
+    h.addEventListener('mousemove', e => showTip(e, linkTip(l)));
+    h.addEventListener('mouseleave', hideTip);
+    EDGE[l.id] = { p, mp, w, dash: p.getAttribute('stroke-dasharray') };
+  });
+  // nodes
+  for (const id of IDS) {
+    const c = C[id], [x, y] = POS[id], r = R[id];
+    const g = el('g', { class: 'node', transform: `translate(${x},${y})`, tabindex: 0, role: 'button', 'aria-label': c.name }, gN);
+    const halo = el('circle', { r: r + 9, fill: 'none', stroke: 'rgba(232,68,90,0)', 'stroke-width': 1 }, g);
+    const sel = el('circle', { r: r + 5, class: 'selring' }, g);
+    const core = el('circle', { r, class: 'core', fill: '#121216', stroke: exposureColor(TIED[id]), 'stroke-width': id === 'sb' ? 1.5 : 2.6 }, g);
+    if (id === 'sb') core.setAttribute('stroke-dasharray', '3 3');
+    const big = r >= 17;
+    const t1 = el('text', { class: 'tick', 'text-anchor': 'middle', y: big ? 4 : r + 14 }, g); t1.textContent = id === 'openai' ? 'OpenAI' : id === 'skh' ? 'SK HYNIX' : id === 'sb' ? 'SOFTBANK' : c.ticker;
+    const t2 = el('text', { class: 'rev', 'text-anchor': 'middle', y: big ? r + 13 : r + 26 }, g); t2.textContent = c.revenue_usd_b ? fB(c.revenue_usd_b) : 'investor';
+    const bg = el('g', { transform: `translate(0,${-r - 13})`, opacity: 0 }, g);
+    const br = el('rect', { class: 'badge-r', x: -26, y: -9, width: 52, height: 16 }, bg);
+    const bt = el('text', { class: 'badge-t', 'text-anchor': 'middle', y: 3 }, bg);
+    g.addEventListener('click', e => { e.stopPropagation(); select('node', id); });
+    g.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); select('node', id); } });
+    g.addEventListener('mousemove', e => showTip(e, nodeTip(id)));
+    g.addEventListener('mouseleave', hideTip);
+    NODE[id] = { g, core, halo, t1, t2, bg, br, bt };
+  }
+  svg.addEventListener('click', () => { if (S.sel) select(null); });
+}
+
+function nodeTip(id) {
+  const c = C[id];
+  let s = `<b>${esc(c.name)}</b> <span class="mono" style="color:#8B8993">${esc(c.ticker)}</span><div class="s">${c.revenue_usd_b ? 'Revenue ' + fB(c.revenue_usd_b) + ' · ' + esc(c.fiscal_year) : 'Investor'}</div>`;
+  if (id !== 'openai' && c.revenue_usd_b) s += `<div class="s">${fP(TIED[id])} of revenue traces to OpenAI</div>`;
+  if (S.shown && S.shown[id]) s += `<div class="s" style="color:#E8445A">Scenario: -${fP(S.shown[id])} of revenue</div>`;
+  return s;
+}
+function linkTip(l) {
+  const v = l.type === 'supply' ? `${l.amount_usd_b != null ? fB(l.amount_usd_b) + ' total' : 'amount undisclosed'} · ~${fB(l.annual_usd_b)}/yr in model` : `${l.stake_value_usd_b ? fB(l.stake_value_usd_b) + ' stake' : 'value not modelled'}`;
+  return `<b>${esc(short(l.from))} ${l.type === 'supply' ? 'sells to' : 'invests in'} ${esc(short(l.to))}</b><div class="s">${esc(l.label)}</div><div class="s">${v}</div><div class="s">${l.confidence}</div>`;
+}
+function showTip(e, html) {
+  const t = $('#tip'); t.innerHTML = html; t.classList.remove('hide');
+  const w = t.offsetWidth, h = t.offsetHeight;
+  let x = e.clientX + 14, y = e.clientY + 14;
+  if (x + w > innerWidth - 8) x = e.clientX - w - 14;
+  if (y + h > innerHeight - 8) y = e.clientY - h - 14;
+  t.style.left = x + 'px'; t.style.top = y + 'px';
+}
+function hideTip() { $('#tip').classList.add('hide'); }
+
+// one function decides how every node and edge looks
+function paintMap() {
+  const loop = S.loops ? LOOPS.loops[S.loopIdx] : null;
+  const matches = searchMatches();
+  const selLinkIds = new Set();
+  const focusNodes = new Set();
+  if (S.sel?.kind === 'node') { focusNodes.add(S.sel.id); for (const l of DATA.links) if (l.from === S.sel.id || l.to === S.sel.id) { selLinkIds.add(l.id); focusNodes.add(l.from); focusNodes.add(l.to); } }
+  if (S.sel?.kind === 'link') { const l = L[S.sel.id]; selLinkIds.add(l.id); focusNodes.add(l.from); focusNodes.add(l.to); }
+  if (S.sel?.kind === 'source') { for (const l of DATA.links) if (l.source_id === S.sel.id) { selLinkIds.add(l.id); focusNodes.add(l.from); focusNodes.add(l.to); } focusNodes.add(SRC[S.sel.id].company); }
+  const loopNodes = loop ? new Set(loop.core.flatMap(c => c.nodes)) : null;
+  const scen = !!S.shown;
+
+  for (const id of IDS) {
+    const n = NODE[id];
+    let dim = false;
+    if (loop) dim = !loopNodes.has(id);
+    else if (S.sel) dim = !focusNodes.has(id);
+    else if (matches) dim = !matches.has(id);
+    n.g.classList.toggle('dim', dim);
+    n.g.classList.toggle('sel', S.sel?.kind === 'node' && S.sel.id === id);
+    n.g.classList.toggle('match', !!matches && matches.has(id) && !S.sel);
+    n.g.classList.toggle('pf', S.pf.has(id));
+    const p = scen ? (S.shown[id] || 0) : 0;
+    const isOrigin = scen && S.res && S.res.sc.origin === id;
+    if (p > 0) {
+      const k = Math.min(1, 0.25 + p / 0.4 * 0.75);
+      n.core.setAttribute('fill', `rgba(232,68,90,${(0.15 + 0.75 * k).toFixed(2)})`);
+      n.core.setAttribute('stroke', '#E8445A');
+      n.bg.setAttribute('opacity', 1);
+      n.bt.textContent = '-' + fP(p, p < 0.01 ? 2 : 1);
+      const w = Math.max(44, n.bt.textContent.length * 7 + 10); n.br.setAttribute('x', -w / 2); n.br.setAttribute('width', w);
+    } else {
+      n.core.setAttribute('fill', isOrigin ? '#2a0f15' : '#121216');
+      n.core.setAttribute('stroke', isOrigin ? '#E8445A' : exposureColor(TIED[id]));
+      n.bg.setAttribute('opacity', isOrigin ? 1 : 0);
+      if (isOrigin) { n.bt.textContent = (S.res.sc.kind === 'demand' ? 'cuts ' : 'short ') + fP(S.res.sc.severity, 0); const w = n.bt.textContent.length * 7 + 10; n.br.setAttribute('x', -w / 2); n.br.setAttribute('width', w); }
+    }
+    n.halo.setAttribute('stroke', isOrigin ? 'rgba(232,68,90,.5)' : 'rgba(0,0,0,0)');
+  }
+  for (const l of DATA.links) {
+    const e = EDGE[l.id];
+    let color = EDGE_BASE(l), op = 1, w = e.w, flow = false, dash = e.dash;
+    if (loop) {
+      if (loop.links.has(l.id)) { color = '#F7931E'; w = Math.max(2.2, e.w); flow = true; dash = l.type === 'equity' ? '6 4' : '10 6'; }
+      else op = 0.06;
+    } else if (scen && S.hot.has(l.id)) { color = '#E8445A'; }
+    else if (S.sel) { if (selLinkIds.has(l.id)) { color = S.sel.kind === 'link' ? '#FFFFFF' : (l.type === 'supply' ? 'rgba(241,236,228,.85)' : '#F7931E'); } else op = 0.07; }
+    else if (matches) { op = (matches.has(l.from) || matches.has(l.to)) ? 1 : 0.08; }
+    else if (scen) op = 0.35;
+    e.p.setAttribute('stroke', color); e.mp.setAttribute('fill', color);
+    e.p.setAttribute('stroke-width', w.toFixed(2));
+    e.p.style.opacity = op;
+    if (dash) e.p.setAttribute('stroke-dasharray', dash); else e.p.removeAttribute('stroke-dasharray');
+    e.p.classList.toggle('flow', flow);
+  }
+}
+
+// ============================================================
+//  Selection + detail panel
+// ============================================================
+function select(kind, id) {
+  S.sel = kind ? { kind, id } : null;
+  if (kind && S.loops) { /* keep loops mode but selection wins visually */ }
+  renderDetail(); paintMap(); renderFilings();
+}
+function linkRow(l, side) {
+  const other = side === 'out' ? l.to : l.from;
+  const amt = l.type === 'supply' ? (l.annual_usd_b != null ? fB(l.annual_usd_b) + '/yr' : '-') : (l.stake_value_usd_b ? fB(l.stake_value_usd_b) : 'n/a');
+  const rel = l.type === 'equity' ? (side === 'out' ? 'invests in' : 'investor') : (side === 'out' ? 'sells to' : 'buys from');
+  return `<div class="ll" data-link="${l.id}"><div class="n">${esc(short(other))} <small>· ${rel}</small></div><div class="a">${amt}</div><div class="m">${tagHTML(l.confidence)}${isDotted(l) ? '<span>dotted</span>' : ''}<span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc(l.label)}</span></div></div>`;
+}
+function renderDetail() {
+  const d = $('#detail');
+  if (!S.sel) { d.innerHTML = overviewHTML(); bindDetail(); return; }
+  if (S.sel.kind === 'node') d.innerHTML = companyHTML(S.sel.id);
+  else if (S.sel.kind === 'link') d.innerHTML = linkHTML(L[S.sel.id]);
+  else d.innerHTML = sourceHTML(SRC[S.sel.id]);
+  bindDetail();
+}
+function overviewHTML() {
+  const flows = SUP.reduce((s, l) => s + l.annual_usd_b, 0);
+  const cnt = k => DATA.links.filter(l => l.confidence === k).length;
+  const top = IDS.filter(id => id !== 'openai' && C[id].revenue_usd_b).sort((a, b) => TIED[b] - TIED[a]);
+  return `<div class="lbl">Network overview</div>
+  <div class="headline" style="font-size:17px;margin-top:6px">12 companies, ${DATA.links.length} deals, every one with a source.</div>
+  <div class="stat-grid">
+    <div><div class="lbl">Supply flows</div><div class="v">${fB(flows)}<span class="note">/yr</span></div></div>
+    <div><div class="lbl">Money loops</div><div class="v" style="color:var(--accent)">${LOOPS.loops.length}</div></div>
+    <div><div class="lbl">Sells-to links</div><div class="v">${SUP.length}</div></div>
+    <div><div class="lbl">Invests-in links</div><div class="v">${EQ.length}</div></div>
+  </div>
+  <div class="lbl" style="margin-bottom:4px">Confidence</div>
+  <table class="mini"><tr><td>${tagHTML('DISCLOSED')}</td><td class="note">${CONF_TXT.DISCLOSED}</td><td class="r">${cnt('DISCLOSED')}</td></tr>
+  <tr><td>${tagHTML('REPORTED')}</td><td class="note">${CONF_TXT.REPORTED}</td><td class="r">${cnt('REPORTED')}</td></tr>
+  <tr><td>${tagHTML('ESTIMATED')}</td><td class="note">Our assumption, with the method stated.</td><td class="r">${cnt('ESTIMATED')}</td></tr></table>
+  <div class="lbl" style="margin:16px 0 4px">Most exposed to OpenAI</div>
+  ${top.slice(0, 6).map(id => `<div class="hold" data-node="${id}"><b>${esc(tick(id))}</b><div class="bar"><i style="width:${Math.min(100, TIED[id] * 100)}%;background:${exposureColor(TIED[id])}"></i></div><span class="v">${fP(TIED[id])}</span></div>`).join('')}
+  <p class="note" style="margin-top:12px">Click any company or arrow on the map for the numbers and the source.</p>`;
+}
+function companyHTML(id) {
+  const c = C[id];
+  const out = DATA.links.filter(l => l.from === id), inn = DATA.links.filter(l => l.to === id);
+  const sells = out.filter(l => l.type === 'supply').sort((a, b) => b.annual_usd_b - a.annual_usd_b);
+  const buys = inn.filter(l => l.type === 'supply').sort((a, b) => b.annual_usd_b - a.annual_usd_b);
+  const eqo = out.filter(l => l.type === 'equity'), eqi = inn.filter(l => l.type === 'equity');
+  const direct = SUP.filter(l => l.from === id && l.to === 'openai').reduce((s, l) => s + l.annual_usd_b, 0);
+  const res = S.res && S.shown ? S.res.rows.find(r => r.id === id) : null;
+  const src = c.revenue_source_id ? SRC[c.revenue_source_id] : null;
+  const top = sells[0];
+  return `<div class="dh"><div><div class="tkr">${esc(c.ticker)}${S.pf.has(id) ? ' <span class="tag pf">IN PORTFOLIO</span>' : ''}</div><h2>${esc(c.name)}</h2><div class="note">${esc(c.sells)}</div></div>
+    ${c.listed ? `<button class="btn" data-pf="${id}" aria-pressed="${S.pf.has(id)}">${S.pf.has(id) ? 'Holding' : '+ Portfolio'}</button>` : ''}</div>
+  ${c.leverage_flag ? `<div style="margin-bottom:10px"><span class="tag lev">LEVERAGE AMPLIFIES THIS</span> <span class="note">${esc(c.leverage_flag)}</span></div>` : ''}
+  <div class="kpis">
+    <div class="kpi"><div class="lbl">Revenue</div><div class="v">${c.revenue_usd_b ? fB(c.revenue_usd_b) : 'n/a'}</div><div class="s">${esc(c.fiscal_year || 'investor')}</div></div>
+    <div class="kpi"><div class="lbl">Tied to OpenAI</div><div class="v a">${id === 'openai' ? '-' : c.revenue_usd_b ? fP(TIED[id]) : 'n/a'}</div><div class="s">${direct ? fB(direct) + '/yr direct' : id === 'openai' ? 'the buyer' : 'indirect only'}</div></div>
+    ${res ? `<div class="kpi"><div class="lbl">Scenario hit</div><div class="v d">-${fP(res.pct)}</div><div class="s">${fB(res.loss)}/yr revenue</div></div><div class="kpi"><div class="lbl">Equity hit</div><div class="v d">${res.eq ? '-' + fB(res.eq) : '$0'}</div><div class="s">stake value</div></div>`
+      : `<div class="kpi"><div class="lbl">Biggest customer</div><div class="v" style="font-size:14px">${top ? esc(short(top.to)) : '-'}</div><div class="s">${top ? fB(top.annual_usd_b) + '/yr' : 'no sales in map'}</div></div><div class="kpi"><div class="lbl">Links</div><div class="v">${out.length + inn.length}</div><div class="s">${sells.length} out · ${buys.length} in · ${eqo.length + eqi.length} equity</div></div>`}
+  </div>
+  <ul class="facts">${c.facts.map(f => `<li>${esc(f)}</li>`).join('')}</ul>
+  ${sells.length ? `<div class="lbl" style="margin:14px 0 2px">Who it depends on (customers)</div>${sells.map(l => linkRow(l, 'out')).join('')}` : ''}
+  ${buys.length ? `<div class="lbl" style="margin:14px 0 2px">Who it buys from</div>${buys.map(l => linkRow(l, 'in')).join('')}` : ''}
+  ${eqo.length + eqi.length ? `<div class="lbl" style="margin:14px 0 2px">Investments</div>${eqo.map(l => linkRow(l, 'out')).join('')}${eqi.map(l => linkRow(l, 'in')).join('')}` : ''}
+  <div class="lbl" style="margin:14px 0 4px">Revenue source</div>
+  <div class="note">${esc(c.revenue_source)} ${tagHTML(c.revenue_confidence)}${src ? `<br><a href="${esc(src.url)}" target="_blank" rel="noopener">Open document</a> · <a href="#" data-src="${src.id}">Show in filings</a>` : ''}</div>`;
+}
+function linkHTML(l) {
+  const isS = l.type === 'supply';
+  return `<div class="lbl">${isS ? 'Supply deal' : 'Investment'} · ${l.id}</div>
+  <div class="flow"><button data-node="${l.from}">${esc(short(l.from))}</button><span class="rel">${isS ? 'sells to' : 'invests in'}</span><button data-node="${l.to}">${esc(short(l.to))}</button></div>
+  <div class="note" style="margin-bottom:10px">${esc(l.label)}</div>
+  <div class="kpis">
+    <div class="kpi"><div class="lbl">${isS ? 'Deal amount' : 'Amount'}</div><div class="v">${l.amount_usd_b != null ? fB(l.amount_usd_b) : '<span style="font-size:13px">undisclosed</span>'}</div><div class="s">${esc(l.period)}</div></div>
+    <div class="kpi"><div class="lbl">${isS ? 'Used in model' : 'Stake value'}</div><div class="v a">${isS ? fB(l.annual_usd_b) + '<span class="note">/yr</span>' : (l.stake_value_usd_b ? fB(l.stake_value_usd_b) : '<span style="font-size:13px">not modelled</span>')}</div><div class="s">${tagHTML(l.amount_confidence)}</div></div>
+  </div>
+  <dl class="kv">
+    <dt>Confidence</dt><dd>${tagHTML(l.confidence)}<div class="note" style="font-family:var(--sans);margin-top:3px">${CONF_TXT[l.confidence]}</div></dd>
+    <dt>Date</dt><dd>${esc(l.date)}</dd>
+    ${l.consideration ? `<dt>Paid in</dt><dd>${l.consideration === 'cash' ? 'cash' : 'shares issued in the deal'}</dd>` : ''}
+  </dl>
+  <div class="quote"><small>${l.quote_kind === 'verbatim' ? 'Quote' : 'Paraphrase'}</small>${l.quote_kind === 'verbatim' ? '"' + esc(l.quote) + '"' : esc(l.quote)}</div>
+  ${l.estimate_note ? `<div class="lbl" style="margin-top:12px">How we got the number</div><div class="note" style="margin-top:4px">${esc(l.estimate_note)}</div>` : ''}
+  <div class="lbl" style="margin-top:14px">Source</div>
+  <div style="margin-top:4px;font-size:12.5px">${esc(l.source_title)}</div>
+  <div style="margin-top:4px;word-break:break-all;font:500 11px var(--mono)"><a href="${esc(l.source_url)}" target="_blank" rel="noopener">${esc(l.source_url)}</a></div>
+  <div style="margin-top:10px;display:flex;gap:6px;flex-wrap:wrap"><button class="btn" data-src="${l.source_id}">Show in filings</button><button class="btn" data-node="${l.from}">${esc(short(l.from))}</button><button class="btn" data-node="${l.to}">${esc(short(l.to))}</button></div>`;
+}
+function sourceHTML(s) {
+  const ls = DATA.links.filter(l => l.source_id === s.id);
+  const cs = DATA.companies.filter(c => c.revenue_source_id === s.id);
+  return `<div class="lbl">Source document</div>
+  <h2 style="font-size:17px;margin:6px 0 6px;line-height:1.25">${esc(s.title)}</h2>
+  <div style="display:flex;gap:6px;align-items:center;margin-bottom:10px"><span class="typ">${esc(s.type)}</span><span class="mono note">${esc(s.date)}</span></div>
+  <div class="quote"><small>What we took from it</small>${esc(s.used_for)}</div>
+  <div style="word-break:break-all;font:500 11px var(--mono);margin:8px 0 14px"><a href="${esc(s.url)}" target="_blank" rel="noopener">${esc(s.url)}</a></div>
+  ${cs.length ? `<div class="lbl" style="margin-bottom:2px">Revenue figure for</div>${cs.map(c => `<div class="ll" data-node="${c.id}"><div class="n">${esc(c.name)}</div><div class="a">${fB(c.revenue_usd_b)}</div></div>`).join('')}` : ''}
+  ${ls.length ? `<div class="lbl" style="margin:12px 0 2px">Links citing it (${ls.length})</div>${ls.map(l => `<div class="ll" data-link="${l.id}"><div class="n">${esc(short(l.from))} > ${esc(short(l.to))} <small>· ${l.type === 'supply' ? 'sells to' : 'invests in'}</small></div><div class="a">${tagHTML(l.confidence)}</div></div>`).join('')}` : ''}`;
+}
+function bindDetail() {
+  const d = $('#detail');
+  d.querySelectorAll('[data-link]').forEach(b => b.addEventListener('click', () => select('link', b.dataset.link)));
+  d.querySelectorAll('[data-node]').forEach(b => b.addEventListener('click', () => select('node', b.dataset.node)));
+  d.querySelectorAll('[data-src]').forEach(b => b.addEventListener('click', e => { e.preventDefault(); openFilingsFor(b.dataset.src); }));
+  d.querySelectorAll('[data-pf]').forEach(b => b.addEventListener('click', () => togglePf(b.dataset.pf)));
+}
+
+// ============================================================
+//  Portfolio
+// ============================================================
+const PF_IDS = ['msft', 'nvda', 'orcl', 'crwv', 'amzn', 'googl', 'amd', 'avgo', 'tsm', 'skh', 'sb'];
+function togglePf(id) {
+  S.pf.has(id) ? S.pf.delete(id) : S.pf.add(id);
+  renderPortfolio(); paintMap(); renderDetail(); if (S.res) { renderResults(); renderTicker(); }
+}
+function renderPortfolio() {
+  const res = S.res && S.shown ? S.res : null;
+  $('#chips').innerHTML = PF_IDS.map(id => {
+    const r = res?.rows.find(x => x.id === id);
+    const hit = r && (r.pct > 0 ? `<span class="hit">-${fP(r.pct)}</span>` : r.eq ? `<span class="hit">-${fB(r.eq)} eq.</span>` : '');
+    return `<button class="chip" data-id="${id}" aria-pressed="${S.pf.has(id)}"><b>${esc(C[id].ticker)}</b><span>${esc(short(id))}</span>${hit || ''}</button>`;
+  }).join('');
+  $('#chips').querySelectorAll('.chip').forEach(b => b.addEventListener('click', () => togglePf(b.dataset.id)));
+  const hold = [...S.pf].filter(id => C[id]);
+  $('#pfCount').textContent = hold.length + ' / ' + PF_IDS.length;
+  const dep = hold.filter(id => (C[id].revenue_usd_b && TIED[id] >= DEPEND_T) || EQ.some(l => l.from === id && l.to === 'openai'));
+  const hl = $('#headline');
+  if (!hold.length) hl.innerHTML = 'Pick the stocks you own to see what they <em>really</em> depend on.';
+  else if (!dep.length) hl.innerHTML = `None of your ${hold.length} holdings depend on OpenAI paying its bills.`;
+  else hl.innerHTML = `<em>${dep.length === hold.length && hold.length > 1 ? 'All ' + dep.length : dep.length} of your ${hold.length}</em> holding${hold.length > 1 ? 's' : ''} depend${dep.length === 1 && hold.length === 1 ? 's' : ''} on OpenAI paying its bills.`;
+  const rows = hold.sort((a, b) => (TIED[b] || 0) - (TIED[a] || 0)).map(id => {
+    const t = C[id].revenue_usd_b ? TIED[id] : null;
+    const stake = EQ.filter(l => l.from === id && l.to === 'openai' && l.stake_value_usd_b).reduce((s, l) => s + l.stake_value_usd_b, 0);
+    return `<div class="hold" data-node="${id}" title="${esc(C[id].name)}"><b>${esc(C[id].ticker)}</b><div class="bar"><i style="width:${t != null ? Math.min(100, t * 100) : 0}%;background:${exposureColor(t || 0)}"></i></div><span class="v">${t != null ? fP(t) : stake ? fB(stake) + ' eq' : 'n/a'}</span></div>`;
+  }).join('');
+  $('#holdings').innerHTML = rows;
+  $('#holdings').querySelectorAll('.hold').forEach(r => r.addEventListener('click', () => select('node', r.dataset.node)));
+  // scenario impact box
+  const box = $('#pfImpact');
+  if (res) {
+    const pr = res.rows.filter(r => S.pf.has(r.id));
+    const tot = pr.reduce((s, r) => s + r.loss, 0), eq = pr.reduce((s, r) => s + r.eq, 0);
+    box.innerHTML = `<div class="pfimpact"><div class="lbl" style="color:var(--danger)">Scenario impact on your holdings</div><div class="big">-${fB(tot)}<span style="font-size:12px">/yr</span></div><div class="note">revenue at risk${eq ? `, plus <span class="mono" style="color:var(--text)">-${fB(eq)}</span> in stake value` : ''}</div></div>`;
+  } else box.innerHTML = '';
+}
+document.addEventListener('click', e => { const h = e.target.closest('#detail .hold'); if (h) select('node', h.dataset.node); });
+
+// ============================================================
+//  Ticker strip
+// ============================================================
+function renderTicker() {
+  const res = S.res && S.shown ? S.res : null;
+  $('#ticker').innerHTML = IDS.map(id => {
+    const c = C[id], r = res?.rows.find(x => x.id === id);
+    const right = r && r.pct > 0 ? `<em class="hi">-${fP(r.pct)}</em>` : c.revenue_usd_b && id !== 'openai' ? `<em title="share of revenue tied to OpenAI">${fP(TIED[id], 0)} OAI</em>` : '';
+    return `<button class="tk" data-node="${id}"><b>${esc(id === 'openai' ? 'OPENAI' : c.ticker)}</b><span>${c.revenue_usd_b ? fB(c.revenue_usd_b) + (id === 'openai' ? ' ann.' : '') : 'investor'}</span>${right}</button>`;
+  }).join('');
+  $('#ticker').querySelectorAll('.tk').forEach(b => b.addEventListener('click', () => select('node', b.dataset.node)));
+}
+
+// ============================================================
+//  Search + filings
+// ============================================================
+function searchMatches() {
+  const q = S.q.trim().toLowerCase();
+  if (!q || q.length < 2) return null;
+  const m = new Set();
+  for (const c of DATA.companies) if ([c.name, c.ticker, c.id, short(c.id)].some(x => x.toLowerCase().includes(q))) m.add(c.id);
+  for (const s of filteredSources()) { m.add(s.company); }
+  for (const l of DATA.links) if ([l.label, l.source_title, l.quote].some(x => (x || '').toLowerCase().includes(q))) { m.add(l.from); m.add(l.to); }
+  return m;
+}
+function filteredSources(ignoreType) {
+  const q = S.q.trim().toLowerCase();
+  return DATA.sources.filter(s => {
+    if (!ignoreType && S.fType !== 'All' && s.type !== S.fType) return false;
+    if (!q) return true;
+    const hay = [s.title, s.type, s.used_for, s.date, C[s.company]?.name, C[s.company]?.ticker, short(s.company)].join(' ').toLowerCase();
+    return q.split(/\s+/).every(w => hay.includes(w));
+  }).sort((a, b) => b.date.localeCompare(a.date));
+}
+function renderFilings() {
+  const types = ['All', ...Array.from(new Set(DATA.sources.map(s => s.type)))];
+  const typeOrder = ['All', '10-K', '10-Q', '8-K', 'press release', 'news'];
+  types.sort((a, b) => typeOrder.indexOf(a) - typeOrder.indexOf(b));
+  $('#fType').innerHTML = types.map(t => `<button data-t="${esc(t)}" aria-pressed="${S.fType === t}">${esc(t)}</button>`).join('');
+  $('#fType').querySelectorAll('button').forEach(b => b.addEventListener('click', () => { S.fType = b.dataset.t; renderFilings(); paintMap(); }));
+  const list = filteredSources();
+  $('#fCount').textContent = DATA.sources.length;
+  $('#fInfo').textContent = `${list.length} of ${DATA.sources.length} documents`;
+  const tb = $('#fTable tbody');
+  tb.innerHTML = list.length ? list.map(s => {
+    const n = DATA.links.filter(l => l.source_id === s.id).length + DATA.companies.filter(c => c.revenue_source_id === s.id).length;
+    return `<tr class="click${S.sel?.kind === 'source' && S.sel.id === s.id ? ' selr' : ''}" data-src="${s.id}"><td class="mono">${esc(s.date)}</td><td><span class="typ">${esc(s.type)}</span></td><td class="mono">${esc(C[s.company]?.ticker === 'PRIVATE' ? 'OpenAI' : C[s.company]?.ticker)}</td><td>${esc(s.title)}</td><td class="n">${n}</td><td><a href="${esc(s.url)}" target="_blank" rel="noopener" class="mono" style="font-size:11px">open</a></td></tr>`;
+  }).join('') : `<tr><td colspan="6" class="empty">No documents match "${esc(S.q)}".</td></tr>`;
+  tb.querySelectorAll('tr.click').forEach(tr => tr.addEventListener('click', e => { if (e.target.closest('a')) return; select('source', tr.dataset.src); }));
+}
+function openFilingsFor(srcId) { setTab('filings'); select('source', srcId); const tr = $(`#fTable tr[data-src="${srcId}"]`); if (tr) tr.scrollIntoView({ block: 'nearest' }); }
+function setQuery(q, from) {
+  S.q = q;
+  if (from !== 'cmd') $('#cmd').value = q;
+  if (from !== 'fq') $('#fq').value = q;
+  renderFilings(); paintMap();
+}
+
+// command bar
+const SCEN_RE = /\b(cut|cuts|miss|misses|missed|default|defaults|fail|fails|drop|drops|halve|halves|collapse|collapses|stop|stops|delay|delays|cancel|cancels|shortage|outage|pull|pulls|slash|slashes|reduce|reduces)\b|%/i;
+let menuIdx = 0;
+function cmdItems(q) {
+  const items = [];
+  const t = q.trim(); if (!t) return items;
+  if (SCEN_RE.test(t)) items.push({ k: 'Scenario', run: true, label: `Run: "${t}"`, act: () => runFromText(t) });
+  const ql = t.toLowerCase();
+  DATA.companies.filter(c => [c.name, c.ticker, short(c.id)].some(x => x.toLowerCase().includes(ql))).slice(0, 4).forEach(c => items.push({ k: 'Company', label: `${c.name} <span class="mono note">${esc(c.ticker)}</span>`, act: () => { select('node', c.id); closeMenu(); } }));
+  const fs = filteredSources(true);
+  if (fs.length) items.push({ k: 'Filings', label: `${fs.length} document${fs.length > 1 ? 's' : ''} match`, act: () => { setTab('filings'); openDrawer(); closeMenu(); } });
+  if (!SCEN_RE.test(t) && t.length > 3) items.push({ k: 'Scenario', run: true, label: `Run as scenario: "${t}"`, act: () => runFromText(t) });
+  return items;
+}
+function renderMenu() {
+  const items = cmdItems($('#cmd').value);
+  const m = $('#cmdMenu');
+  if (!items.length || document.activeElement !== $('#cmd')) { m.classList.add('hide'); return; }
+  menuIdx = Math.min(menuIdx, items.length - 1);
+  m.innerHTML = items.map((it, i) => `<button type="button" class="${it.run ? 'run' : ''}${i === menuIdx ? ' on' : ''}" data-i="${i}"><span class="k">${it.k}</span><span>${it.run ? esc(it.label) : it.label}</span></button>`).join('');
+  m.querySelectorAll('button').forEach(b => b.addEventListener('mousedown', e => { e.preventDefault(); items[+b.dataset.i].act(); }));
+  m.classList.remove('hide');
+}
+function closeMenu() { $('#cmdMenu').classList.add('hide'); }
+
+// ============================================================
+//  Drawer tabs
+// ============================================================
+function setTab(t) {
+  S.tab = t;
+  $$('.tab[data-tab]').forEach(b => b.setAttribute('aria-selected', b.dataset.tab === t));
+  ['filings', 'scenario', 'trace'].forEach(x => $('#pane-' + x).classList.toggle('hide', x !== t));
+  openDrawer();
+}
+function openDrawer() { S.drawerOpen = true; $('#drawer').classList.remove('closed'); $('#dtIcon').setAttribute('d', 'M2 4 L6 8 L10 4'); }
+function toggleDrawer() {
+  S.drawerOpen = !S.drawerOpen;
+  $('#drawer').classList.toggle('closed', !S.drawerOpen);
+  $('#dtIcon').setAttribute('d', S.drawerOpen ? 'M2 4 L6 8 L10 4' : 'M2 8 L6 4 L10 8');
+}
+
+// ============================================================
+//  Money loops UI
+// ============================================================
+function renderLoops() {
+  $('#loopCount').textContent = `${LOOPS.loops.length} money loops found`;
+  $('#loopCount').title = `${LOOPS.paths} distinct cycles in the money-flow graph, grouped by the investment that closes them`;
+  const cap = $('#loopCap');
+  $('#loopBtn').setAttribute('aria-pressed', S.loops);
+  if (!S.loops) { cap.classList.add('hide'); return; }
+  const lp = LOOPS.loops[S.loopIdx];
+  const variants = lp.cycles.length - lp.core.length;
+  cap.innerHTML = `<div style="display:flex;justify-content:space-between"><span class="lbl" style="color:var(--accent)">Money loop ${lp.meta.n} · ${S.loopIdx + 1} of ${LOOPS.loops.length}</span><span class="lbl mono">${lp.cycles.length} cycle${lp.cycles.length > 1 ? 's' : ''}</span></div>
+    <div class="t">${esc(lp.meta.t)}</div>
+    ${lp.pathStr.slice(0, 5).map(p => `<div class="p">${esc(p)}</div>`).join('')}
+    <div class="note">${esc(lp.meta.c)}${variants > 0 ? ` Plus ${variants} longer variant${variants > 1 ? 's' : ''}.` : ''}</div>
+    <div class="nav"><button class="btn" id="lpPrev">Prev</button><button class="btn" id="lpNext">Next</button><span class="sp"></span><button class="btn ghost" id="lpClose">Hide loops</button></div>`;
+  cap.classList.remove('hide');
+  $('#lpPrev').onclick = () => { S.loopIdx = (S.loopIdx + LOOPS.loops.length - 1) % LOOPS.loops.length; renderLoops(); paintMap(); };
+  $('#lpNext').onclick = () => { S.loopIdx = (S.loopIdx + 1) % LOOPS.loops.length; renderLoops(); paintMap(); };
+  $('#lpClose').onclick = () => toggleLoops(false);
+}
+function toggleLoops(on) {
+  S.loops = on ?? !S.loops;
+  if (S.loops) { S.sel = null; renderDetail(); }
+  renderLoops(); paintMap();
+}
+
+// ============================================================
+//  Scenario UI + animation
+// ============================================================
+const PRESETS = [
+  { t: 'OpenAI cuts compute spending 40%', k: 'hero' },
+  { t: 'OpenAI misses its Oracle payments', k: '' },
+  { t: 'Microsoft cuts CoreWeave contracts 50%', k: '' }
+];
+function fillSelects() {
+  $('#iOrigin').innerHTML = IDS.map(id => `<option value="${id}">${esc(C[id].name)}</option>`).join('');
+}
+function fillTargets() {
+  const o = $('#iOrigin').value, k = $('#iKind').value;
+  const opts = k === 'demand' ? [...new Set(SUP.filter(l => l.to === o).map(l => l.from))] : [...new Set(SUP.filter(l => l.from === o).map(l => l.to))];
+  const cur = $('#iTarget').value;
+  $('#iTarget').innerHTML = `<option value="">${k === 'demand' ? 'All its suppliers' : 'All its customers'}</option>` + opts.map(id => `<option value="${id}">${k === 'demand' ? 'Only purchases from ' : 'Only deliveries to '}${esc(short(id))}</option>`).join('');
+  $('#iTarget').value = opts.includes(cur) ? cur : '';
+}
+function controlsToScenario() {
+  return { text: $('#sText').value, origin: $('#iOrigin').value, target: $('#iTarget').value, kind: $('#iKind').value, severity: +$('#iSev').value / 100, notes: S.sc?.notes || [] };
+}
+function scenarioToControls(sc) {
+  $('#iOrigin').value = sc.origin; $('#iKind').value = sc.kind; fillTargets(); $('#iTarget').value = sc.target || '';
+  $('#iSev').value = Math.round(sc.severity * 100); syncOutputs();
+}
+function syncOutputs() {
+  $('#oSev').textContent = $('#iSev').value + '%';
+  $('#oEq').textContent = (+$('#iEq').value).toFixed(1) + 'x';
+  $('#oDamp').textContent = (+$('#iDamp').value).toFixed(2);
+  $('#hDamp').textContent = (+$('#iDamp').value).toFixed(2);
+  $('#hEq').textContent = (+$('#iEq').value).toFixed(1);
+}
+function describe(sc) {
+  const sev = fP(sc.severity, 0);
+  if (sc.kind === 'demand') return `${short(sc.origin)} cuts ${sc.target ? 'purchases from ' + short(sc.target) : 'compute spending'} ${sev}`;
+  return `${short(sc.origin)} can't deliver ${sev}${sc.target ? ' to ' + short(sc.target) : ''}`;
+}
+function renderInterp() {
+  const sc = S.sc; if (!sc) return;
+  const json = `{ company: "${sc.origin}", applies_to: ${sc.target ? '"' + sc.target + '"' : 'all'}, shock: ${sc.severity.toFixed(2)}, type: "${sc.kind}_shock" }`;
+  $('#iWhy').innerHTML = esc(json) + (sc.notes?.length ? '<br><span style="color:var(--accent2)">note: ' + esc(sc.notes.join('; ')) + '</span>' : '');
+  $$('.preset').forEach(b => b.classList.toggle('on', b.dataset.t === sc.text));
+}
+function compute() {
+  S.res = runShock(S.sc, +$('#iEq').value, +$('#iDamp').value);
+}
+async function runFromText(text) {
+  closeMenu(); $('#cmd').blur();
+  S.q = ''; $('#cmd').value = ''; $('#fq').value = ''; renderFilings();
+  $('#sText').value = text;
+  S.sc = parseScenario(text);
+  scenarioToControls(S.sc);
+  renderInterp();
+  await play();
+}
+async function play() {
+  compute();
+  if (S.loops) toggleLoops(false);
+  S.sel = null; renderDetail();
+  setTab('scenario');
+  const res = S.res, my = ++S.animToken;
+  S.animating = true; S.shown = {}; S.hot = new Set(); S.hop = 0;
+  $('#scenLive').classList.remove('hide');
+  renderHud(); paintMap(); renderResults(true); renderPortfolio(); renderTicker();
+  pulse(res.sc.origin);
+  await sleep(650);
+  for (let i = 0; i < res.hops.length; i++) {
+    if (my !== S.animToken) return;
+    S.hop = i + 1;
+    const h = res.hops[i];
+    for (const f of h.fired) S.hot.add(f.link);
+    paintMap(); renderHud();
+    h.fired.forEach(f => particle(f.link, res.sc.kind === 'demand', Math.min(1, 0.35 + Math.sqrt(f.usd) / 5)));
+    await sleep(560);
+    if (my !== S.animToken) return;
+    S.shown = h.pct; paintMap(); renderHud(); renderTicker();
+    await sleep(240);
+  }
+  if (my !== S.animToken) return;
+  S.animating = false; S.shown = res.pct;
+  renderAll();
+}
+function showInstant() { // recompute after a slider / dropdown edit, no animation
+  S.animToken++; S.animating = false;
+  compute();
+  S.shown = S.res.pct; S.hot = new Set(S.res.hops.flatMap(h => h.fired.map(f => f.link))); S.hop = S.res.hops.length;
+  $('#scenLive').classList.remove('hide');
+  renderAll();
+}
+function clearScenario() {
+  S.animToken++; S.animating = false; S.res = null; S.shown = null; S.hot = new Set(); S.hop = 0;
+  $('#scenLive').classList.add('hide');
+  gParticles.innerHTML = ''; gPulse.innerHTML = '';
+  renderAll();
+}
+function renderAll() { renderHud(); paintMap(); renderResults(); renderPortfolio(); renderTicker(); renderDetail(); renderTrace(); renderInterp(); }
+
+function pulse(id) {
+  const [x, y] = POS[id]; const r0 = R[id];
+  for (let k = 0; k < 3; k++) {
+    const c = el('circle', { cx: x, cy: y, r: r0, class: 'pulse', 'stroke-width': 2 }, gPulse);
+    const t0 = performance.now() + k * 220;
+    const step = now => { const t = (now - t0) / 1100; if (t < 0) return requestAnimationFrame(step); if (t >= 1) { c.remove(); return; } c.setAttribute('r', r0 + t * 70); c.setAttribute('opacity', (1 - t).toFixed(2)); requestAnimationFrame(step); };
+    requestAnimationFrame(step);
+  }
+}
+function particle(linkId, reverse, size) {
+  const path = EDGE[linkId].p, len = path.getTotalLength();
+  const c = el('circle', { r: 3 + 3 * size, fill: '#E8445A', filter: 'url(#glow)' }, gParticles);
+  const t0 = performance.now(), dur = 560;
+  const step = now => {
+    let t = Math.min(1, (now - t0) / dur); const e = t < .5 ? 2 * t * t : 1 - Math.pow(-2 * t + 2, 2) / 2;
+    const pt = path.getPointAtLength(len * (reverse ? 1 - e : e));
+    c.setAttribute('cx', pt.x); c.setAttribute('cy', pt.y);
+    if (t < 1) requestAnimationFrame(step); else c.remove();
+  };
+  requestAnimationFrame(step);
+}
+
+function renderHud() {
+  const h = $('#hud');
+  const play_ = '<svg width="10" height="10" viewBox="0 0 10 10" aria-hidden="true"><path d="M1 0 L9 5 L1 10Z" fill="currentColor"/></svg>';
+  if (!S.res) {
+    h.className = 'hud cta';
+    h.innerHTML = `<div class="qq"><span class="lbl" style="color:var(--accent)">Type what could go wrong</span><span class="q">See which of your stocks it hits.</span></div>
+      <div class="acts"><button class="btn primary" id="heroRun" style="height:32px">${play_}Run: OpenAI cuts compute spending 40%</button></div>`;
+    $('#heroRun').onclick = () => runFromText(PRESETS[0].t);
+    return;
+  }
+  const res = S.res, n = res.hops.length;
+  const snap = S.hop ? res.hops[S.hop - 1] : null;
+  const atRisk = snap ? Object.values(snap.loss).reduce((s, v) => s + v, 0) : 0;
+  const hitN = snap ? Object.keys(snap.loss).length : 0;
+  const pfL = snap ? Object.entries(snap.loss).filter(([id]) => S.pf.has(id)).reduce((s, [, v]) => s + v, 0) : 0;
+  h.className = 'hud';
+  h.innerHTML = `<div class="qq"><span class="lbl" style="color:var(--danger)">Scenario${S.animating ? ' · running' : ''} · ${S.hop ? 'Hop ' + S.hop + ' / ' + n : 'Origin'}</span><span class="q">${esc(describe(res.sc))}</span><div class="pips">${res.hops.map((_, i) => `<i class="${i < S.hop ? 'on' : ''}"></i>`).join('')}</div></div>
+    <div class="st">Revenue at risk<b class="d">-${fB(atRisk)}/yr</b></div>
+    <div class="st">Companies hit<b>${hitN}</b></div>
+    <div class="st">Your holdings<b class="a">-${fB(pfL)}/yr</b></div>
+    <div class="acts"><button class="btn" id="hudReplay"><svg width="12" height="12" viewBox="0 0 16 16" aria-hidden="true"><path d="M3 8a5 5 0 1 0 2-4" fill="none" stroke="currentColor" stroke-width="1.7"/><path d="M2 1v4h4" fill="none" stroke="currentColor" stroke-width="1.7"/></svg>Replay</button><button class="btn" id="hudTable">Results</button><button class="btn ghost" id="hudClear">Clear</button></div>`;
+  $('#hudReplay').onclick = () => play();
+  $('#hudClear').onclick = () => clearScenario();
+  $('#hudTable').onclick = () => { setTab('scenario'); $('#pane-scenario').scrollTop = 0; $('#drawer').scrollIntoView({ behavior: 'smooth', block: 'nearest' }); };
+}
+
+function renderResults(running) {
+  const tb = $('#rTable tbody'), sb = $('#sumbar');
+  if (!S.res) {
+    sb.innerHTML = `<div class="txt" style="color:var(--muted)">Run a scenario to see which companies lose revenue, by how much, and through which deals.</div><button class="btn primary" id="sbRun">Run hero scenario</button>`;
+    $('#sbRun').onclick = () => runFromText(PRESETS[0].t);
+    tb.innerHTML = `<tr><td colspan="8" class="empty">No scenario run yet.</td></tr>`;
+    return;
+  }
+  if (running) {
+    sb.innerHTML = `<div class="txt">Propagating <span class="mono" style="color:var(--danger)">${esc(describe(S.res.sc))}</span> through ${SUP.length} supply links...</div>`;
+    tb.innerHTML = `<tr><td colspan="8" class="empty">Running, results appear when the shock settles.</td></tr>`;
+    return;
+  }
+  const res = S.res;
+  const hold = [...S.pf];
+  const pr = res.rows.filter(r => S.pf.has(r.id));
+  const tot = pr.reduce((s, r) => s + r.loss, 0), eq = pr.reduce((s, r) => s + r.eq, 0);
+  // holdings that are hit through at least one company the user does not own
+  const viaOthers = pr.filter(r => (res.contrib[r.id] || []).some(c => c.from !== res.sc.origin && !S.pf.has(c.from)));
+  sb.innerHTML = `<div class="txt">Your ${hold.length} holding${hold.length === 1 ? '' : 's'} lose an estimated <b>${fB(tot)}/yr</b> of revenue${eq ? ` and <b>${fB(eq)}</b> of stake value` : ''}; <em>${viaOthers.length} of them</em> through companies you don't own.</div>
+    <div class="mono note">Total, all companies: <span style="color:var(--danger)">${fB(res.total)}/yr</span> · ${res.hops.length} hops · damping ${res.damp.toFixed(2)}</div>
+    <button class="btn" id="sbReplay">Replay</button><button class="btn ghost" id="sbClear">Clear</button>`;
+  $('#sbReplay').onclick = () => play();
+  $('#sbClear').onclick = () => clearScenario();
+  tb.innerHTML = res.rows.map(r => {
+    const c = C[r.id];
+    return `<tr class="click" data-node="${r.id}">
+      <td><b>${esc(c.name)}</b>${c.leverage_flag && r.loss > 0 ? ` <span class="tag lev" title="${esc(c.leverage_flag)}">LEVERAGE AMPLIFIES THIS</span>` : ''}</td>
+      <td class="mono">${esc(c.ticker)}</td>
+      <td>${S.pf.has(r.id) ? '<span class="yes">yes</span>' : '<span class="note">no</span>'}</td>
+      <td class="n">${r.loss ? fB(r.loss) + '/yr' : '-'}</td>
+      <td class="mono"><span class="pctbar"><i style="width:${Math.min(100, r.pct / 0.4 * 100)}%"></i></span>${r.loss ? fP(r.pct, r.pct < 0.01 ? 2 : 1) : '-'}</td>
+      <td class="n">${r.eq ? '-' + fB(r.eq) : '-'}</td>
+      <td class="path">${r.viaEquity ? 'stake in ' + esc(short(L[res.eq[r.id][0].link].to)) : r.path.map(short).map(esc).join(' > ')}</td>
+      <td>${tagHTML(r.conf)}</td></tr>`;
+  }).join('') || `<tr><td colspan="8" class="empty">No company is hit by this scenario.</td></tr>`;
+  tb.querySelectorAll('tr.click').forEach(tr => tr.addEventListener('click', () => select('node', tr.dataset.node)));
+}
+
+// ============================================================
+//  Agent trace (recorded run; values from the live computation)
+// ============================================================
+function traceSteps() {
+  const res = S.res || runShock(parseScenario(PRESETS[0].t), +$('#iEq').value, +$('#iDamp').value);
+  const sc = res.sc, o = short(sc.origin);
+  const fs = DATA.sources.filter(s => [s.title, s.used_for].join(' ').toLowerCase().includes(o.toLowerCase()));
+  const rel = sc.kind === 'demand' ? 'customers_of' : 'suppliers_of';
+  const links = SUP.filter(l => sc.kind === 'demand' ? l.to === sc.origin : l.from === sc.origin);
+  const tgt = res.rows.find(r => r.id === 'nvda' && r.loss) ? 'nvda' : (res.rows.find(r => r.loss && r.hop > 1) || res.rows[0] || { id: 'nvda' }).id;
+  const paths = allPaths(sc.origin, tgt, sc.kind);
+  const pathVal = p => { // dollars that actually flowed along this path's last hop from its predecessor
+    const last = p[p.length - 2]; return (res.contrib[tgt] || []).filter(c => c.from === last).reduce((s, c) => s + c.usd, 0);
+  };
+  const top = res.rows.filter(r => r.loss).slice(0, 4);
+  const fmtRows = rows => rows.map(r => `  { company: "${C[r.id].ticker}", revenue_at_risk: ${r.loss.toFixed(2)}, pct: ${(r.pct * 100).toFixed(1)} }`).join(',\n');
+  return [
+    { fn: 'search_filings', args: `"${o}"`, ms: 184, out: `{ matches: ${fs.length}, top: [\n${fs.slice(0, 3).map(s => `  "${s.title}" (${s.type}, ${s.date})`).join(',\n')}\n] }` },
+    { fn: 'get_links', args: `"${o}", "${rel}"`, ms: 92, out: `[\n${links.map(l => `  { ${sc.kind === 'demand' ? 'seller' : 'buyer'}: "${short(sc.kind === 'demand' ? l.from : l.to)}", annual_usd_b: ${l.annual_usd_b}, confidence: "${l.confidence}" }`).join(',\n')}\n]` },
+    { fn: sc.kind === 'demand' ? 'demand_shock' : 'supply_shock', args: `"${o}", ${sc.severity.toFixed(2)}${sc.target ? `, only="${short(sc.target)}"` : ''}`, ms: 38, out: `{ hops: ${res.hops.length}, companies_hit: ${res.rows.filter(r => r.loss).length}, revenue_at_risk_usd_b: ${res.total.toFixed(2)}, equity_hit_usd_b: ${res.eqTotal.toFixed(2)},\n top: [\n${fmtRows(top)}\n ] }` },
+    { fn: 'find_loops', args: '', ms: 21, out: `{ loops: ${LOOPS.loops.length}, cycles: ${LOOPS.paths}, ids: [${LOOPS.loops.map(l => '"' + l.meta.n + '"').join(', ')}] }` },
+    { fn: 'paths', args: `"${o}", "${C[tgt].ticker}"`, ms: 15, out: `[\n${paths.map(p => `  "${p.map(short).join(' > ')}"  ${pathVal(p) ? '(last hop $' + pathVal(p).toFixed(2) + 'B)' : ''}`).join(',\n')}\n]  // ${paths.length} paths` },
+    { fn: 'explain', args: '', ms: 1260, out: '-> see summary' }
+  ];
+}
+function explainText() {
+  const res = S.res || runShock(parseScenario(PRESETS[0].t), +$('#iEq').value, +$('#iDamp').value);
+  const r = res.rows.filter(x => x.loss);
+  if (!r.length) return 'This scenario does not move revenue for any company in the map.';
+  const byPct = r[0], second = r[1];
+  const byUsd = [...r].sort((a, b) => b.loss - a.loss)[0];
+  const nv = r.find(x => x.id === 'nvda');
+  const nvPaths = nv ? new Set((res.contrib.nvda || []).map(c => c.from)).size : 0;
+  const late = r.filter(x => x.id === 'tsm' || x.id === 'skh');
+  const eqTop = Object.entries(res.eq).map(([id, es]) => [id, es.reduce((s, e) => s + e.usd, 0)]).sort((a, b) => b[1] - a[1])[0];
+  const lev = r.filter(x => C[x.id].leverage_flag);
+  let s = `If ${esc(describe(res.sc))}, about <b>${fB(res.total)}</b> a year of revenue is at risk across ${r.length} companies. `;
+  s += `${esc(short(byPct.id))} is hit hardest by share of revenue (<b>-${fP(byPct.pct)}</b>, ${fB(byPct.loss)}/yr)${second ? `, then ${esc(short(second.id))} (<b>-${fP(second.pct)}</b>)` : ''}. `;
+  if (byUsd.id !== byPct.id) s += `${esc(short(byUsd.id))} loses the most in dollars (${fB(byUsd.loss)}/yr) but only ${fP(byUsd.pct)} of revenue. `;
+  if (nv) s += `Nvidia is hit through ${nvPaths} customer${nvPaths > 1 ? 's' : ''} (<b>-${fP(nv.pct)}</b>), mostly via ${esc(short(res.parent.nvda))}. `;
+  if (late.length) s += `${late.map(x => esc(short(x.id))).join(' and ')} feel it last, from hop ${Math.min(...late.map(x => x.hop))}. `;
+  if (eqTop) s += `Separately, stakes lose about <b>${fB(res.eqTotal)}</b> in value, led by ${esc(short(eqTop[0]))} (${fB(eqTop[1])}). `;
+  if (lev.length) s += `${lev.map(x => esc(short(x.id))).join(' and ')} fund${lev.length === 1 ? 's' : ''} this buildout with debt, so the gap hurts more than the percentage suggests.`;
+  return s;
+}
+let traceToken = 0;
+function renderTrace(animate) {
+  const steps = traceSteps();
+  const total = steps.reduce((s, x) => s + x.ms, 0);
+  $('#trMeta').textContent = `${steps.length} tool calls · ${(total / 1000).toFixed(2)}s`;
+  $('#calls').innerHTML = steps.map((s, i) => `<div class="call${animate ? ' pending' : ''}" data-i="${i}"><div class="h" role="button" tabindex="0"><span class="i">${String(i + 1).padStart(2, '0')}</span><span><span class="fn">${s.fn}</span>(${esc(s.args)})</span><span class="ms">${s.ms} ms</span></div><pre>${esc(s.out)}</pre></div>`).join('');
+  $('#calls').querySelectorAll('.call .h').forEach(h => {
+    const t = () => h.parentElement.classList.toggle('closed');
+    h.addEventListener('click', t); h.addEventListener('keydown', e => { if (e.key === 'Enter') t(); });
+  });
+  $('#explain').innerHTML = animate ? '' : explainText();
+  if (animate) {
+    const my = ++traceToken;
+    (async () => {
+      for (const c of $$('#calls .call')) { await sleep(380); if (my !== traceToken) return; c.classList.remove('pending'); }
+      await sleep(300); if (my === traceToken) $('#explain').innerHTML = explainText();
+    })();
+  }
+}
+
+// ============================================================
+//  Wire up
+// ============================================================
+function init() {
+  buildMap();
+  $('#mapMeta').textContent = `${IDS.length} companies · ${DATA.links.length} links · ${DATA.sources.length} sources`;
+  fillSelects();
+  $('#presets').innerHTML = PRESETS.map(p => `<button class="preset" data-t="${esc(p.t)}"><span>${esc(p.t)}</span>${p.k ? '<small>HERO</small>' : ''}</button>`).join('');
+  $$('.preset').forEach(b => b.addEventListener('click', () => runFromText(b.dataset.t)));
+  $('#sForm').addEventListener('submit', e => { e.preventDefault(); const t = $('#sText').value.trim(); if (t) runFromText(t); });
+  $('#iOrigin').addEventListener('change', () => { fillTargets(); S.sc = { ...controlsToScenario(), notes: ['edited by hand'] }; renderInterp(); showInstant(); });
+  $('#iKind').addEventListener('change', () => { fillTargets(); S.sc = { ...controlsToScenario(), notes: ['edited by hand'] }; renderInterp(); showInstant(); });
+  $('#iTarget').addEventListener('change', () => { S.sc = { ...controlsToScenario(), notes: ['edited by hand'] }; renderInterp(); showInstant(); });
+  ['#iSev', '#iEq', '#iDamp'].forEach(s => $(s).addEventListener('input', () => { syncOutputs(); S.sc = controlsToScenario(); renderInterp(); if (S.res) showInstant(); }));
+  $('#loopBtn').addEventListener('click', () => toggleLoops());
+  const openHow = () => $('#how').classList.remove('hide');
+  $('#howBtn').addEventListener('click', openHow); $('#howBtn2').addEventListener('click', openHow);
+  $('#howClose').addEventListener('click', () => $('#how').classList.add('hide'));
+  $('#how').addEventListener('click', e => { if (e.target.id === 'how') $('#how').classList.add('hide'); });
+  $$('.tab[data-tab]').forEach(b => b.addEventListener('click', () => setTab(b.dataset.tab)));
+  $('#drawerToggle').addEventListener('click', toggleDrawer);
+  $('#trReplay').addEventListener('click', () => renderTrace(true));
+  const reset = () => { S.q = ''; $('#cmd').value = ''; $('#fq').value = ''; S.fType = 'All'; if (S.loops) toggleLoops(false); select(null); };
+  $('#brand').addEventListener('click', reset);
+  $('#brand').addEventListener('keydown', e => { if (e.key === 'Enter') reset(); });
+  // search
+  const cmd = $('#cmd');
+  cmd.addEventListener('input', () => { menuIdx = 0; setQuery(cmd.value, 'cmd'); renderMenu(); if (cmd.value.trim() && !SCEN_RE.test(cmd.value) && S.tab !== 'filings') setTab('filings'); });
+  cmd.addEventListener('focus', renderMenu);
+  cmd.addEventListener('blur', () => setTimeout(closeMenu, 120));
+  cmd.addEventListener('keydown', e => {
+    const items = cmdItems(cmd.value);
+    if (e.key === 'ArrowDown') { e.preventDefault(); menuIdx = Math.min(items.length - 1, menuIdx + 1); renderMenu(); }
+    else if (e.key === 'ArrowUp') { e.preventDefault(); menuIdx = Math.max(0, menuIdx - 1); renderMenu(); }
+    else if (e.key === 'Enter') { e.preventDefault(); if (items[menuIdx]) items[menuIdx].act(); }
+    else if (e.key === 'Escape') { setQuery('', ''); closeMenu(); cmd.blur(); }
+  });
+  $('#fq').addEventListener('input', e => setQuery(e.target.value, 'fq'));
+  document.addEventListener('keydown', e => {
+    if (e.key === '/' && !/INPUT|TEXTAREA|SELECT/.test(document.activeElement.tagName)) { e.preventDefault(); cmd.focus(); }
+    if (e.key === 'Escape') { $('#how').classList.add('hide'); if (S.sel) select(null); }
+  });
+  // default scenario loaded in the controls, not yet run
+  S.sc = parseScenario(PRESETS[0].t); scenarioToControls(S.sc); syncOutputs();
+  renderLoops(); renderFilings(); renderAll();
+}
+init();
+</script>
+</body>
+</html>
