@@ -23,7 +23,7 @@ Every link carries a confidence tag and a source (`data/sources.md`):
 - **REPORTED**: credible media (WSJ, FT, Reuters, CNBC, Yonhap).
 - **ESTIMATED**: our assumption, explained in the link's `estimate_note`. Annualised values (for example $250B over ~7 years = ~$36B/yr) are estimates.
 
-Sources marked `unverified` in `data/sources.md` were not re-checked against the live document in our quick pass (many sites block automated fetches). Snapshot: hand-verified from filings and press releases, Oct 2026. Not investment advice.
+Sources marked `unverified` in `data/sources.md` were not re-checked against the live document in our quick pass (many sites block automated fetches). Snapshot: verified from filings and press releases, Oct 2026. Not investment advice.
 
 ## Run it locally
 
