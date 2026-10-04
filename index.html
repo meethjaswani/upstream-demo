@@ -134,8 +134,8 @@ kbd{font:500 10px var(--mono);color:var(--muted);border:1px solid var(--line2);p
 /* svg */
 .lane-t{font:700 11px var(--sans);letter-spacing:.2em;fill:#6b6a74;text-transform:uppercase}
 .node{cursor:pointer}
-.node .tick{font:700 13px var(--mono);fill:var(--text)}
-.node .rev{font:500 11.5px var(--mono);fill:var(--muted)}
+.node .tick{font:700 13px var(--mono);fill:var(--text);paint-order:stroke;stroke:var(--bg);stroke-width:3px;stroke-linejoin:round}
+.node .rev{font:500 11.5px var(--mono);fill:var(--muted);paint-order:stroke;stroke:var(--bg);stroke-width:3px;stroke-linejoin:round}
 .node.pf .tick{fill:var(--accent2)}
 .node.dim{opacity:.18}
 .node .selring{fill:none;stroke:var(--text);stroke-width:1.2;opacity:0}
@@ -150,6 +150,40 @@ kbd{font:500 10px var(--mono);color:var(--muted);border:1px solid var(--line2);p
 .badge-t{font:700 12.5px var(--mono);fill:#ff6b7f}
 .badge-r{fill:#140a0c;stroke:var(--danger);stroke-width:.8}
 .pulse{fill:none;stroke:var(--danger)}
+.choke{fill:none;stroke:#F1ECE4;stroke-width:1.2;opacity:.55;pointer-events:none;transition:opacity .2s,stroke-width .2s}
+.node.chokeon .choke{opacity:1;stroke-width:2}
+.choke-t{font:700 9.5px var(--mono);letter-spacing:.12em;fill:#F1ECE4;paint-order:stroke;stroke:var(--bg);stroke-width:3px;opacity:0;pointer-events:none}
+.node.chokeon .choke-t{opacity:1}
+.chokecap{display:grid;grid-template-columns:auto repeat(3,1fr) auto;gap:0;border-bottom:1px solid var(--line);background:linear-gradient(90deg,rgba(241,236,228,.07),transparent 70%)}
+.chokecap.hide{display:none}
+.chokecap .hd{padding:8px 12px;display:flex;flex-direction:column;justify-content:center;max-width:210px}
+.chokecap .hd .note{font-size:10.5px;color:var(--muted);line-height:1.3;margin-top:2px}
+.chokecap .cp{padding:8px 12px;border-left:1px solid var(--line2);background:none;border-top:0;border-right:0;border-bottom:0;color:inherit;text-align:left;cursor:pointer;font:inherit}
+.chokecap .cp:hover{background:rgba(241,236,228,.06)}
+.chokecap .cp .n{font:700 13px var(--mono)}
+.chokecap .cp .w{font:500 11px var(--sans);color:var(--muted);margin-left:4px}
+.chokecap .cp .v{font:700 15px var(--mono);color:var(--danger)}
+.chokecap .cp .v span{font:500 10.5px var(--mono);color:var(--muted)}
+.chokecap .cp .go{font:600 10px var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--accent2);margin-top:3px}
+.chokecap .x{display:flex;align-items:center;padding:0 12px}
+@media (max-width:900px){.chokecap{grid-template-columns:1fr}.chokecap .cp{border-left:0;border-top:1px solid var(--line2)}.chokecap .x{padding:8px 12px}}
+.burn{fill:none;opacity:.9;stroke-linecap:round;pointer-events:none}
+.floater{font:700 14px var(--mono);paint-order:stroke;stroke:var(--bg);stroke-width:4px;stroke-linejoin:round;pointer-events:none}
+.feed{position:absolute;right:8px;top:26px;width:206px;pointer-events:none;font-family:var(--mono);background:rgba(9,9,11,.82);border:1px solid var(--line2);border-left:2px solid var(--danger);backdrop-filter:blur(3px)}
+.feed.hide{display:none}
+.feed .fh{display:flex;justify-content:space-between;gap:8px;padding:6px 9px;font-size:10px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--danger);border-bottom:1px solid var(--line)}
+.feed .fh span{color:var(--muted);letter-spacing:.04em}
+.feed .fc{padding:5px 9px 6px;font:500 11px var(--sans);color:var(--text);border-bottom:1px solid var(--line);line-height:1.3}
+.feed .fr{display:grid;grid-template-columns:18px 46px 1fr auto;gap:5px;align-items:baseline;padding:3px 9px;font-size:11px;font-variant-numeric:tabular-nums;animation:feedin .35s ease-out}
+.feed .fr i{font-style:normal;color:var(--muted);font-size:9.5px}
+.feed .fr b{color:var(--text)}
+.feed .fr.pf b{color:var(--accent2)}
+.feed .fr u{text-decoration:none;color:#ff6b7f;font-weight:700}
+.feed .fr em{font-style:normal;color:var(--muted);text-align:right}
+.feed .fr.eq u{color:var(--accent2)}
+@keyframes feedin{from{opacity:0;transform:translateX(14px);background:rgba(232,68,90,.28)}to{opacity:1;transform:none;background:transparent}}
+.chip.struck{animation:struck .7s ease-out}
+@keyframes struck{0%{box-shadow:0 0 0 0 rgba(232,68,90,.9);background:rgba(232,68,90,.35)}100%{box-shadow:0 0 0 10px rgba(232,68,90,0)}}
 
 /* tooltip */
 .tip{position:fixed;z-index:60;pointer-events:none;background:var(--panel2);border:1px solid var(--line3);padding:7px 9px;font-size:11.5px;max-width:280px;box-shadow:0 8px 24px rgba(0,0,0,.6)}
@@ -306,9 +340,10 @@ td.mono{font-family:var(--mono);white-space:nowrap}
   .drawer.closed .pane{display:none}
 }
 @media (max-width:700px){
-  .mapwrap{aspect-ratio:auto;height:auto}
-  #map{position:static;height:auto;aspect-ratio:1100/640}
+  .mapwrap{aspect-ratio:auto;height:auto;overflow-x:auto;-webkit-overflow-scrolling:touch}
+  #map{position:static;height:auto;width:760px;max-width:none;aspect-ratio:1100/640}
   .legend{position:static;flex-direction:row;flex-wrap:wrap;gap:4px 12px;margin:6px 12px;background:none}
+  .feed{position:sticky;left:8px;right:auto;top:auto;width:auto;max-width:300px;margin:6px 8px}
   .hud .st{padding-left:0;border-left:0}
   .hud .acts{margin-left:0}
   .brand small{display:none}
@@ -359,18 +394,22 @@ td.mono{font-family:var(--mono);white-space:nowrap}
         <span class="loopcount" id="loopCount"></span>
         <button class="btn" id="loopBtn" aria-pressed="false">
           <svg width="13" height="13" viewBox="0 0 16 16" aria-hidden="true"><path d="M3 8a5 5 0 0 1 9-3M13 8a5 5 0 0 1-9 3" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M12 1v4H8M4 15v-4h4" fill="none" stroke="currentColor" stroke-width="1.6"/></svg>
-          Show money loops</button>
+          Money loops</button>
+        <button class="btn" id="chokeBtn" aria-pressed="false"><svg width="11" height="11" viewBox="0 0 12 12" aria-hidden="true"><path d="M6 1 L11 6 L6 11 L1 6Z" fill="none" stroke="currentColor" stroke-width="1.5"/></svg>Choke points</button>
         <button class="btn ghost" id="howBtn">How it works</button>
       </div>
       <div class="hud" id="hud"></div>
       <div class="loopcap hide" id="loopCap"></div>
+      <div class="chokecap hide" id="chokeCap"></div>
       <div class="mapwrap" id="mapwrap">
         <svg id="map" viewBox="0 8 1100 612" preserveAspectRatio="xMidYMid meet" role="img" aria-label="Network map of AI company deals"></svg>
+      <div class="feed hide" id="feed" aria-live="off"></div>
       <div class="legend" id="legend">
           <span><svg width="26" height="8"><path d="M1 4H25" stroke="#C9C4BC" stroke-width="2.5"/></svg>sells to</span>
           <span><svg width="26" height="8"><path d="M1 4H25" stroke="#F7931E" stroke-width="1.6" stroke-dasharray="5 3"/></svg>invests in</span>
           <span><svg width="26" height="8"><path d="M2 4H25" stroke="#C9C4BC" stroke-width="2" stroke-dasharray="0.1 4" stroke-linecap="round"/></svg>undisclosed / est.</span>
           <span><svg width="44" height="8"><defs><linearGradient id="lg"><stop offset="0" stop-color="#4A4952"/><stop offset=".5" stop-color="#F7931E"/><stop offset="1" stop-color="#E8445A"/></linearGradient></defs><rect width="44" height="5" y="1.5" fill="url(#lg)"/></svg>ring = OpenAI exposure</span>
+          <span><svg width="26" height="12"><path d="M13 1 L18 6 L13 11 L8 6Z" fill="none" stroke="#F1ECE4" stroke-width="1.3"/></svg>choke point</span>
           <span>size = revenue</span>
           <span>click a node or arrow</span>
       </div>
@@ -398,7 +437,7 @@ td.mono{font-family:var(--mono);white-space:nowrap}
         <span class="sp"></span>
         <span class="note mono" id="fInfo"></span>
       </div>
-      <table class="grid" id="fTable"><thead><tr><th>Date</th><th>Type</th><th>Company</th><th>Document</th><th class="n">Links</th><th>Source</th></tr></thead><tbody></tbody></table>
+      <table class="grid" id="fTable"><thead><tr><th>Date</th><th>Type</th><th>Company</th><th>Document</th><th class="n">Links</th><th>Check</th><th>Source</th></tr></thead><tbody></tbody></table>
     </div>
 
     <div class="pane" id="pane-scenario">
@@ -411,7 +450,7 @@ td.mono{font-family:var(--mono);white-space:nowrap}
           </form>
           <div class="presets" id="presets"></div>
           <div class="interp">
-            <div class="sec-h" style="margin:0"><span class="lbl">AI interpretation</span><span class="lbl mono" style="color:var(--dim)">editable</span></div>
+            <div class="sec-h" style="margin:0"><span class="lbl">AI interpretation</span><span class="lbl mono" id="parserBadge" title="Start server.js with ANTHROPIC_API_KEY for live parsing"></span></div>
             <div class="row"><label for="iOrigin">Company</label><select id="iOrigin"></select></div>
             <div class="row"><label for="iTarget">Applies to</label><select id="iTarget"></select></div>
             <div class="row"><label for="iKind">Type</label><select id="iKind"><option value="demand">Demand shock (buyer cuts spending)</option><option value="supply">Supply shock (seller can't deliver)</option></select></div>
@@ -458,6 +497,7 @@ td.mono{font-family:var(--mono);white-space:nowrap}
       <li><b>Annual values.</b> Multi-year contracts are spread evenly over their term. Undisclosed amounts use a stated placeholder (dotted arrows). Each link says how it was estimated.</li>
       <li><b>Leverage flag.</b> Oracle (free cash flow -$23.7B, $43B debt raised in FY26) and CoreWeave (debt-funded buildout) carry a "Leverage amplifies this" chip: the same revenue gap hurts more when it services debt.</li>
       <li><b>Supply shock.</b> Flows downstream instead: buyers lose the share of their business that depends on the seller's deliveries, with the same damping.</li>
+      <li><b>Choke points.</b> We fail each company in full, both as a buyer and as a supplier, and rank by revenue at risk times companies hit. The top three are marked with a diamond.</li>
     </ol>
     <p class="note">Not investment advice. A first-order model to show where exposure sits, not a price forecast.</p>
   </div>
@@ -466,7 +506,7 @@ td.mono{font-family:var(--mono);white-space:nowrap}
 
 <script>
 /*DATA:BEGIN*/
-const DATA = {"companies":[{"id":"openai","name":"OpenAI","ticker":"PRIVATE","type":"ai_lab","listed":false,"revenue_usd_b":22.8,"fiscal_year":"Q1 2026 annualised","revenue_confidence":"ESTIMATED","revenue_source":"Motley Fool, Jun 2026: Q1 2026 revenue $5.7B (x4 = $22.8B, our annualisation)","revenue_source_id":"fool-openai","sells":"ChatGPT subscriptions, API access","facts":["Q1 2026 revenue $5.7B","2025 net loss $38.5B","Biggest single buyer of AI compute in this map"],"leverage_flag":null},{"id":"msft","name":"Microsoft","ticker":"MSFT","type":"cloud","listed":true,"revenue_usd_b":331.8,"fiscal_year":"FY2026 (to Jun 2026)","revenue_confidence":"DISCLOSED","revenue_source":"Microsoft FY26 Q4 earnings release, Jul 29 2026","revenue_source_id":"msft-fy26q4","sells":"Azure cloud compute, software","facts":["Azure passed $100B annual revenue","Owns ~27% of OpenAI","CoreWeave's largest customer"],"leverage_flag":null},{"id":"nvda","name":"Nvidia","ticker":"NVDA","type":"chips","listed":true,"revenue_usd_b":215.9,"fiscal_year":"FY2026 (to Jan 2026)","revenue_confidence":"DISCLOSED","revenue_source":"Nvidia FY2026 10-K (nvda-20260125)","revenue_source_id":"nvda-10k","sells":"GPUs (GB200, HBM-based accelerators), networking","facts":["One direct customer = 22% of revenue, another = 14%","10-K: an AI research company bought meaningful volume via Nvidia's cloud customers","Invested $30B in OpenAI, owns ~13% of CoreWeave"],"leverage_flag":null},{"id":"orcl","name":"Oracle","ticker":"ORCL","type":"cloud","listed":true,"revenue_usd_b":67.4,"fiscal_year":"FY2026 (to May 2026)","revenue_confidence":"DISCLOSED","revenue_source":"Oracle Q4 FY26 earnings release, Jun 10 2026","revenue_source_id":"orcl-q4fy26","sells":"Oracle Cloud Infrastructure (OCI), databases","facts":["Remaining performance obligations $638B, >$300B from OpenAI","Raised $43B of debt in FY26","Free cash flow -$23.7B"],"leverage_flag":"FCF -$23.7B and $43B new debt in FY26"},{"id":"crwv","name":"CoreWeave","ticker":"CRWV","type":"cloud","listed":true,"revenue_usd_b":5.13,"fiscal_year":"FY2025","revenue_confidence":"DISCLOSED","revenue_source":"CoreWeave FY2025 10-K","revenue_source_id":"crwv-10k","sells":"GPU cloud capacity","facts":["Microsoft ~67% of FY2025 revenue","Backlog $99.4B at Mar 31 2026","Largest customer 45% of Q1 2026 revenue"],"leverage_flag":"GPU buildout funded largely with debt"},{"id":"amzn","name":"Amazon (AWS)","ticker":"AMZN","type":"cloud","listed":true,"revenue_usd_b":128.7,"fiscal_year":"2025 (AWS segment)","revenue_confidence":"DISCLOSED","revenue_source":"Amazon Q4 2025 results: AWS quarters summed, Q4 $35.6B","revenue_source_id":"amzn-q425","sells":"AWS cloud compute","facts":["AWS backlog $244B","Invested $50B in OpenAI (~5%)","Revenue here = AWS segment only"],"leverage_flag":null},{"id":"googl","name":"Alphabet","ticker":"GOOGL","type":"cloud","listed":true,"revenue_usd_b":402.8,"fiscal_year":"2025","revenue_confidence":"DISCLOSED","revenue_source":"Alphabet Q4 2025 earnings release, Feb 4 2026","revenue_source_id":"googl-q425","sells":"Google Cloud, search ads, TPUs","facts":["Google Cloud revenue $58.7B","Resells CoreWeave capacity to OpenAI (reported)"],"leverage_flag":null},{"id":"amd","name":"AMD","ticker":"AMD","type":"chips","listed":true,"revenue_usd_b":34.6,"fiscal_year":"2025","revenue_confidence":"DISCLOSED","revenue_source":"AMD Q4 2025 earnings release, Feb 3 2026","revenue_source_id":"amd-q425","sells":"GPUs (Instinct MI series), CPUs","facts":["6 GW GPU deal with OpenAI, first 1 GW in 2H 2026","Gave OpenAI a warrant for up to 160M AMD shares"],"leverage_flag":null},{"id":"avgo","name":"Broadcom","ticker":"AVGO","type":"chips","listed":true,"revenue_usd_b":64,"fiscal_year":"FY2025","revenue_confidence":"DISCLOSED","revenue_source":"Broadcom Q4 FY25 earnings release, Dec 11 2025","revenue_source_id":"avgo-q4fy25","sells":"Custom AI accelerators, networking chips","facts":["AI revenue $20B in FY2025","10 GW custom accelerator deal with OpenAI to end-2029"],"leverage_flag":null},{"id":"tsm","name":"TSMC","ticker":"TSM","type":"supplier","listed":true,"revenue_usd_b":122,"fiscal_year":"2025","revenue_confidence":"DISCLOSED","revenue_source":"TSMC 2025 annual report via Taiwan News, Mar 2026 (USD derived: Nvidia NT$726.9B = 19%)","revenue_source_id":"tsm-ar","sells":"Chip manufacturing (foundry)","facts":["Nvidia = 19% of 2025 revenue (NT$726.9B)","Makes chips for Nvidia, AMD and Broadcom"],"leverage_flag":null},{"id":"skh","name":"SK Hynix","ticker":"000660.KS","type":"supplier","listed":true,"revenue_usd_b":67.9,"fiscal_year":"2025","revenue_confidence":"DISCLOSED","revenue_source":"SK Hynix FY25 results, Jan 2026 (KRW 97.15T)","revenue_source_id":"skh-fy25","sells":"HBM memory, DRAM, NAND","facts":["Revenue KRW 97.15T","~70% of Nvidia's 2026 HBM4 demand (reported)"],"leverage_flag":null},{"id":"sb","name":"SoftBank","ticker":"9984.T","type":"investor","listed":true,"revenue_usd_b":null,"fiscal_year":null,"revenue_confidence":null,"revenue_source":"Investor node: revenue not modelled","revenue_source_id":null,"sells":"Investment holding company","facts":["Put $30B into OpenAI's Feb 2026 round","Round: $110B at $730B pre-money, later $122B"],"leverage_flag":null}],"links":[{"id":"S01","from":"msft","to":"openai","type":"supply","label":"Azure compute","amount_usd_b":250,"annual_usd_b":36,"amount_confidence":"ESTIMATED","period":"Oct 2025 - 2032","date":"2025-10-28","confidence":"DISCLOSED","source_id":"msft-10q","source_title":"Microsoft 10-Q, quarter to Sep 30 2025, Note 17","source_url":"https://www.sec.gov/Archives/edgar/data/789019/000119312525256321/msft-20250930.htm","quote":"OpenAI contracted an incremental $250B of Azure services.","quote_kind":"paraphrase","estimate_note":"Annual value is our estimate: $250B spread over ~7 years to 2032 = ~$36B/yr."},{"id":"S02","from":"orcl","to":"openai","type":"supply","label":"OCI compute (Stargate)","amount_usd_b":300,"annual_usd_b":60,"amount_confidence":"REPORTED","period":"5 years from 2027","date":"2025-09-10","confidence":"REPORTED","source_id":"wsj-orcl","source_title":"WSJ: OpenAI signs ~$300B Oracle compute deal (Sep 2025)","source_url":"https://www.datacenterdynamics.com/en/news/oracle-may-need-to-borrow-100bn-for-openai-efforts-says-keybanc-capital-markets/","quote":"About $300B of compute over roughly five years, starting 2027.","quote_kind":"paraphrase","estimate_note":"$300B / 5 years = ~$60B/yr. Oracle RPO is $638B, of which >$300B is OpenAI."},{"id":"S03","from":"amzn","to":"openai","type":"supply","label":"AWS compute","amount_usd_b":138,"annual_usd_b":17,"amount_confidence":"ESTIMATED","period":"Nov 2025 - ~2034","date":"2026-02-27","confidence":"DISCLOSED","source_id":"geekwire-amzn","source_title":"GeekWire: Amazon invests $50B in OpenAI, expands AWS deal by $100B","source_url":"https://www.geekwire.com/2026/amazon-invests-50b-in-openai-deepens-aws-partnership-with-expanded-100b-cloud-deal/","quote":"$38B deal (Nov 2025) plus $100B over eight years.","quote_kind":"paraphrase","estimate_note":"~$17B/yr is William Blair's estimate, used as-is."},{"id":"S04","from":"crwv","to":"openai","type":"supply","label":"GPU cloud capacity","amount_usd_b":22.4,"annual_usd_b":4.5,"amount_confidence":"ESTIMATED","period":"2025 - ~2030","date":"2025-09-25","confidence":"DISCLOSED","source_id":"dcd-keybanc","source_title":"DCD: contract values for OpenAI compute (CoreWeave $11.9B + $4B + $6.5B)","source_url":"https://www.datacenterdynamics.com/en/news/oracle-may-need-to-borrow-100bn-for-openai-efforts-says-keybanc-capital-markets/","quote":"Three contracts: $11.9B, $4B and $6.5B, up to $22.4B total.","quote_kind":"paraphrase","estimate_note":"~$4.5B/yr is our estimate: $22.4B over ~5 years."},{"id":"S05","from":"googl","to":"openai","type":"supply","label":"Google Cloud capacity","amount_usd_b":null,"annual_usd_b":2,"amount_confidence":"ESTIMATED","period":"from mid-2025","date":"2025-06-10","confidence":"REPORTED","source_id":"reuters-googl","source_title":"Reuters: OpenAI taps Google Cloud for extra capacity (Jun 2025)","source_url":"https://www.reuters.com/site-search/?query=OpenAI+Google+cloud+deal","quote":"OpenAI added Google Cloud to meet its compute needs.","quote_kind":"paraphrase","estimate_note":"Amount undisclosed. $2B/yr is our placeholder so the link counts in the math; small vs Azure/AWS deals."},{"id":"S06","from":"crwv","to":"googl","type":"supply","label":"Capacity resold to OpenAI","amount_usd_b":null,"annual_usd_b":1,"amount_confidence":"ESTIMATED","period":"from 2025","date":"2025-07-15","confidence":"REPORTED","source_id":"dcd-crwv-googl","source_title":"DCD (citing Reuters): CoreWeave to provide compute for Google's OpenAI deal","source_url":"https://www.datacenterdynamics.com/en/news/coreweave-to-provide-compute-capacity-for-googles-openai-deal-report/","quote":"Google resells CoreWeave capacity to OpenAI.","quote_kind":"paraphrase","estimate_note":"Amount undisclosed. $1B/yr is our placeholder."},{"id":"S07","from":"crwv","to":"msft","type":"supply","label":"GPU cloud capacity","amount_usd_b":3.44,"annual_usd_b":3.44,"amount_confidence":"DISCLOSED","period":"FY2025","date":"2026-03-02","confidence":"DISCLOSED","source_id":"crwv-10k","source_title":"CoreWeave FY2025 10-K, risk factors","source_url":"https://www.sec.gov/cgi-bin/browse-edgar?action=getcompany&CIK=0001769628&type=10-K","quote":"Microsoft accounted for about 67% of FY2025 revenue.","quote_kind":"paraphrase","estimate_note":"67% x $5.13B = $3.44B."},{"id":"S08","from":"amd","to":"openai","type":"supply","label":"6 GW of Instinct GPUs","amount_usd_b":null,"annual_usd_b":10,"amount_confidence":"ESTIMATED","period":"first 1 GW in 2H 2026","date":"2025-10-06","confidence":"DISCLOSED","source_id":"amd-openai","source_title":"AMD and OpenAI announce strategic partnership (6 GW)","source_url":"https://newsroom.amd.com/news/amd-and-openai-announce-strategic-partnership-to-d/","quote":"tens of billions of dollars in revenue","quote_kind":"verbatim","estimate_note":"Deal is disclosed; dollar value is not. ~$10B/yr is our estimate from the CFO's 'tens of billions'."},{"id":"S09","from":"avgo","to":"openai","type":"supply","label":"10 GW custom accelerators","amount_usd_b":null,"annual_usd_b":5,"amount_confidence":"ESTIMATED","period":"deploy to end-2029","date":"2025-10-13","confidence":"DISCLOSED","source_id":"openai-avgo","source_title":"OpenAI and Broadcom announce strategic collaboration (10 GW)","source_url":"https://openai.com/index/openai-and-broadcom-announce-strategic-collaboration/","quote":"10 GW of OpenAI-designed accelerators, deployed through end of 2029.","quote_kind":"paraphrase","estimate_note":"Amount undisclosed. ~$5B/yr early run-rate is our assumption."},{"id":"S10","from":"nvda","to":"orcl","type":"supply","label":"GB200 chips for Stargate Abilene","amount_usd_b":40,"annual_usd_b":20,"amount_confidence":"ESTIMATED","period":"2025 - 2026","date":"2025-05-23","confidence":"REPORTED","source_id":"dcd-orcl-nvda","source_title":"DCD (citing FT): Oracle to spend $40B on Nvidia chips for OpenAI Texas site","source_url":"https://www.datacenterdynamics.com/en/news/oracle-to-spend-40bn-on-nvidia-chips-for-openai-texas-data-center/","quote":"About $40B of GB200 chips for the Abilene data center.","quote_kind":"paraphrase","estimate_note":"$40B over ~2 years = ~$20B/yr, our estimate."},{"id":"S11","from":"nvda","to":"msft","type":"supply","label":"GPU sales","amount_usd_b":null,"annual_usd_b":30,"amount_confidence":"ESTIMATED","period":"FY2026","date":"2026-02-25","confidence":"ESTIMATED","source_id":"nvda-10k","source_title":"Nvidia FY2026 10-K, concentration of revenue","source_url":"https://www.sec.gov/cgi-bin/browse-edgar?action=getcompany&CIK=0001045810&type=10-K","quote":"Two direct customers made up 22% and 14% of revenue.","quote_kind":"paraphrase","estimate_note":"Nvidia names no customers. Split of the 22% + 14% across clouds is our assumption."},{"id":"S12","from":"nvda","to":"amzn","type":"supply","label":"GPU sales","amount_usd_b":null,"annual_usd_b":20,"amount_confidence":"ESTIMATED","period":"FY2026","date":"2026-02-25","confidence":"ESTIMATED","source_id":"nvda-10k","source_title":"Nvidia FY2026 10-K, concentration of revenue","source_url":"https://www.sec.gov/cgi-bin/browse-edgar?action=getcompany&CIK=0001045810&type=10-K","quote":"Two direct customers made up 22% and 14% of revenue.","quote_kind":"paraphrase","estimate_note":"Nvidia names no customers. $20B/yr is our assumption."},{"id":"S13","from":"nvda","to":"googl","type":"supply","label":"GPU sales","amount_usd_b":null,"annual_usd_b":20,"amount_confidence":"ESTIMATED","period":"FY2026","date":"2026-02-25","confidence":"ESTIMATED","source_id":"nvda-10k","source_title":"Nvidia FY2026 10-K, concentration of revenue","source_url":"https://www.sec.gov/cgi-bin/browse-edgar?action=getcompany&CIK=0001045810&type=10-K","quote":"Two direct customers made up 22% and 14% of revenue.","quote_kind":"paraphrase","estimate_note":"Nvidia names no customers. $20B/yr is our assumption."},{"id":"S14","from":"nvda","to":"crwv","type":"supply","label":"GPU sales","amount_usd_b":null,"annual_usd_b":10,"amount_confidence":"ESTIMATED","period":"FY2026","date":"2026-02-25","confidence":"ESTIMATED","source_id":"nvda-10k","source_title":"Nvidia FY2026 10-K, concentration of revenue","source_url":"https://www.sec.gov/cgi-bin/browse-edgar?action=getcompany&CIK=0001045810&type=10-K","quote":"Two direct customers made up 22% and 14% of revenue.","quote_kind":"paraphrase","estimate_note":"Nvidia names no customers. $10B/yr is our assumption, sized to CoreWeave's debt-funded GPU buildout."},{"id":"S15","from":"crwv","to":"nvda","type":"supply","label":"Unsold capacity, bought back","amount_usd_b":6.3,"annual_usd_b":1.05,"amount_confidence":"ESTIMATED","period":"through Apr 2032","date":"2025-09-15","confidence":"DISCLOSED","source_id":"dcd-nvda-crwv","source_title":"DCD: Nvidia invests another $2B in CoreWeave","source_url":"https://www.datacenterdynamics.com/en/news/nvidia-invests-another-2bn-in-coreweave/","quote":"Nvidia agreed to buy $6.3B of CoreWeave's unsold capacity.","quote_kind":"paraphrase","estimate_note":"$6.3B over ~6 years = ~$1.05B/yr, our estimate."},{"id":"S16","from":"tsm","to":"nvda","type":"supply","label":"Chip manufacturing","amount_usd_b":23.2,"annual_usd_b":23.2,"amount_confidence":"DISCLOSED","period":"2025","date":"2026-03-10","confidence":"DISCLOSED","source_id":"tsm-ar","source_title":"Taiwan News: TSMC 2025 annual report, client A = 19% of revenue","source_url":"https://www.taiwannews.com.tw/news/6310676","quote":"Client A was 19% of revenue, NT$726.9B.","quote_kind":"paraphrase","estimate_note":"Client A is unnamed; Jensen Huang confirmed Nvidia is TSMC's top customer. NT$726.9B = ~US$23.2B."},{"id":"S17","from":"tsm","to":"amd","type":"supply","label":"Chip manufacturing","amount_usd_b":null,"annual_usd_b":7,"amount_confidence":"ESTIMATED","period":"2025","date":"2026-03-10","confidence":"ESTIMATED","source_id":"tsm-ar","source_title":"TSMC 2025 annual report (customer amounts not named)","source_url":"https://www.taiwannews.com.tw/news/6310676","quote":"TSMC manufactures AMD's leading-edge GPUs and CPUs.","quote_kind":"paraphrase","estimate_note":"Amount undisclosed. $7B/yr is our assumption (~20% of AMD revenue)."},{"id":"S18","from":"tsm","to":"avgo","type":"supply","label":"Chip manufacturing","amount_usd_b":null,"annual_usd_b":8,"amount_confidence":"ESTIMATED","period":"2025","date":"2026-03-10","confidence":"ESTIMATED","source_id":"tsm-ar","source_title":"TSMC 2025 annual report (customer amounts not named)","source_url":"https://www.taiwannews.com.tw/news/6310676","quote":"TSMC manufactures Broadcom's custom accelerators.","quote_kind":"paraphrase","estimate_note":"Amount undisclosed. $8B/yr is our assumption."},{"id":"S19","from":"skh","to":"nvda","type":"supply","label":"HBM4 memory","amount_usd_b":null,"annual_usd_b":18,"amount_confidence":"ESTIMATED","period":"2026","date":"2026-01-20","confidence":"REPORTED","source_id":"yonhap-hbm","source_title":"Yonhap: SK Hynix to supply ~70% of Nvidia's 2026 HBM4","source_url":"https://en.yna.co.kr/search/index?query=SK%20hynix%20HBM4%20Nvidia","quote":"SK Hynix to supply about 70% of Nvidia's 2026 HBM4 needs.","quote_kind":"paraphrase","estimate_note":"Dollar amount undisclosed. $18B/yr is our assumption (~27% of SK Hynix revenue)."},{"id":"E01","from":"msft","to":"openai","type":"equity","label":"~27% stake","amount_usd_b":135,"stake_value_usd_b":135,"annual_usd_b":null,"amount_confidence":"DISCLOSED","period":"since 2019","date":"2025-10-28","confidence":"DISCLOSED","source_id":"msft-10q","source_title":"Microsoft 10-Q, quarter to Sep 30 2025, Note 17","source_url":"https://www.sec.gov/Archives/edgar/data/789019/000119312525256321/msft-20250930.htm","quote":"~27% stake valued ~$135B after the Oct 2025 recapitalisation.","quote_kind":"paraphrase","estimate_note":"Microsoft has put $13B of funding in total.","consideration":"cash"},{"id":"E02","from":"amzn","to":"openai","type":"equity","label":"$50B, ~5% stake","amount_usd_b":50,"stake_value_usd_b":50,"annual_usd_b":null,"amount_confidence":"DISCLOSED","period":"completed Feb 2026","date":"2026-02-27","confidence":"DISCLOSED","source_id":"geekwire-amzn","source_title":"GeekWire: Amazon invests $50B in OpenAI, expands AWS deal by $100B","source_url":"https://www.geekwire.com/2026/amazon-invests-50b-in-openai-deepens-aws-partnership-with-expanded-100b-cloud-deal/","quote":"Amazon completed a $50B investment for about 5% of OpenAI.","quote_kind":"paraphrase","estimate_note":null,"consideration":"cash"},{"id":"E03","from":"nvda","to":"openai","type":"equity","label":"$30B equity","amount_usd_b":30,"stake_value_usd_b":30,"annual_usd_b":null,"amount_confidence":"REPORTED","period":"Feb 2026 round","date":"2026-02-20","confidence":"REPORTED","source_id":"dcd-nvda-openai","source_title":"DCD (citing FT, CNBC): Nvidia plans $30B investment in OpenAI round","source_url":"https://www.datacenterdynamics.com/en/news/nvidia-plans-30bn-investment-in-upcoming-openai-funding-round/","quote":"$30B equity, replacing the Sep 2025 'up to $100B' letter of intent.","quote_kind":"paraphrase","estimate_note":null,"consideration":"cash"},{"id":"E04","from":"sb","to":"openai","type":"equity","label":"$30B equity","amount_usd_b":30,"stake_value_usd_b":30,"annual_usd_b":null,"amount_confidence":"REPORTED","period":"Feb 2026 round","date":"2026-02-20","confidence":"REPORTED","source_id":"sb-openai","source_title":"Reports: SoftBank puts $30B into OpenAI's $110B round","source_url":"https://www.reuters.com/site-search/?query=SoftBank+OpenAI+30+billion","quote":"$110B round at $730B pre-money, later raised to $122B.","quote_kind":"paraphrase","estimate_note":null,"consideration":"cash"},{"id":"E05","from":"nvda","to":"crwv","type":"equity","label":"~13% stake","amount_usd_b":2,"stake_value_usd_b":5.7,"annual_usd_b":null,"amount_confidence":"ESTIMATED","period":"extra $2B Jan 2026","date":"2026-01-26","confidence":"DISCLOSED","source_id":"dcd-nvda-crwv","source_title":"DCD: Nvidia invests another $2B in CoreWeave","source_url":"https://www.datacenterdynamics.com/en/news/nvidia-invests-another-2bn-in-coreweave/","quote":"Another $2B at $87.20 per share, taking the stake to ~13%.","quote_kind":"paraphrase","estimate_note":"Stake value ~$5.7B is our estimate: 13% x ~$44B market cap.","consideration":"cash"},{"id":"E06","from":"openai","to":"crwv","type":"equity","label":"$350M stake","amount_usd_b":0.35,"stake_value_usd_b":0.35,"annual_usd_b":null,"amount_confidence":"REPORTED","period":"Mar 2025","date":"2025-03-10","confidence":"REPORTED","source_id":"reuters-crwv","source_title":"Reuters: OpenAI takes $350M CoreWeave stake with $11.9B deal","source_url":"https://www.reuters.com/site-search/?query=OpenAI+CoreWeave+350+million+stake","quote":"CoreWeave issued $350M of stock to OpenAI alongside the contract.","quote_kind":"paraphrase","estimate_note":"Stock issued as part of the compute deal, so value flows CoreWeave to OpenAI.","consideration":"issued_in_deal"},{"id":"E07","from":"openai","to":"amd","type":"equity","label":"Warrant, up to ~10% of AMD","amount_usd_b":null,"stake_value_usd_b":null,"annual_usd_b":null,"amount_confidence":"DISCLOSED","period":"vests with GW milestones","date":"2025-10-06","confidence":"DISCLOSED","source_id":"amd-openai","source_title":"AMD and OpenAI announce strategic partnership (6 GW)","source_url":"https://newsroom.amd.com/news/amd-and-openai-announce-strategic-partnership-to-d/","quote":"Warrant for up to 160M AMD shares at $0.01, vesting by milestones.","quote_kind":"paraphrase","estimate_note":"AMD issues the shares, so value flows AMD to OpenAI. Dollar value depends on AMD's share price; not modelled.","consideration":"issued_in_deal"}],"sources":[{"id":"msft-10q","title":"Microsoft Form 10-Q, quarter ended Sep 30 2025 (Note 17: OpenAI)","company":"msft","date":"2025-10-29","type":"10-Q","url":"https://www.sec.gov/Archives/edgar/data/789019/000119312525256321/msft-20250930.htm","used_for":"$250B incremental Azure commitment from OpenAI; ~27% stake valued ~$135B; $13B total funding."},{"id":"msft-fy26q4","title":"Microsoft FY26 Q4 earnings release","company":"msft","date":"2026-07-29","type":"press release","url":"https://www.microsoft.com/en-us/investor","used_for":"FY2026 revenue $331.8B; Azure passed $100B."},{"id":"nvda-10k","title":"Nvidia Form 10-K, fiscal year ended Jan 25 2026 (nvda-20260125)","company":"nvda","date":"2026-02-25","type":"10-K","url":"https://www.sec.gov/cgi-bin/browse-edgar?action=getcompany&CIK=0001045810&type=10-K","used_for":"FY2026 revenue $215.9B; direct customers at 22% and 14%; AI research company buying via cloud customers."},{"id":"orcl-q4fy26","title":"Oracle Q4 FY26 earnings release","company":"orcl","date":"2026-06-10","type":"press release","url":"https://investor.oracle.com/","used_for":"FY2026 revenue $67.4B; RPO $638B; $43B debt raised; FCF -$23.7B."},{"id":"wsj-orcl","title":"WSJ: OpenAI signs ~$300B, five-year Oracle compute deal","company":"orcl","date":"2025-09-10","type":"news","url":"https://www.wsj.com/search?query=Oracle%20OpenAI%20300%20billion","used_for":"~$300B over 5 years from 2027 (REPORTED)."},{"id":"dcd-keybanc","title":"DCD: Oracle may need to borrow $100B for OpenAI efforts, says KeyBanc","company":"orcl","date":"2025-09-25","type":"news","url":"https://www.datacenterdynamics.com/en/news/oracle-may-need-to-borrow-100bn-for-openai-efforts-says-keybanc-capital-markets/","used_for":"OpenAI compute contract values incl. CoreWeave $11.9B + $4B + $6.5B; Oracle funding pressure."},{"id":"crwv-10k","title":"CoreWeave Form 10-K, fiscal year 2025","company":"crwv","date":"2026-03-02","type":"10-K","url":"https://www.sec.gov/cgi-bin/browse-edgar?action=getcompany&CIK=0001769628&type=10-K","used_for":"FY2025 revenue $5.13B; Microsoft ~67% of revenue; debt-funded buildout."},{"id":"crwv-10q","title":"CoreWeave Form 10-Q, quarter ended Mar 31 2026","company":"crwv","date":"2026-05-12","type":"10-Q","url":"https://www.sec.gov/cgi-bin/browse-edgar?action=getcompany&CIK=0001769628&type=10-Q","used_for":"Backlog $99.4B; largest customer 45% of Q1 2026 revenue."},{"id":"amzn-q425","title":"Amazon Q4 2025 financial results","company":"amzn","date":"2026-02-05","type":"press release","url":"https://ir.aboutamazon.com/","used_for":"AWS revenue 2025 ~$128.7B (Q4 $35.6B); AWS backlog $244B."},{"id":"geekwire-amzn","title":"GeekWire: Amazon invests $50B in OpenAI, expands AWS deal by $100B","company":"amzn","date":"2026-02-27","type":"news","url":"https://www.geekwire.com/2026/amazon-invests-50b-in-openai-deepens-aws-partnership-with-expanded-100b-cloud-deal/","used_for":"$50B equity (~5%); $38B + $100B AWS commitments; ~$17B/yr (William Blair)."},{"id":"googl-q425","title":"Alphabet Q4 2025 earnings release","company":"googl","date":"2026-02-04","type":"press release","url":"https://abc.xyz/investor/","used_for":"2025 revenue $402.8B; Google Cloud $58.7B."},{"id":"reuters-googl","title":"Reuters: OpenAI taps Google Cloud for more computing capacity","company":"googl","date":"2025-06-10","type":"news","url":"https://www.reuters.com/site-search/?query=OpenAI+Google+cloud+deal","used_for":"Google sells cloud capacity to OpenAI; amount undisclosed."},{"id":"dcd-crwv-googl","title":"DCD: CoreWeave to provide compute capacity for Google's OpenAI deal","company":"crwv","date":"2025-07-15","type":"news","url":"https://www.datacenterdynamics.com/en/news/coreweave-to-provide-compute-capacity-for-googles-openai-deal-report/","used_for":"CoreWeave capacity resold by Google to OpenAI (REPORTED)."},{"id":"amd-q425","title":"AMD Q4 2025 financial results","company":"amd","date":"2026-02-03","type":"press release","url":"https://ir.amd.com/","used_for":"2025 revenue $34.6B."},{"id":"amd-openai","title":"AMD and OpenAI announce strategic partnership to deploy 6 GW of AMD GPUs","company":"amd","date":"2025-10-06","type":"press release","url":"https://newsroom.amd.com/news/amd-and-openai-announce-strategic-partnership-to-d/","used_for":"6 GW deal, first 1 GW 2H 2026; warrant up to 160M shares; CFO 'tens of billions'."},{"id":"avgo-q4fy25","title":"Broadcom Q4 FY25 financial results","company":"avgo","date":"2025-12-11","type":"press release","url":"https://investors.broadcom.com/","used_for":"FY2025 revenue ~$64B; AI revenue $20B."},{"id":"openai-avgo","title":"OpenAI and Broadcom announce strategic collaboration (10 GW)","company":"avgo","date":"2025-10-13","type":"press release","url":"https://openai.com/index/openai-and-broadcom-announce-strategic-collaboration/","used_for":"10 GW custom accelerators to end-2029; amount undisclosed."},{"id":"dcd-orcl-nvda","title":"DCD: Oracle to spend $40B on Nvidia chips for OpenAI Texas data center","company":"nvda","date":"2025-05-23","type":"news","url":"https://www.datacenterdynamics.com/en/news/oracle-to-spend-40bn-on-nvidia-chips-for-openai-texas-data-center/","used_for":"~$40B of GB200 chips for Stargate Abilene (REPORTED, FT)."},{"id":"dcd-nvda-crwv","title":"DCD: Nvidia invests another $2B in CoreWeave","company":"crwv","date":"2026-01-26","type":"news","url":"https://www.datacenterdynamics.com/en/news/nvidia-invests-another-2bn-in-coreweave/","used_for":"$2B at $87.20/share; ~13% stake; $6.3B capacity backstop through Apr 2032."},{"id":"dcd-nvda-openai","title":"DCD: Nvidia plans $30B investment in upcoming OpenAI funding round","company":"nvda","date":"2026-02-20","type":"news","url":"https://www.datacenterdynamics.com/en/news/nvidia-plans-30bn-investment-in-upcoming-openai-funding-round/","used_for":"$30B equity replacing the 'up to $100B' LOI (REPORTED, FT/CNBC)."},{"id":"tsm-ar","title":"Taiwan News: TSMC 2025 annual report, client A = 19% of revenue","company":"tsm","date":"2026-03-10","type":"news","url":"https://www.taiwannews.com.tw/news/6310676","used_for":"Nvidia NT$726.9B = 19% of revenue; TSMC revenue ~US$122B derived."},{"id":"skh-fy25","title":"SK Hynix FY2025 earnings results","company":"skh","date":"2026-01-22","type":"press release","url":"https://www.skhynix.com/ir/","used_for":"2025 revenue KRW 97.15T (~$67.9B)."},{"id":"yonhap-hbm","title":"Yonhap: SK Hynix to supply ~70% of Nvidia's 2026 HBM4","company":"skh","date":"2026-01-20","type":"news","url":"https://en.yna.co.kr/search/index?query=SK%20hynix%20HBM4%20Nvidia","used_for":"~70% share of Nvidia HBM4 demand (REPORTED)."},{"id":"reuters-crwv","title":"Reuters: OpenAI signs $11.9B CoreWeave deal, takes $350M stake","company":"crwv","date":"2025-03-10","type":"news","url":"https://www.reuters.com/site-search/?query=OpenAI+CoreWeave+350+million+stake","used_for":"$350M of CoreWeave stock to OpenAI (REPORTED)."},{"id":"sb-openai","title":"Reports: SoftBank commits $30B to OpenAI's $110B round","company":"sb","date":"2026-02-20","type":"news","url":"https://www.reuters.com/site-search/?query=SoftBank+OpenAI+30+billion","used_for":"$30B; round $110B at $730B pre-money, later $122B (REPORTED)."},{"id":"fool-openai","title":"Motley Fool: OpenAI revenue and losses","company":"openai","date":"2026-06-15","type":"news","url":"https://www.fool.com/search/?q=OpenAI%20revenue","used_for":"Q1 2026 revenue $5.7B; 2025 net loss $38.5B."}]};
+const DATA = {"companies":[{"id":"openai","name":"OpenAI","ticker":"PRIVATE","type":"ai_lab","listed":false,"revenue_usd_b":22.8,"fiscal_year":"Q1 2026 annualised","revenue_confidence":"ESTIMATED","revenue_source":"Motley Fool, Jun 2026: Q1 2026 revenue $5.7B (x4 = $22.8B, our annualisation)","revenue_source_id":"fool-openai","sells":"ChatGPT subscriptions, API access","facts":["Q1 2026 revenue $5.7B","2025 net loss $38.5B","Biggest single buyer of AI compute in this map"],"leverage_flag":null},{"id":"msft","name":"Microsoft","ticker":"MSFT","type":"cloud","listed":true,"revenue_usd_b":331.8,"fiscal_year":"FY2026 (to Jun 2026)","revenue_confidence":"DISCLOSED","revenue_source":"Microsoft FY26 Q4 earnings release, Jul 29 2026","revenue_source_id":"msft-fy26q4","sells":"Azure cloud compute, software","facts":["Azure passed $100B annual revenue","Owns ~27% of OpenAI","CoreWeave's largest customer"],"leverage_flag":null},{"id":"nvda","name":"Nvidia","ticker":"NVDA","type":"chips","listed":true,"revenue_usd_b":215.9,"fiscal_year":"FY2026 (to Jan 2026)","revenue_confidence":"DISCLOSED","revenue_source":"Nvidia FY2026 10-K (nvda-20260125)","revenue_source_id":"nvda-10k","sells":"GPUs (GB200, HBM-based accelerators), networking","facts":["One direct customer = 22% of revenue, another = 14%","10-K: an AI research company bought meaningful volume via Nvidia's cloud customers","Invested $30B in OpenAI, owns ~13% of CoreWeave"],"leverage_flag":null},{"id":"orcl","name":"Oracle","ticker":"ORCL","type":"cloud","listed":true,"revenue_usd_b":67.4,"fiscal_year":"FY2026 (to May 2026)","revenue_confidence":"DISCLOSED","revenue_source":"Oracle Q4 FY26 earnings release, Jun 10 2026","revenue_source_id":"orcl-q4fy26","sells":"Oracle Cloud Infrastructure (OCI), databases","facts":["Remaining performance obligations $638B, >$300B from OpenAI","Raised $43B of debt in FY26","Free cash flow -$23.7B"],"leverage_flag":"FCF -$23.7B and $43B new debt in FY26"},{"id":"crwv","name":"CoreWeave","ticker":"CRWV","type":"cloud","listed":true,"revenue_usd_b":5.13,"fiscal_year":"FY2025","revenue_confidence":"DISCLOSED","revenue_source":"CoreWeave FY2025 10-K","revenue_source_id":"crwv-10k","sells":"GPU cloud capacity","facts":["Microsoft ~67% of FY2025 revenue","Backlog $99.4B at Mar 31 2026","Largest customer 45% of Q1 2026 revenue"],"leverage_flag":"GPU buildout funded largely with debt"},{"id":"amzn","name":"Amazon (AWS)","ticker":"AMZN","type":"cloud","listed":true,"revenue_usd_b":128.7,"fiscal_year":"2025 (AWS segment)","revenue_confidence":"DISCLOSED","revenue_source":"Amazon Q4 2025 results: AWS quarters summed, Q4 $35.6B","revenue_source_id":"amzn-q425","sells":"AWS cloud compute","facts":["AWS backlog $244B","Invested $50B in OpenAI (~5%)","Revenue here = AWS segment only"],"leverage_flag":null},{"id":"googl","name":"Alphabet","ticker":"GOOGL","type":"cloud","listed":true,"revenue_usd_b":402.8,"fiscal_year":"2025","revenue_confidence":"DISCLOSED","revenue_source":"Alphabet Q4 2025 earnings release, Feb 4 2026","revenue_source_id":"googl-q425","sells":"Google Cloud, search ads, TPUs","facts":["Google Cloud revenue $58.7B","Resells CoreWeave capacity to OpenAI (reported)"],"leverage_flag":null},{"id":"amd","name":"AMD","ticker":"AMD","type":"chips","listed":true,"revenue_usd_b":34.6,"fiscal_year":"2025","revenue_confidence":"DISCLOSED","revenue_source":"AMD Q4 2025 earnings release, Feb 3 2026","revenue_source_id":"amd-q425","sells":"GPUs (Instinct MI series), CPUs","facts":["6 GW GPU deal with OpenAI, first 1 GW in 2H 2026","Gave OpenAI a warrant for up to 160M AMD shares"],"leverage_flag":null},{"id":"avgo","name":"Broadcom","ticker":"AVGO","type":"chips","listed":true,"revenue_usd_b":64,"fiscal_year":"FY2025","revenue_confidence":"DISCLOSED","revenue_source":"Broadcom Q4 FY25 earnings release, Dec 11 2025","revenue_source_id":"avgo-q4fy25","sells":"Custom AI accelerators, networking chips","facts":["AI revenue $20B in FY2025","10 GW custom accelerator deal with OpenAI to end-2029"],"leverage_flag":null},{"id":"tsm","name":"TSMC","ticker":"TSM","type":"supplier","listed":true,"revenue_usd_b":122,"fiscal_year":"2025","revenue_confidence":"DISCLOSED","revenue_source":"TSMC 2025 annual report via Taiwan News, Mar 2026 (USD derived: Nvidia NT$726.9B = 19%)","revenue_source_id":"tsm-ar","sells":"Chip manufacturing (foundry)","facts":["Nvidia = 19% of 2025 revenue (NT$726.9B)","Makes chips for Nvidia, AMD and Broadcom"],"leverage_flag":null},{"id":"skh","name":"SK Hynix","ticker":"000660.KS","type":"supplier","listed":true,"revenue_usd_b":67.9,"fiscal_year":"2025","revenue_confidence":"DISCLOSED","revenue_source":"SK Hynix FY25 results, Jan 2026 (KRW 97.15T)","revenue_source_id":"skh-fy25","sells":"HBM memory, DRAM, NAND","facts":["Revenue KRW 97.15T","~70% of Nvidia's 2026 HBM4 demand (reported)"],"leverage_flag":null},{"id":"sb","name":"SoftBank","ticker":"9984.T","type":"investor","listed":true,"revenue_usd_b":null,"fiscal_year":null,"revenue_confidence":null,"revenue_source":"Investor node: revenue not modelled","revenue_source_id":null,"sells":"Investment holding company","facts":["Put $30B into OpenAI's Feb 2026 round","Round: $110B at $730B pre-money, later $122B"],"leverage_flag":null}],"links":[{"id":"S01","from":"msft","to":"openai","type":"supply","label":"Azure compute","amount_usd_b":250,"annual_usd_b":36,"amount_confidence":"ESTIMATED","period":"Oct 2025 - 2032","date":"2025-10-28","confidence":"DISCLOSED","source_id":"msft-10q","source_title":"Microsoft 10-Q, quarter to Sep 30 2025, Note 17","source_url":"https://www.sec.gov/Archives/edgar/data/789019/000119312525256321/msft-20250930.htm","quote":"OpenAI contracted an incremental $250B of Azure services.","quote_kind":"paraphrase","estimate_note":"Annual value is our estimate: $250B spread over ~7 years to 2032 = ~$36B/yr.","verification":"verified"},{"id":"S02","from":"orcl","to":"openai","type":"supply","label":"OCI compute (Stargate)","amount_usd_b":300,"annual_usd_b":60,"amount_confidence":"REPORTED","period":"5 years from 2027","date":"2025-09-10","confidence":"REPORTED","source_id":"wsj-orcl","source_title":"WSJ: OpenAI signs ~$300B Oracle compute deal (Sep 2025)","source_url":"https://www.wsj.com/search?query=Oracle%20OpenAI%20300%20billion","quote":"About $300B of compute over roughly five years, starting 2027.","quote_kind":"paraphrase","estimate_note":"$300B / 5 years = ~$60B/yr. Oracle RPO is $638B, of which >$300B is OpenAI.","verification":"unverified"},{"id":"S03","from":"amzn","to":"openai","type":"supply","label":"AWS compute","amount_usd_b":138,"annual_usd_b":17,"amount_confidence":"ESTIMATED","period":"Nov 2025 - ~2034","date":"2026-02-27","confidence":"DISCLOSED","source_id":"geekwire-amzn","source_title":"GeekWire: Amazon invests $50B in OpenAI, expands AWS deal by $100B","source_url":"https://www.geekwire.com/2026/amazon-invests-50b-in-openai-deepens-aws-partnership-with-expanded-100b-cloud-deal/","quote":"$38B deal (Nov 2025) plus $100B over eight years.","quote_kind":"paraphrase","estimate_note":"~$17B/yr is William Blair's estimate, used as-is.","verification":"unverified"},{"id":"S04","from":"crwv","to":"openai","type":"supply","label":"GPU cloud capacity","amount_usd_b":22.4,"annual_usd_b":4.5,"amount_confidence":"ESTIMATED","period":"2025 - ~2030","date":"2025-09-25","confidence":"DISCLOSED","source_id":"dcd-keybanc","source_title":"DCD: contract values for OpenAI compute (CoreWeave $11.9B + $4B + $6.5B)","source_url":"https://www.datacenterdynamics.com/en/news/oracle-may-need-to-borrow-100bn-for-openai-efforts-says-keybanc-capital-markets/","quote":"Three contracts: $11.9B, $4B and $6.5B, up to $22.4B total.","quote_kind":"paraphrase","estimate_note":"~$4.5B/yr is our estimate: $22.4B over ~5 years.","verification":"unverified"},{"id":"S05","from":"googl","to":"openai","type":"supply","label":"Google Cloud capacity","amount_usd_b":null,"annual_usd_b":2,"amount_confidence":"ESTIMATED","period":"from mid-2025","date":"2025-06-10","confidence":"REPORTED","source_id":"reuters-googl","source_title":"Reuters: OpenAI taps Google Cloud for extra capacity (Jun 2025)","source_url":"https://www.reuters.com/site-search/?query=OpenAI+Google+cloud+deal","quote":"OpenAI added Google Cloud to meet its compute needs.","quote_kind":"paraphrase","estimate_note":"Amount undisclosed. $2B/yr is our placeholder so the link counts in the math; small vs Azure/AWS deals.","verification":"unverified"},{"id":"S06","from":"crwv","to":"googl","type":"supply","label":"Capacity resold to OpenAI","amount_usd_b":null,"annual_usd_b":1,"amount_confidence":"ESTIMATED","period":"from 2025","date":"2025-07-15","confidence":"REPORTED","source_id":"dcd-crwv-googl","source_title":"DCD (citing Reuters): CoreWeave to provide compute for Google's OpenAI deal","source_url":"https://www.datacenterdynamics.com/en/news/coreweave-to-provide-compute-capacity-for-googles-openai-deal-report/","quote":"Google resells CoreWeave capacity to OpenAI.","quote_kind":"paraphrase","estimate_note":"Amount undisclosed. $1B/yr is our placeholder.","verification":"unverified"},{"id":"S07","from":"crwv","to":"msft","type":"supply","label":"GPU cloud capacity","amount_usd_b":3.44,"annual_usd_b":3.44,"amount_confidence":"DISCLOSED","period":"FY2025","date":"2026-03-02","confidence":"DISCLOSED","source_id":"crwv-10k","source_title":"CoreWeave FY2025 10-K, risk factors","source_url":"https://www.sec.gov/Archives/edgar/data/1769628/000176962826000104/crwv-20251231.htm","quote":"Microsoft accounted for about 67% of FY2025 revenue.","quote_kind":"paraphrase","estimate_note":"67% x $5.13B = $3.44B.","verification":"unverified"},{"id":"S08","from":"amd","to":"openai","type":"supply","label":"6 GW of Instinct GPUs","amount_usd_b":null,"annual_usd_b":10,"amount_confidence":"ESTIMATED","period":"first 1 GW in 2H 2026","date":"2025-10-06","confidence":"DISCLOSED","source_id":"amd-openai","source_title":"AMD and OpenAI announce strategic partnership (6 GW)","source_url":"https://newsroom.amd.com/news/amd-and-openai-announce-strategic-partnership-to-d/","quote":"tens of billions of dollars in revenue","quote_kind":"verbatim","estimate_note":"Deal is disclosed; dollar value is not. ~$10B/yr is our estimate from the CFO's 'tens of billions'.","verification":"verified"},{"id":"S09","from":"avgo","to":"openai","type":"supply","label":"10 GW custom accelerators","amount_usd_b":null,"annual_usd_b":5,"amount_confidence":"ESTIMATED","period":"deploy to end-2029","date":"2025-10-13","confidence":"DISCLOSED","source_id":"openai-avgo","source_title":"OpenAI and Broadcom announce strategic collaboration (10 GW)","source_url":"https://openai.com/index/openai-and-broadcom-announce-strategic-collaboration/","quote":"10 GW of OpenAI-designed accelerators, deployed through end of 2029.","quote_kind":"paraphrase","estimate_note":"Amount undisclosed. ~$5B/yr early run-rate is our assumption.","verification":"unverified"},{"id":"S10","from":"nvda","to":"orcl","type":"supply","label":"GB200 chips for Stargate Abilene","amount_usd_b":40,"annual_usd_b":20,"amount_confidence":"ESTIMATED","period":"2025 - 2026","date":"2025-05-23","confidence":"REPORTED","source_id":"dcd-orcl-nvda","source_title":"DCD (citing FT): Oracle to spend $40B on Nvidia chips for OpenAI Texas site","source_url":"https://www.datacenterdynamics.com/en/news/oracle-to-spend-40bn-on-nvidia-chips-for-openai-texas-data-center/","quote":"About $40B of GB200 chips for the Abilene data center.","quote_kind":"paraphrase","estimate_note":"$40B over ~2 years = ~$20B/yr, our estimate.","verification":"unverified"},{"id":"S11","from":"nvda","to":"msft","type":"supply","label":"GPU sales","amount_usd_b":null,"annual_usd_b":30,"amount_confidence":"ESTIMATED","period":"FY2026","date":"2026-02-25","confidence":"ESTIMATED","source_id":"nvda-10k","source_title":"Nvidia FY2026 10-K, concentration of revenue","source_url":"https://www.sec.gov/Archives/edgar/data/1045810/000104581026000021/nvda-20260125.htm","quote":"Two direct customers made up 22% and 14% of revenue.","quote_kind":"paraphrase","estimate_note":"Nvidia names no customers. Split of the 22% + 14% across clouds is our assumption.","verification":"verified"},{"id":"S12","from":"nvda","to":"amzn","type":"supply","label":"GPU sales","amount_usd_b":null,"annual_usd_b":20,"amount_confidence":"ESTIMATED","period":"FY2026","date":"2026-02-25","confidence":"ESTIMATED","source_id":"nvda-10k","source_title":"Nvidia FY2026 10-K, concentration of revenue","source_url":"https://www.sec.gov/Archives/edgar/data/1045810/000104581026000021/nvda-20260125.htm","quote":"Two direct customers made up 22% and 14% of revenue.","quote_kind":"paraphrase","estimate_note":"Nvidia names no customers. $20B/yr is our assumption.","verification":"verified"},{"id":"S13","from":"nvda","to":"googl","type":"supply","label":"GPU sales","amount_usd_b":null,"annual_usd_b":20,"amount_confidence":"ESTIMATED","period":"FY2026","date":"2026-02-25","confidence":"ESTIMATED","source_id":"nvda-10k","source_title":"Nvidia FY2026 10-K, concentration of revenue","source_url":"https://www.sec.gov/Archives/edgar/data/1045810/000104581026000021/nvda-20260125.htm","quote":"Two direct customers made up 22% and 14% of revenue.","quote_kind":"paraphrase","estimate_note":"Nvidia names no customers. $20B/yr is our assumption.","verification":"verified"},{"id":"S14","from":"nvda","to":"crwv","type":"supply","label":"GPU sales","amount_usd_b":null,"annual_usd_b":10,"amount_confidence":"ESTIMATED","period":"FY2026","date":"2026-02-25","confidence":"ESTIMATED","source_id":"nvda-10k","source_title":"Nvidia FY2026 10-K, concentration of revenue","source_url":"https://www.sec.gov/Archives/edgar/data/1045810/000104581026000021/nvda-20260125.htm","quote":"Two direct customers made up 22% and 14% of revenue.","quote_kind":"paraphrase","estimate_note":"Nvidia names no customers. $10B/yr is our assumption, sized to CoreWeave's debt-funded GPU buildout.","verification":"verified"},{"id":"S15","from":"crwv","to":"nvda","type":"supply","label":"Unsold capacity, bought back","amount_usd_b":6.3,"annual_usd_b":1.05,"amount_confidence":"ESTIMATED","period":"through Apr 2032","date":"2025-09-15","confidence":"DISCLOSED","source_id":"dcd-nvda-crwv","source_title":"DCD: Nvidia invests another $2B in CoreWeave","source_url":"https://www.datacenterdynamics.com/en/news/nvidia-invests-another-2bn-in-coreweave/","quote":"Nvidia agreed to buy $6.3B of CoreWeave's unsold capacity.","quote_kind":"paraphrase","estimate_note":"$6.3B over ~6 years = ~$1.05B/yr, our estimate.","verification":"unverified"},{"id":"S16","from":"tsm","to":"nvda","type":"supply","label":"Chip manufacturing","amount_usd_b":23.2,"annual_usd_b":23.2,"amount_confidence":"DISCLOSED","period":"2025","date":"2026-03-10","confidence":"DISCLOSED","source_id":"tsm-ar","source_title":"Taiwan News: TSMC 2025 annual report, client A = 19% of revenue","source_url":"https://www.taiwannews.com.tw/news/6310676","quote":"Client A was 19% of revenue, NT$726.9B.","quote_kind":"paraphrase","estimate_note":"Client A is unnamed; Jensen Huang confirmed Nvidia is TSMC's top customer. NT$726.9B = ~US$23.2B.","verification":"verified"},{"id":"S17","from":"tsm","to":"amd","type":"supply","label":"Chip manufacturing","amount_usd_b":null,"annual_usd_b":7,"amount_confidence":"ESTIMATED","period":"2025","date":"2026-03-10","confidence":"ESTIMATED","source_id":"tsm-ar","source_title":"TSMC 2025 annual report (customer amounts not named)","source_url":"https://www.taiwannews.com.tw/news/6310676","quote":"TSMC manufactures AMD's leading-edge GPUs and CPUs.","quote_kind":"paraphrase","estimate_note":"Amount undisclosed. $7B/yr is our assumption (~20% of AMD revenue).","verification":"verified"},{"id":"S18","from":"tsm","to":"avgo","type":"supply","label":"Chip manufacturing","amount_usd_b":null,"annual_usd_b":8,"amount_confidence":"ESTIMATED","period":"2025","date":"2026-03-10","confidence":"ESTIMATED","source_id":"tsm-ar","source_title":"TSMC 2025 annual report (customer amounts not named)","source_url":"https://www.taiwannews.com.tw/news/6310676","quote":"TSMC manufactures Broadcom's custom accelerators.","quote_kind":"paraphrase","estimate_note":"Amount undisclosed. $8B/yr is our assumption.","verification":"verified"},{"id":"S19","from":"skh","to":"nvda","type":"supply","label":"HBM4 memory","amount_usd_b":null,"annual_usd_b":18,"amount_confidence":"ESTIMATED","period":"2026","date":"2026-01-20","confidence":"REPORTED","source_id":"yonhap-hbm","source_title":"Yonhap: SK Hynix to supply ~70% of Nvidia's 2026 HBM4","source_url":"https://en.yna.co.kr/search/index?query=SK%20hynix%20HBM4%20Nvidia","quote":"SK Hynix to supply about 70% of Nvidia's 2026 HBM4 needs.","quote_kind":"paraphrase","estimate_note":"Dollar amount undisclosed. $18B/yr is our assumption (~27% of SK Hynix revenue).","verification":"unverified"},{"id":"E01","from":"msft","to":"openai","type":"equity","label":"~27% stake","amount_usd_b":135,"stake_value_usd_b":135,"annual_usd_b":null,"amount_confidence":"DISCLOSED","period":"since 2019","date":"2025-10-28","confidence":"DISCLOSED","source_id":"msft-10q","source_title":"Microsoft 10-Q, quarter to Sep 30 2025, Note 17","source_url":"https://www.sec.gov/Archives/edgar/data/789019/000119312525256321/msft-20250930.htm","quote":"~27% stake valued ~$135B after the Oct 2025 recapitalisation.","quote_kind":"paraphrase","estimate_note":"Microsoft has put $13B of funding in total.","consideration":"cash","verification":"verified"},{"id":"E02","from":"amzn","to":"openai","type":"equity","label":"$50B, ~5% stake","amount_usd_b":50,"stake_value_usd_b":50,"annual_usd_b":null,"amount_confidence":"DISCLOSED","period":"completed Feb 2026","date":"2026-02-27","confidence":"DISCLOSED","source_id":"amzn-8k-openai","source_title":"Amazon 8-K: equity commitment letter with OpenAI Group PBC","source_url":"https://www.sec.gov/Archives/edgar/data/1018724/000110465926021050/tm267374d1_8k.htm","quote":"Amazon completed a $50B investment for about 5% of OpenAI.","quote_kind":"paraphrase","estimate_note":"8-K confirms the equity commitment; $50B and ~5% are from press coverage (GeekWire).","consideration":"cash","verification":"unverified"},{"id":"E03","from":"nvda","to":"openai","type":"equity","label":"$30B equity","amount_usd_b":30,"stake_value_usd_b":30,"annual_usd_b":null,"amount_confidence":"REPORTED","period":"Feb 2026 round","date":"2026-02-20","confidence":"REPORTED","source_id":"dcd-nvda-openai","source_title":"DCD (citing FT, CNBC): Nvidia plans $30B investment in OpenAI round","source_url":"https://www.datacenterdynamics.com/en/news/nvidia-plans-30bn-investment-in-upcoming-openai-funding-round/","quote":"$30B equity, replacing the Sep 2025 'up to $100B' letter of intent.","quote_kind":"paraphrase","estimate_note":null,"consideration":"cash","verification":"unverified"},{"id":"E04","from":"sb","to":"openai","type":"equity","label":"$30B equity","amount_usd_b":30,"stake_value_usd_b":30,"annual_usd_b":null,"amount_confidence":"REPORTED","period":"Feb 2026 round","date":"2026-02-20","confidence":"REPORTED","source_id":"sb-openai","source_title":"Reports: SoftBank puts $30B into OpenAI's $110B round","source_url":"https://www.reuters.com/site-search/?query=SoftBank+OpenAI+30+billion","quote":"$110B round at $730B pre-money, later raised to $122B.","quote_kind":"paraphrase","estimate_note":null,"consideration":"cash","verification":"unverified"},{"id":"E05","from":"nvda","to":"crwv","type":"equity","label":"~13% stake","amount_usd_b":2,"stake_value_usd_b":5.7,"annual_usd_b":null,"amount_confidence":"ESTIMATED","period":"extra $2B Jan 2026","date":"2026-01-26","confidence":"DISCLOSED","source_id":"dcd-nvda-crwv","source_title":"DCD: Nvidia invests another $2B in CoreWeave","source_url":"https://www.datacenterdynamics.com/en/news/nvidia-invests-another-2bn-in-coreweave/","quote":"Another $2B at $87.20 per share, taking the stake to ~13%.","quote_kind":"paraphrase","estimate_note":"Stake value ~$5.7B is our estimate: 13% x ~$44B market cap.","consideration":"cash","verification":"unverified"},{"id":"E06","from":"openai","to":"crwv","type":"equity","label":"$350M stake","amount_usd_b":0.35,"stake_value_usd_b":0.35,"annual_usd_b":null,"amount_confidence":"REPORTED","period":"Mar 2025","date":"2025-03-10","confidence":"REPORTED","source_id":"reuters-crwv","source_title":"Reuters: OpenAI takes $350M CoreWeave stake with $11.9B deal","source_url":"https://www.reuters.com/site-search/?query=OpenAI+CoreWeave+350+million+stake","quote":"CoreWeave issued $350M of stock to OpenAI alongside the contract.","quote_kind":"paraphrase","estimate_note":"Stock issued as part of the compute deal, so value flows CoreWeave to OpenAI.","consideration":"issued_in_deal","verification":"unverified"},{"id":"E07","from":"openai","to":"amd","type":"equity","label":"Warrant, up to ~10% of AMD","amount_usd_b":null,"stake_value_usd_b":null,"annual_usd_b":null,"amount_confidence":"DISCLOSED","period":"vests with GW milestones","date":"2025-10-06","confidence":"DISCLOSED","source_id":"amd-openai","source_title":"AMD and OpenAI announce strategic partnership (6 GW)","source_url":"https://newsroom.amd.com/news/amd-and-openai-announce-strategic-partnership-to-d/","quote":"Warrant for up to 160M AMD shares at $0.01, vesting by milestones.","quote_kind":"paraphrase","estimate_note":"AMD issues the shares, so value flows AMD to OpenAI. Dollar value depends on AMD's share price; not modelled.","consideration":"issued_in_deal","verification":"verified"}],"sources":[{"id":"msft-10q","title":"Microsoft Form 10-Q, quarter ended Sep 30 2025 (Note 17: OpenAI)","company":"msft","date":"2025-10-29","type":"10-Q","url":"https://www.sec.gov/Archives/edgar/data/789019/000119312525256321/msft-20250930.htm","used_for":"$250B incremental Azure commitment from OpenAI; ~27% stake valued ~$135B; $13B total funding.","verification":"verified","verified_note":"Confirmed in filing text: \"OpenAI has contracted to purchase an incremental $250 billion of Azure services\". Stake % and value not checked in quick pass."},{"id":"msft-fy26q4","title":"Microsoft FY26 Q4 earnings release (8-K, Exhibit 99.1)","company":"msft","date":"2026-07-29","type":"8-K","url":"https://www.sec.gov/Archives/edgar/data/789019/000119312526323632/msft-ex99_1.htm","used_for":"FY2026 revenue $331.8B; Azure passed $100B.","verification":"verified","verified_note":"Confirmed: \"Azure revenue surpassed $100 billion for the first time\". FY revenue $331.8B not checked in quick pass."},{"id":"nvda-10k","title":"Nvidia Form 10-K, fiscal year ended Jan 25 2026 (nvda-20260125)","company":"nvda","date":"2026-02-25","type":"10-K","url":"https://www.sec.gov/Archives/edgar/data/1045810/000104581026000021/nvda-20260125.htm","used_for":"FY2026 revenue $215.9B; direct customers at 22% and 14%; AI research company buying via cloud customers.","verification":"verified","verified_note":"Confirmed: direct customers at 22% and 14% of FY2026 revenue; \"one AI research and deployment company contributed to a meaningful amount of our revenue\"."},{"id":"orcl-q4fy26","title":"Oracle Q4 FY26 earnings release (8-K, Exhibit 99.1)","company":"orcl","date":"2026-06-10","type":"8-K","url":"https://www.sec.gov/Archives/edgar/data/1341439/000119312526265848/orcl-ex99_1.htm","used_for":"FY2026 revenue $67.4B; RPO $638B; $43B debt raised; FCF -$23.7B.","verification":"verified","verified_note":"Confirmed: FY2026 revenue $67.4B; RPO $638B. Debt and FCF not checked in quick pass."},{"id":"wsj-orcl","title":"WSJ: OpenAI signs ~$300B, five-year Oracle compute deal","company":"orcl","date":"2025-09-10","type":"news","url":"https://www.wsj.com/search?query=Oracle%20OpenAI%20300%20billion","used_for":"~$300B over 5 years from 2027 (REPORTED).","verification":"unverified","verified_note":"Not confirmed in the quick pass (site blocked automated fetch); value kept from the hand-verified brief."},{"id":"dcd-keybanc","title":"DCD: Oracle may need to borrow $100B for OpenAI efforts, says KeyBanc","company":"orcl","date":"2025-09-25","type":"news","url":"https://www.datacenterdynamics.com/en/news/oracle-may-need-to-borrow-100bn-for-openai-efforts-says-keybanc-capital-markets/","used_for":"OpenAI compute contract values incl. CoreWeave $11.9B + $4B + $6.5B; Oracle funding pressure.","verification":"unverified","verified_note":"Not confirmed in the quick pass (site blocked automated fetch); value kept from the hand-verified brief."},{"id":"crwv-10k","title":"CoreWeave Form 10-K, fiscal year 2025","company":"crwv","date":"2026-03-02","type":"10-K","url":"https://www.sec.gov/Archives/edgar/data/1769628/000176962826000104/crwv-20251231.htm","used_for":"FY2025 revenue $5.13B; Microsoft ~67% of revenue; debt-funded buildout.","verification":"unverified","verified_note":"Filing located; the 67% Microsoft figure was not confirmed in the quick pass."},{"id":"crwv-10q","title":"CoreWeave Form 10-Q, quarter ended Mar 31 2026","company":"crwv","date":"2026-05-12","type":"10-Q","url":"https://www.sec.gov/Archives/edgar/data/1769628/000176962826000222/crwv-20260331.htm","used_for":"Backlog $99.4B; largest customer 45% of Q1 2026 revenue.","verification":"unverified","verified_note":"Filing located; backlog and 45% figures not confirmed in the quick pass."},{"id":"amzn-q425","title":"Amazon Q4 2025 results (8-K, Exhibit 99.1)","company":"amzn","date":"2026-02-05","type":"8-K","url":"https://www.sec.gov/Archives/edgar/data/1018724/000101872426000002/amzn-20251231xex991.htm","used_for":"AWS revenue 2025 ~$128.7B (Q4 $35.6B); AWS backlog $244B.","verification":"verified","verified_note":"Confirmed: AWS segment sales $128.7B for 2025, $35.6B in Q4. Backlog not checked."},{"id":"geekwire-amzn","title":"GeekWire: Amazon invests $50B in OpenAI, expands AWS deal by $100B","company":"amzn","date":"2026-02-27","type":"news","url":"https://www.geekwire.com/2026/amazon-invests-50b-in-openai-deepens-aws-partnership-with-expanded-100b-cloud-deal/","used_for":"$50B equity (~5%); $38B + $100B AWS commitments; ~$17B/yr (William Blair).","verification":"unverified","verified_note":"Not confirmed in the quick pass (site blocked automated fetch); value kept from the hand-verified brief."},{"id":"googl-q425","title":"Alphabet Q4 2025 earnings (8-K)","company":"googl","date":"2026-02-04","type":"8-K","url":"https://www.sec.gov/Archives/edgar/data/1652044/000165204426000012/goog-20260204.htm","used_for":"2025 revenue $402.8B; Google Cloud $58.7B.","verification":"unverified","verified_note":"Filing located; figures not confirmed in the quick pass."},{"id":"reuters-googl","title":"Reuters: OpenAI taps Google Cloud for more computing capacity","company":"googl","date":"2025-06-10","type":"news","url":"https://www.reuters.com/site-search/?query=OpenAI+Google+cloud+deal","used_for":"Google sells cloud capacity to OpenAI; amount undisclosed.","verification":"unverified","verified_note":"Not confirmed in the quick pass (site blocked automated fetch); value kept from the hand-verified brief."},{"id":"dcd-crwv-googl","title":"DCD: CoreWeave to provide compute capacity for Google's OpenAI deal","company":"crwv","date":"2025-07-15","type":"news","url":"https://www.datacenterdynamics.com/en/news/coreweave-to-provide-compute-capacity-for-googles-openai-deal-report/","used_for":"CoreWeave capacity resold by Google to OpenAI (REPORTED).","verification":"unverified","verified_note":"Not confirmed in the quick pass (site blocked automated fetch); value kept from the hand-verified brief."},{"id":"amd-q425","title":"AMD Q4 2025 financial results (8-K)","company":"amd","date":"2026-02-03","type":"8-K","url":"https://www.sec.gov/Archives/edgar/data/2488/000000248826000014/amd-20260203.htm","used_for":"2025 revenue $34.6B.","verification":"unverified","verified_note":"Filing located; figures not confirmed in the quick pass."},{"id":"amd-openai","title":"AMD and OpenAI announce strategic partnership to deploy 6 GW of AMD GPUs","company":"amd","date":"2025-10-06","type":"press release","url":"https://newsroom.amd.com/news/amd-and-openai-announce-strategic-partnership-to-d/","used_for":"6 GW deal, first 1 GW 2H 2026; warrant up to 160M shares; CFO 'tens of billions'.","verification":"verified","verified_note":"Confirmed: 6 GW, 1 GW from 2H 2026, warrant up to 160M shares, CFO \"tens of billions of dollars in revenue\"."},{"id":"avgo-q4fy25","title":"Broadcom Q4 FY25 results (8-K, Exhibit 99.1)","company":"avgo","date":"2025-12-11","type":"8-K","url":"https://www.sec.gov/Archives/edgar/data/1730168/000173016825000116/avgo-11022025x8kxex99.htm","used_for":"FY2025 revenue ~$64B; AI revenue $20B.","verification":"unverified","verified_note":"Filing located (Q4 revenue $18,015M confirmed); FY total and AI revenue not confirmed."},{"id":"openai-avgo","title":"OpenAI and Broadcom announce strategic collaboration (10 GW)","company":"avgo","date":"2025-10-13","type":"press release","url":"https://openai.com/index/openai-and-broadcom-announce-strategic-collaboration/","used_for":"10 GW custom accelerators to end-2029; amount undisclosed.","verification":"unverified","verified_note":"Not confirmed in the quick pass (site blocked automated fetch); value kept from the hand-verified brief."},{"id":"dcd-orcl-nvda","title":"DCD: Oracle to spend $40B on Nvidia chips for OpenAI Texas data center","company":"nvda","date":"2025-05-23","type":"news","url":"https://www.datacenterdynamics.com/en/news/oracle-to-spend-40bn-on-nvidia-chips-for-openai-texas-data-center/","used_for":"~$40B of GB200 chips for Stargate Abilene (REPORTED, FT).","verification":"unverified","verified_note":"Not confirmed in the quick pass (site blocked automated fetch); value kept from the hand-verified brief."},{"id":"dcd-nvda-crwv","title":"DCD: Nvidia invests another $2B in CoreWeave","company":"crwv","date":"2026-01-26","type":"news","url":"https://www.datacenterdynamics.com/en/news/nvidia-invests-another-2bn-in-coreweave/","used_for":"$2B at $87.20/share; ~13% stake; $6.3B capacity backstop through Apr 2032.","verification":"unverified","verified_note":"Not confirmed in the quick pass (site blocked automated fetch); value kept from the hand-verified brief."},{"id":"dcd-nvda-openai","title":"DCD: Nvidia plans $30B investment in upcoming OpenAI funding round","company":"nvda","date":"2026-02-20","type":"news","url":"https://www.datacenterdynamics.com/en/news/nvidia-plans-30bn-investment-in-upcoming-openai-funding-round/","used_for":"$30B equity replacing the 'up to $100B' LOI (REPORTED, FT/CNBC).","verification":"unverified","verified_note":"Not confirmed in the quick pass (site blocked automated fetch); value kept from the hand-verified brief."},{"id":"tsm-ar","title":"Taiwan News: TSMC 2025 annual report, client A = 19% of revenue","company":"tsm","date":"2026-02-27","type":"news","url":"https://www.taiwannews.com.tw/news/6310676","used_for":"Nvidia NT$726.9B = 19% of revenue; TSMC revenue ~US$122B derived.","verification":"verified","verified_note":"Confirmed: client A NT$726.9B (US$23.2B), 19% of 2025 revenue; Nvidia identified via Jensen Huang comments."},{"id":"skh-fy25","title":"SK Hynix FY2025 earnings results","company":"skh","date":"2026-01-22","type":"press release","url":"https://www.skhynix.com/ir/","used_for":"2025 revenue KRW 97.15T (~$67.9B).","verification":"unverified","verified_note":"Not confirmed in the quick pass (site blocked automated fetch); value kept from the hand-verified brief."},{"id":"yonhap-hbm","title":"Yonhap: SK Hynix to supply ~70% of Nvidia's 2026 HBM4","company":"skh","date":"2026-01-20","type":"news","url":"https://en.yna.co.kr/search/index?query=SK%20hynix%20HBM4%20Nvidia","used_for":"~70% share of Nvidia HBM4 demand (REPORTED).","verification":"unverified","verified_note":"Not confirmed in the quick pass (site blocked automated fetch); value kept from the hand-verified brief."},{"id":"reuters-crwv","title":"Reuters: OpenAI signs $11.9B CoreWeave deal, takes $350M stake","company":"crwv","date":"2025-03-10","type":"news","url":"https://www.reuters.com/site-search/?query=OpenAI+CoreWeave+350+million+stake","used_for":"$350M of CoreWeave stock to OpenAI (REPORTED).","verification":"unverified","verified_note":"Not confirmed in the quick pass (site blocked automated fetch); value kept from the hand-verified brief."},{"id":"sb-openai","title":"Reports: SoftBank commits $30B to OpenAI's $110B round","company":"sb","date":"2026-02-20","type":"news","url":"https://www.reuters.com/site-search/?query=SoftBank+OpenAI+30+billion","used_for":"$30B; round $110B at $730B pre-money, later $122B (REPORTED).","verification":"unverified","verified_note":"Not confirmed in the quick pass (site blocked automated fetch); value kept from the hand-verified brief."},{"id":"fool-openai","title":"Motley Fool: OpenAI revenue and losses","company":"openai","date":"2026-06-15","type":"news","url":"https://www.fool.com/search/?q=OpenAI%20revenue","used_for":"Q1 2026 revenue $5.7B; 2025 net loss $38.5B.","verification":"unverified","verified_note":"Not confirmed in the quick pass (site blocked automated fetch); value kept from the hand-verified brief."},{"id":"amzn-8k-openai","title":"Amazon 8-K: equity commitment letter with OpenAI Group PBC","company":"amzn","date":"2026-02-27","type":"8-K","url":"https://www.sec.gov/Archives/edgar/data/1018724/000110465926021050/tm267374d1_8k.htm","used_for":"Amazon agreed to buy OpenAI Series C preferred stock (equity link E02).","verification":"verified","verified_note":"Confirmed: equity commitment letter to purchase OpenAI Series C Preferred Stock. Dollar amount per press coverage."}]};
 /*DATA:END*/
 </script>
 <script>
@@ -496,6 +536,7 @@ const short = id => ({ openai: 'OpenAI', msft: 'Microsoft', nvda: 'Nvidia', orcl
 const sleep = ms => new Promise(r => setTimeout(r, ms));
 const isDotted = l => l.confidence === 'ESTIMATED' || l.amount_usd_b == null;
 const tagHTML = c => c ? `<span class="tag ${c}">${c}</span>` : '';
+const verTag = v => v === 'verified' ? '<span class="tag DISCLOSED" style="border-style:solid">CHECKED</span>' : '<span class="tag ESTIMATED">UNVERIFIED</span>';
 
 // ============================================================
 //  Exposure: share of each company's revenue that traces back to OpenAI
@@ -610,6 +651,31 @@ function parseScenario(text) {
 // ============================================================
 //  Shock engine (deterministic, runs in the browser)
 // ============================================================
+// Live mode: when served by server.js with ANTHROPIC_API_KEY set, Claude parses the scenario.
+// Opened as a plain file (or without a key) it silently falls back to the keyword parser above.
+let LIVE = false;
+async function checkLive() {
+  if (location.protocol === 'file:') return;
+  try { const r = await fetch('api/health', { cache: 'no-store' }); if (r.ok) LIVE = !!(await r.json()).live; } catch (e) { LIVE = false; }
+  renderParser();
+}
+function renderParser() { const b = $('#parserBadge'); b.textContent = LIVE ? 'Live: Claude' : 'Offline: keyword parser'; b.style.color = LIVE ? 'var(--accent2)' : 'var(--dim)'; }
+async function parseSmart(text) {
+  if (!LIVE) return parseScenario(text);
+  try {
+    const ctl = new AbortController(); const to = setTimeout(() => ctl.abort(), 12000);
+    const r = await fetch('api/parse-scenario', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ text }), signal: ctl.signal });
+    clearTimeout(to);
+    if (!r.ok) throw new Error('status ' + r.status);
+    const j = await r.json();
+    if (!C[j.origin] || !['demand', 'supply'].includes(j.kind) || !(j.severity >= 0 && j.severity <= 1)) throw new Error('bad parse');
+    let target = C[j.target] ? j.target : '';
+    const ok = j.kind === 'demand' ? SUP.some(l => l.to === j.origin && l.from === target) : SUP.some(l => l.from === j.origin && l.to === target);
+    if (target && !ok) target = '';
+    return { text, origin: j.origin, target, kind: j.kind, severity: j.severity, notes: ['parsed by Claude' + (j.reason ? ': ' + j.reason : '')] };
+  } catch (e) { const sc = parseScenario(text); sc.notes = [...sc.notes, 'live parse unavailable, used keyword parser']; return sc; }
+}
+
 function runShock(sc, eqMult = 1.5, damp = 0.6, maxHops = 4) {
   const demand = sc.kind === 'demand';
   // for a demand shock money stops flowing buyer -> seller, so the hit lands on the seller (upstream)
@@ -680,6 +746,17 @@ function runShock(sc, eqMult = 1.5, damp = 0.6, maxHops = 4) {
   return { sc, eqMult, damp, hops, loss, pct, contrib, eq, rows, total, eqTotal, distress, parent };
 }
 
+// Choke points: fail each company completely, both ways (stops buying / stops delivering),
+// and rank by how far the damage spreads. score = revenue at risk x companies hit.
+function findChokes(n = 3) {
+  const out = [];
+  for (const id of IDS) {
+    const runs = ['demand', 'supply'].map(kind => { const r = runShock({ origin: id, severity: 1, kind, target: null, notes: [] }); return { kind, usd: r.total, reach: r.rows.filter(x => x.loss > 0).length }; });
+    const best = runs.sort((a, b) => b.usd * b.reach - a.usd * a.reach)[0];
+    if (best.usd > 0) out.push({ id, ...best, score: best.usd * best.reach });
+  }
+  return out.sort((a, b) => b.score - a.score).slice(0, n);
+}
 // simple paths in the shock direction (used by the agent trace)
 function allPaths(from, to, kind = 'demand', max = 5) {
   const out = [];
@@ -726,7 +803,8 @@ const exposureColor = t => {
 };
 const el = (tag, attrs = {}, parent) => { const e = document.createElementNS(NS, tag); for (const k in attrs) e.setAttribute(k, attrs[k]); if (parent) parent.appendChild(e); return e; };
 const NODE = {}, EDGE = {};
-let gParticles, gPulse;
+const CHOKE = findChokes();
+let gParticles, gPulse, gShock, gFloat;
 
 function edgeGeom(l) {
   const [ax, ay] = POS[l.from], [bx, by] = POS[l.to];
@@ -754,10 +832,13 @@ function buildMap() {
     const tx = el('text', { x, y: 22, 'text-anchor': 'middle', class: 'lane-t' }, gl); tx.textContent = t;
     if (i < LANES.length - 1) { const ax = el('text', { x: (x + LANES[i + 1][1]) / 2, y: 22, 'text-anchor': 'middle', class: 'lane-t', style: 'fill:#3a3942' }, gl); ax.textContent = '>'; }
   });
-  const gE = el('g', {}, svg), gH = el('g', {}, svg);
+  const gE = el('g', {}, svg);
+  gShock = el('g', {}, svg);
+  const gH = el('g', {}, svg);
   gParticles = el('g', {}, svg);
   const gN = el('g', {}, svg);
   gPulse = el('g', {}, svg);
+  gFloat = el('g', {}, svg);
   // edges: draw thick first
   [...DATA.links].sort((a, b) => edgeW(b) - edgeW(a)).forEach(l => {
     const w = edgeW(l);
@@ -782,8 +863,14 @@ function buildMap() {
     const core = el('circle', { r, class: 'core', fill: '#121216', stroke: exposureColor(TIED[id]), 'stroke-width': id === 'sb' ? 1.5 : 2.6 }, g);
     if (id === 'sb') core.setAttribute('stroke-dasharray', '3 3');
     const big = r >= 17;
-    const t1 = el('text', { class: 'tick', 'text-anchor': 'middle', y: big ? 4.5 : r + 15 }, g); t1.textContent = id === 'openai' ? 'OpenAI' : id === 'skh' ? 'SK HYNIX' : id === 'sb' ? 'SOFTBANK' : c.ticker;
-    const t2 = el('text', { class: 'rev', 'text-anchor': 'middle', y: big ? r + 14 : r + 29 }, g); t2.textContent = c.revenue_usd_b ? fB(c.revenue_usd_b) : 'investor';
+    const ck = CHOKE.find(c => c.id === id);
+    if (ck) {
+      const q = r + 11;
+      el('path', { d: `M0,${-q} L${q},0 L0,${q} L${-q},0Z`, class: 'choke' }, g);
+      const ct = el('text', { class: 'choke-t', 'text-anchor': 'middle', y: q + (big ? 26 : 44) }, g); ct.textContent = 'CHOKE POINT';
+    }
+    const t1 = el('text', { class: 'tick', 'text-anchor': 'middle', y: big ? 4.5 : r + 19 }, g); t1.textContent = id === 'openai' ? 'OpenAI' : id === 'skh' ? 'SK HYNIX' : id === 'sb' ? 'SOFTBANK' : c.ticker;
+    const t2 = el('text', { class: 'rev', 'text-anchor': 'middle', y: big ? r + 14 : r + 32 }, g); t2.textContent = c.revenue_usd_b ? fB(c.revenue_usd_b) : 'investor';
     const bg = el('g', { transform: `translate(0,${-r - 13})`, opacity: 0 }, g);
     const br = el('rect', { class: 'badge-r', x: -28, y: -11, width: 56, height: 19 }, bg);
     const bt = el('text', { class: 'badge-t', 'text-anchor': 'middle', y: 3.5 }, bg);
@@ -832,7 +919,9 @@ function paintMap() {
   for (const id of IDS) {
     const n = NODE[id];
     let dim = false;
+    n.g.classList.toggle('chokeon', !!S.chokes && CHOKE.some(c => c.id === id));
     if (loop) dim = !loopNodes.has(id);
+    else if (S.chokes && !scen) dim = !CHOKE.some(c => c.id === id) && !DATA.links.some(l => l.type === 'supply' && ((l.from === id && CHOKE.some(c => c.id === l.to)) || (l.to === id && CHOKE.some(c => c.id === l.from))));
     else if (S.sel) dim = !focusNodes.has(id);
     else if (matches) dim = !matches.has(id);
     n.g.classList.toggle('dim', dim);
@@ -863,6 +952,7 @@ function paintMap() {
       if (loop.links.has(l.id)) { color = '#F7931E'; w = Math.max(2.2, e.w); flow = true; dash = l.type === 'equity' ? '6 4' : '10 6'; }
       else op = 0.06;
     } else if (scen && S.hot.has(l.id)) { color = '#E8445A'; }
+    else if (S.chokes && !scen) { const a = CHOKE.some(c => c.id === l.from), b = CHOKE.some(c => c.id === l.to); if (l.type === 'supply' && (a || b)) { color = 'rgba(241,236,228,.8)'; } else op = 0.07; }
     else if (S.sel) { if (selLinkIds.has(l.id)) { color = S.sel.kind === 'link' ? '#FFFFFF' : (l.type === 'supply' ? 'rgba(241,236,228,.85)' : '#F7931E'); } else op = 0.07; }
     else if (matches) { op = (matches.has(l.from) || matches.has(l.to)) ? 1 : 0.08; }
     else if (scen) op = 0.35;
@@ -954,6 +1044,7 @@ function linkHTML(l) {
   <dl class="kv">
     <dt>Confidence</dt><dd>${tagHTML(l.confidence)}<div class="note" style="font-family:var(--sans);margin-top:3px">${CONF_TXT[l.confidence]}</div></dd>
     <dt>Date</dt><dd>${esc(l.date)}</dd>
+    <dt>Checked</dt><dd>${verTag(l.verification)}<div class="note" style="font-family:var(--sans);margin-top:3px">${esc(SRC[l.source_id]?.verified_note || '')}</div></dd>
     ${l.consideration ? `<dt>Paid in</dt><dd>${l.consideration === 'cash' ? 'cash' : 'shares issued in the deal'}</dd>` : ''}
   </dl>
   <div class="quote"><small>${l.quote_kind === 'verbatim' ? 'Quote' : 'Paraphrase'}</small>${l.quote_kind === 'verbatim' ? '"' + esc(l.quote) + '"' : esc(l.quote)}</div>
@@ -970,6 +1061,7 @@ function sourceHTML(s) {
   <h2 style="font-size:17px;margin:6px 0 6px;line-height:1.25">${esc(s.title)}</h2>
   <div style="display:flex;gap:6px;align-items:center;margin-bottom:10px"><span class="typ">${esc(s.type)}</span><span class="mono note">${esc(s.date)}</span></div>
   <div class="quote"><small>What we took from it</small>${esc(s.used_for)}</div>
+  <div style="margin:6px 0">${verTag(s.verification)} <span class="note">${esc(s.verified_note)}</span></div>
   <div style="word-break:break-all;font:500 11px var(--mono);margin:8px 0 14px"><a href="${esc(s.url)}" target="_blank" rel="noopener">${esc(s.url)}</a></div>
   ${cs.length ? `<div class="lbl" style="margin-bottom:2px">Revenue figure for</div>${cs.map(c => `<div class="ll" data-node="${c.id}"><div class="n">${esc(c.name)}</div><div class="a">${fB(c.revenue_usd_b)}</div></div>`).join('')}` : ''}
   ${ls.length ? `<div class="lbl" style="margin:12px 0 2px">Links citing it (${ls.length})</div>${ls.map(l => `<div class="ll" data-link="${l.id}"><div class="n">${esc(short(l.from))} > ${esc(short(l.to))} <small>· ${l.type === 'supply' ? 'sells to' : 'invests in'}</small></div><div class="a">${tagHTML(l.confidence)}</div></div>`).join('')}` : ''}`;
@@ -1068,8 +1160,8 @@ function renderFilings() {
   const tb = $('#fTable tbody');
   tb.innerHTML = list.length ? list.map(s => {
     const n = DATA.links.filter(l => l.source_id === s.id).length + DATA.companies.filter(c => c.revenue_source_id === s.id).length;
-    return `<tr class="click${S.sel?.kind === 'source' && S.sel.id === s.id ? ' selr' : ''}" data-src="${s.id}"><td class="mono">${esc(s.date)}</td><td><span class="typ">${esc(s.type)}</span></td><td class="mono">${esc(C[s.company]?.ticker === 'PRIVATE' ? 'OpenAI' : C[s.company]?.ticker)}</td><td>${esc(s.title)}</td><td class="n">${n}</td><td><a href="${esc(s.url)}" target="_blank" rel="noopener" class="mono" style="font-size:11px">open</a></td></tr>`;
-  }).join('') : `<tr><td colspan="6" class="empty">No documents match "${esc(S.q)}".</td></tr>`;
+    return `<tr class="click${S.sel?.kind === 'source' && S.sel.id === s.id ? ' selr' : ''}" data-src="${s.id}"><td class="mono">${esc(s.date)}</td><td><span class="typ">${esc(s.type)}</span></td><td class="mono">${esc(C[s.company]?.ticker === 'PRIVATE' ? 'OpenAI' : C[s.company]?.ticker)}</td><td>${esc(s.title)}</td><td class="n">${n}</td><td>${verTag(s.verification)}</td><td><a href="${esc(s.url)}" target="_blank" rel="noopener" class="mono" style="font-size:11px">open</a></td></tr>`;
+  }).join('') : `<tr><td colspan="7" class="empty">No documents match "${esc(S.q)}".</td></tr>`;
   tb.querySelectorAll('tr.click').forEach(tr => tr.addEventListener('click', e => { if (e.target.closest('a')) return; select('source', tr.dataset.src); }));
 }
 function openFilingsFor(srcId) { setTab('filings'); select('source', srcId); const tr = $(`#fTable tr[data-src="${srcId}"]`); if (tr) tr.scrollIntoView({ block: 'nearest' }); }
@@ -1150,8 +1242,31 @@ function compactPaths(lp) {
   if (!ps.every(p => p.length === n)) return lp.pathStr.join('  |  ');
   return ps[0].map((_, i) => { const u = [...new Set(ps.map(p => p[i]))]; return u.length > 1 ? '{' + u.join(' | ') + '}' : u[0]; }).join(' > ');
 }
+const CHOKE_WHY = c => c.kind === 'demand' ? 'the one buyer' : 'no substitute supplier';
+function renderChokes() {
+  const cap = $('#chokeCap');
+  $('#chokeBtn').setAttribute('aria-pressed', !!S.chokes);
+  if (!S.chokes) { cap.classList.add('hide'); return; }
+  cap.innerHTML = `<div class="hd"><span class="lbl" style="color:var(--text)">${CHOKE.length} choke points</span><div class="note">Each company failed in full, ranked by damage x reach.</div></div>` +
+    CHOKE.map((c, i) => `<button class="cp" data-i="${i}"><div class="n">${esc(short(c.id))} <span class="w">${CHOKE_WHY(c)}</span></div><div class="v">-${fB(c.usd)}/yr <span>${c.reach} companies hit</span></div><div class="go">Simulate failure</div></button>`).join('') +
+    `<div class="x"><button class="btn ghost" id="ckClose">Hide</button></div>`;
+  cap.classList.remove('hide');
+  cap.querySelectorAll('.cp').forEach(b => b.onclick = () => {
+    const c = CHOKE[+b.dataset.i];
+    S.sc = { origin: c.id, severity: 1, kind: c.kind, target: null, notes: ['choke point test: full failure'] };
+    S.sc.text = describe(S.sc); $('#sText').value = S.sc.text;
+    scenarioToControls(S.sc); renderInterp(); play();
+  });
+  $('#ckClose').onclick = () => toggleChokes(false);
+}
+function toggleChokes(on) {
+  S.chokes = on ?? !S.chokes;
+  if (S.chokes) { if (S.loops) toggleLoops(false); S.sel = null; renderDetail(); }
+  renderChokes(); paintMap();
+}
 function toggleLoops(on) {
   S.loops = on ?? !S.loops;
+  if (S.loops && S.chokes) { S.chokes = false; renderChokes(); }
   if (S.loops) { S.sel = null; renderDetail(); }
   renderLoops(); paintMap();
 }
@@ -1206,50 +1321,128 @@ async function runFromText(text) {
   closeMenu(); $('#cmd').blur();
   S.q = ''; $('#cmd').value = ''; $('#fq').value = ''; renderFilings();
   $('#sText').value = text;
-  S.sc = parseScenario(text);
+  S.sc = await parseSmart(text);
   scenarioToControls(S.sc);
   renderInterp();
   await play();
 }
+const HOP_CAP = (sc, i) => i === 0
+  ? (sc.kind === 'demand' ? `${short(sc.origin)} pays less. Suppliers lose revenue.` : `${short(sc.origin)} cannot deliver. Customers go short.`)
+  : (sc.kind === 'demand' ? 'Hit companies cut their own orders.' : 'Short companies deliver less.');
 async function play() {
   compute();
   if (S.loops) toggleLoops(false);
+  if (S.chokes) { S.chokes = false; renderChokes(); }
   S.sel = null; renderDetail();
   setTab('scenario');
-  const res = S.res, my = ++S.animToken;
-  S.animating = true; S.shown = {}; S.hot = new Set(); S.hop = 0;
+  const res = S.res, my = ++S.animToken, dead = () => my !== S.animToken;
+  const rev = res.sc.kind === 'demand';
+  S.animating = true; S.shown = {}; S.hot = new Set(); S.hop = 0; S.feed = []; S.feedCap = 'Shock starts at ' + short(res.sc.origin) + '.'; S.hudFrom = { risk: 0, pf: 0 };
+  gParticles.innerHTML = ''; gPulse.innerHTML = ''; gShock.innerHTML = ''; gFloat.innerHTML = '';
   $('#scenLive').classList.remove('hide');
-  renderHud(); paintMap(); renderResults(true); renderPortfolio(); renderTicker();
-  pulse(res.sc.origin);
-  await sleep(650);
+  renderHud(); paintMap(); renderResults(true); renderPortfolio(); renderTicker(); renderFeed();
+  blast(res.sc.origin); pulse(res.sc.origin);
+  await sleep(900);
+  let prev = {};
   for (let i = 0; i < res.hops.length; i++) {
-    if (my !== S.animToken) return;
+    if (dead()) return;
     S.hop = i + 1;
     const h = res.hops[i];
+    S.feedCap = HOP_CAP(res.sc, i); renderFeed();
+    for (const f of h.fired) {
+      const size = Math.min(1, 0.35 + Math.sqrt(f.usd) / 5);
+      burn(f.link, rev, 700, '#ff5a70');
+      for (let k = 0; k < 3; k++) setTimeout(() => { if (!dead()) particle(f.link, rev, size * (1 - k * 0.22), '#E8445A', 700); }, k * 110);
+    }
+    await sleep(720);
+    if (dead()) return;
     for (const f of h.fired) S.hot.add(f.link);
-    paintMap(); renderHud();
-    h.fired.forEach(f => particle(f.link, res.sc.kind === 'demand', Math.min(1, 0.35 + Math.sqrt(f.usd) / 5)));
-    await sleep(560);
-    if (my !== S.animToken) return;
-    S.shown = h.pct; paintMap(); renderHud(); renderTicker();
-    await sleep(240);
+    S.shown = h.pct; paintMap(); renderHud(); renderTicker(); renderPortfolio();
+    const hit = Object.keys(h.loss).filter(id => (h.loss[id] || 0) - (prev[id] || 0) > 1e-6).sort((x, y) => (h.loss[y] - (prev[y] || 0)) - (h.loss[x] - (prev[x] || 0)));
+    const delta = Object.fromEntries(hit.map(id => [id, h.loss[id] - (prev[id] || 0)]));
+    hit.forEach((id, k) => setTimeout(() => {
+      if (dead()) return;
+      const d = delta[id];
+      impact(id, '#E8445A'); floater(id, '-' + fB(d) + '/yr', '#ff6b7f'); strike(id);
+      S.feed.unshift({ hop: i + 1, id, pct: h.pct[id], usd: d }); renderFeed();
+    }, k * 70));
+    prev = h.loss;
+    await sleep(Math.max(560, hit.length * 70 + 380));
   }
-  if (my !== S.animToken) return;
-  S.animating = false; S.shown = res.pct;
-  renderAll();
+  if (dead()) return;
+  // the loop closes: the investors' stakes are worth less
+  const inv = Object.entries(res.eq);
+  if (inv.length) {
+    S.feedCap = 'The loop closes. Stakes are written down.'; renderFeed();
+    for (const [, es] of inv) for (const e of es) { burn(e.link, true, 800, '#F7931E'); particle(e.link, true, 0.9, '#F7931E', 800); }
+    await sleep(820);
+    if (dead()) return;
+    inv.forEach(([id, es], k) => setTimeout(() => {
+      if (dead()) return;
+      const usd = es.reduce((a, e) => a + e.usd, 0);
+      impact(id, '#F7931E'); floater(id, '-' + fB(usd) + ' stake', '#FFB45E', (S.shown[id] ? 20 : 0)); strike(id);
+      S.feed.unshift({ hop: 'EQ', id, usd, eq: true }); renderFeed();
+    }, k * 90));
+    await sleep(inv.length * 90 + 700);
+  }
+  if (dead()) return;
+  S.animating = false; S.shown = res.pct; S.feedCap = `Settled. ${res.rows.filter(r => r.loss > 0).length} companies lose revenue.`;
+  renderAll(); renderFeed();
 }
+function renderFeed() {
+  const f = $('#feed'); if (!S.res || !S.feed) { f.classList.add('hide'); f.innerHTML = ''; return; }
+  f.classList.remove('hide');
+  const n = S.res.hops.length;
+  f.innerHTML = `<div class="fh">Shock feed<span>${S.animating ? (S.hop ? 'hop ' + S.hop + ' / ' + n : 'origin') : 'settled'}</span></div><div class="fc">${esc(S.feedCap || '')}</div>` +
+    S.feed.slice(0, 5).map(r => `<div class="fr${S.pf.has(r.id) ? ' pf' : ''}${r.eq ? ' eq' : ''}"><i>${r.eq ? 'EQ' : 'H' + r.hop}</i><b>${esc(C[r.id].listed ? C[r.id].ticker.split('.')[0] : short(r.id))}</b><u>${r.eq ? 'stake' : '-' + fP(r.pct, r.pct < 0.01 ? 2 : 1)}</u><em>-${fB(r.usd)}${r.eq ? '' : '/yr'}</em></div>`).join('');
+}
+function strike(id) { const c = $(`#chips .chip[data-id="${id}"]`); if (c) { c.classList.remove('struck'); void c.offsetWidth; c.classList.add('struck'); } }
+function anim(dur, fn, done) { const t0 = performance.now(); const step = now => { const t = Math.min(1, (now - t0) / dur); fn(t); if (t < 1) requestAnimationFrame(step); else done && done(); }; requestAnimationFrame(step); }
+function blast(id) {
+  const [x, y] = POS[id];
+  const c = el('circle', { cx: x, cy: y, r: 20, fill: 'rgba(232,68,90,.22)', 'pointer-events': 'none' }, gPulse);
+  anim(1100, t => { c.setAttribute('r', 20 + t * 520); c.setAttribute('opacity', (1 - t).toFixed(2)); }, () => c.remove());
+}
+function burn(linkId, reverse, dur, color) {
+  const e = EDGE[linkId], len = e.p.getTotalLength();
+  const b = el('path', { d: e.p.getAttribute('d'), class: 'burn', stroke: color, 'stroke-width': (e.w + 2).toFixed(2), filter: 'url(#glow)', 'stroke-dasharray': `${len} ${len}`, 'stroke-dashoffset': reverse ? -len : len }, gShock);
+  anim(dur, t => { const k = t < .5 ? 2 * t * t : 1 - Math.pow(-2 * t + 2, 2) / 2; b.setAttribute('stroke-dashoffset', ((reverse ? -len : len) * (1 - k)).toFixed(1)); },
+    () => anim(600, t => b.setAttribute('opacity', (1 - t).toFixed(2)), () => b.remove()));
+}
+function impact(id, color) {
+  const [x, y] = POS[id], r0 = R[id], n = NODE[id];
+  const c = el('circle', { cx: x, cy: y, r: r0, fill: 'none', stroke: color, 'stroke-width': 3, 'pointer-events': 'none', filter: 'url(#glow)' }, gPulse);
+  anim(750, t => { c.setAttribute('r', r0 + t * 46); c.setAttribute('opacity', (1 - t).toFixed(2)); c.setAttribute('stroke-width', (3 - 2.4 * t).toFixed(2)); }, () => c.remove());
+  anim(420, t => n.core.setAttribute('r', (r0 * (1 + 0.28 * Math.sin(Math.PI * t))).toFixed(2)), () => n.core.setAttribute('r', r0));
+}
+function floater(id, text, color, dy = 0) {
+  const [x, y] = POS[id], r0 = R[id];
+  const right = x < 980;
+  const off = Math.max(r0 + 10, 22);
+  const t = el('text', { x: x + (right ? off : -off), y: y + 18 + dy, class: 'floater', fill: color, 'text-anchor': right ? 'start' : 'end' }, gFloat);
+  t.textContent = text;
+  anim(1900, k => { t.setAttribute('transform', `translate(0,${(-20 * (1 - Math.pow(1 - k, 3))).toFixed(1)})`); t.setAttribute('opacity', k < .7 ? 1 : ((1 - k) / .3).toFixed(2)); }, () => t.remove());
+}
+// keeps the settled map alive: faint pulses keep moving along the deals that carried the shock
+setInterval(() => {
+  if (!S.res || S.animating || S.loops || document.hidden || !S.hot.size) return;
+  const rev = S.res.sc.kind === 'demand';
+  [...S.hot].forEach((id, k) => setTimeout(() => { if (S.res && !S.animating && !S.loops) particle(id, rev, 0.1, 'rgba(255,107,127,.75)', 1300); }, k * 60));
+}, 2600);
 function showInstant() { // recompute after a slider / dropdown edit, no animation
   S.animToken++; S.animating = false;
   compute();
   S.shown = S.res.pct; S.hot = new Set(S.res.hops.flatMap(h => h.fired.map(f => f.link))); S.hop = S.res.hops.length;
+  S.feed = null; S.hudFrom = null;
   $('#scenLive').classList.remove('hide');
-  renderAll();
+  renderAll(); renderFeed();
 }
 function clearScenario() {
   S.animToken++; S.animating = false; S.res = null; S.shown = null; S.hot = new Set(); S.hop = 0;
   $('#scenLive').classList.add('hide');
-  gParticles.innerHTML = ''; gPulse.innerHTML = '';
-  renderAll();
+  S.feed = null; S.hudFrom = null;
+  gParticles.innerHTML = ''; gPulse.innerHTML = ''; gShock.innerHTML = ''; gFloat.innerHTML = '';
+  renderAll(); renderFeed();
 }
 function renderAll() { renderHud(); paintMap(); renderResults(); renderPortfolio(); renderTicker(); renderDetail(); renderTrace(); renderInterp(); }
 
@@ -1262,10 +1455,10 @@ function pulse(id) {
     requestAnimationFrame(step);
   }
 }
-function particle(linkId, reverse, size) {
+function particle(linkId, reverse, size, color = '#E8445A', dur = 560) {
   const path = EDGE[linkId].p, len = path.getTotalLength();
-  const c = el('circle', { r: 3 + 3 * size, fill: '#E8445A', filter: 'url(#glow)' }, gParticles);
-  const t0 = performance.now(), dur = 560;
+  const c = el('circle', { r: 2 + 4 * size, fill: color, filter: 'url(#glow)', 'pointer-events': 'none' }, gParticles);
+  const t0 = performance.now();
   const step = now => {
     let t = Math.min(1, (now - t0) / dur); const e = t < .5 ? 2 * t * t : 1 - Math.pow(-2 * t + 2, 2) / 2;
     const pt = path.getPointAtLength(len * (reverse ? 1 - e : e));
@@ -1292,10 +1485,16 @@ function renderHud() {
   const pfL = snap ? Object.entries(snap.loss).filter(([id]) => S.pf.has(id)).reduce((s, [, v]) => s + v, 0) : 0;
   h.className = 'hud';
   h.innerHTML = `<div class="qq"><span class="lbl" style="color:var(--danger)">Scenario${S.animating ? ' · running' : ''} · ${S.hop ? 'Hop ' + S.hop + ' / ' + n : 'Origin'}</span><span class="q">${esc(describe(res.sc))}</span><div class="pips">${res.hops.map((_, i) => `<i class="${i < S.hop ? 'on' : ''}"></i>`).join('')}</div></div>
-    <div class="st">Revenue at risk<b class="d">-${fB(atRisk)}/yr</b></div>
+    <div class="st">Revenue at risk<b class="d" id="hudRisk">-${fB(atRisk)}/yr</b></div>
     <div class="st">Companies hit<b>${hitN}</b></div>
-    <div class="st">Your holdings<b class="a">-${fB(pfL)}/yr</b></div>
+    <div class="st">Your holdings<b class="a" id="hudPf">-${fB(pfL)}/yr</b></div>
     <div class="acts"><button class="btn" id="hudReplay"><svg width="12" height="12" viewBox="0 0 16 16" aria-hidden="true"><path d="M3 8a5 5 0 1 0 2-4" fill="none" stroke="currentColor" stroke-width="1.7"/><path d="M2 1v4h4" fill="none" stroke="currentColor" stroke-width="1.7"/></svg>Replay</button><button class="btn" id="hudTable">Results</button><button class="btn ghost" id="hudClear">Clear</button></div>`;
+  if (S.animating && S.hudFrom) {
+    const f = S.hudFrom, a = $('#hudRisk'), b = $('#hudPf'), tok = S.animToken;
+    if (atRisk > f.risk + 1e-6) anim(600, t => { if (tok === S.animToken && a.isConnected) a.textContent = '-' + fB(f.risk + (atRisk - f.risk) * t) + '/yr'; });
+    if (pfL > f.pf + 1e-6) anim(600, t => { if (tok === S.animToken && b.isConnected) b.textContent = '-' + fB(f.pf + (pfL - f.pf) * t) + '/yr'; });
+    S.hudFrom = { risk: atRisk, pf: pfL };
+  }
   $('#hudReplay').onclick = () => play();
   $('#hudClear').onclick = () => clearScenario();
   $('#hudTable').onclick = () => { setTab('scenario'); $('#pane-scenario').scrollTop = 0; $('#drawer').scrollIntoView({ behavior: 'smooth', block: 'nearest' }); };
@@ -1420,6 +1619,7 @@ function init() {
   $('#iTarget').addEventListener('change', () => { S.sc = { ...controlsToScenario(), notes: ['edited by hand'] }; renderInterp(); showInstant(); });
   ['#iSev', '#iEq', '#iDamp'].forEach(s => $(s).addEventListener('input', () => { syncOutputs(); S.sc = controlsToScenario(); renderInterp(); if (S.res) showInstant(); }));
   $('#loopBtn').addEventListener('click', () => toggleLoops());
+  $('#chokeBtn').addEventListener('click', () => toggleChokes());
   const openHow = () => $('#how').classList.remove('hide');
   $('#howBtn').addEventListener('click', openHow); $('#howBtn2').addEventListener('click', openHow);
   $('#howClose').addEventListener('click', () => $('#how').classList.add('hide'));
@@ -1449,9 +1649,11 @@ function init() {
   });
   // default scenario loaded in the controls, not yet run
   S.sc = parseScenario(PRESETS[0].t); scenarioToControls(S.sc); syncOutputs();
-  renderLoops(); renderFilings(); renderAll();
+  renderLoops(); renderFilings(); renderAll(); renderParser(); checkLive();
 }
 init();
+
+(function(){ try { var w=document.querySelector('.mapwrap'); if(w&&w.scrollWidth>w.clientWidth) w.scrollLeft=(w.scrollWidth-w.clientWidth)/2; } catch(e){} })();
 </script>
 </body>
 </html>
