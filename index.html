@@ -18,7 +18,7 @@
   --danger:#E8445A;--dangerbg:rgba(232,68,90,.13);
   --sans:'Inter Tight',ui-sans-serif,system-ui,-apple-system,'Segoe UI',sans-serif;
   --mono:'JetBrains Mono',ui-monospace,'SF Mono',Menlo,monospace;
-  --drawer-h:31vh;
+  --drawer-h:27vh;
 }
 *{box-sizing:border-box}
 html,body{margin:0;background:var(--bg);color:var(--text);font-family:var(--sans);font-size:13px;line-height:1.4;-webkit-font-smoothing:antialiased}
@@ -66,7 +66,7 @@ kbd{font:500 10px var(--mono);color:var(--muted);border:1px solid var(--line2);p
 .tk em.hi{color:var(--danger)}
 
 /* ---------- main 3 columns ---------- */
-.main{display:grid;grid-template-columns:250px minmax(0,1fr) 330px;min-height:0}
+.main{display:grid;grid-template-columns:240px minmax(0,1fr) 310px;min-height:0}
 .col{min-height:0;overflow:auto;scrollbar-width:thin;scrollbar-color:var(--line3) transparent}
 .left{border-right:1px solid var(--line);padding:14px 14px 18px}
 .right{border-left:1px solid var(--line);padding:14px 16px 18px;background:var(--bg2)}
@@ -123,18 +123,19 @@ kbd{font:500 10px var(--mono);color:var(--muted);border:1px solid var(--line2);p
 .hud .st b.d{color:var(--danger);font-size:18px}
 .hud .st b.a{color:var(--accent2)}
 .hud .acts{display:flex;gap:6px;margin-left:auto}
-.legend{display:flex;flex-wrap:wrap;gap:4px 16px;align-items:center;font:500 10px var(--mono);color:var(--muted);padding:6px 12px;border-top:1px solid var(--line)}
+.legend{position:absolute;left:10px;bottom:8px;display:flex;flex-direction:column;gap:3px;font:500 10px var(--mono);color:var(--muted);padding:6px 8px;background:rgba(9,9,11,.72);border:1px solid var(--line);pointer-events:none}
 .legend span{display:inline-flex;align-items:center;gap:6px}
-.loopcap{position:absolute;right:12px;bottom:10px;width:min(430px,calc(100% - 24px));background:rgba(13,13,16,.94);border:1px solid var(--accent);padding:10px 12px}
-.loopcap .t{font-weight:700;font-size:13.5px;margin:3px 0 4px}
-.loopcap .p{font:500 11px var(--mono);color:var(--accent2);margin-bottom:5px;word-break:break-word}
-.loopcap .nav{display:flex;gap:6px;margin-top:8px;align-items:center}
+.loopcap{display:flex;align-items:center;gap:14px;flex-wrap:wrap;padding:8px 12px;border-bottom:1px solid var(--line);background:linear-gradient(90deg,rgba(247,147,30,.12),transparent 70%);min-height:50px}
+.loopcap .qq{flex:1;min-width:240px}
+.loopcap .t{font-weight:700;font-size:15px;margin:1px 0 2px}
+.loopcap .p{font:600 11.5px var(--mono);color:var(--accent2);word-break:break-word}
+.loopcap .nav{display:flex;gap:6px;align-items:center}
 
 /* svg */
-.lane-t{font:600 9.5px var(--sans);letter-spacing:.18em;fill:#6b6a74;text-transform:uppercase}
+.lane-t{font:700 11px var(--sans);letter-spacing:.2em;fill:#6b6a74;text-transform:uppercase}
 .node{cursor:pointer}
-.node .tick{font:700 11px var(--mono);fill:var(--text)}
-.node .rev{font:500 9.5px var(--mono);fill:var(--muted)}
+.node .tick{font:700 13px var(--mono);fill:var(--text)}
+.node .rev{font:500 11.5px var(--mono);fill:var(--muted)}
 .node.pf .tick{fill:var(--accent2)}
 .node.dim{opacity:.18}
 .node .selring{fill:none;stroke:var(--text);stroke-width:1.2;opacity:0}
@@ -146,7 +147,7 @@ kbd{font:500 10px var(--mono);color:var(--muted);border:1px solid var(--line2);p
 .ehit{fill:none;stroke:transparent;stroke-width:12;cursor:pointer}
 .edge.flow{animation:flow 1s linear infinite}
 @keyframes flow{to{stroke-dashoffset:-20}}
-.badge-t{font:700 10.5px var(--mono);fill:var(--danger)}
+.badge-t{font:700 12.5px var(--mono);fill:#ff6b7f}
 .badge-r{fill:#140a0c;stroke:var(--danger);stroke-width:.8}
 .pulse{fill:none;stroke:var(--danger)}
 
@@ -307,7 +308,7 @@ td.mono{font-family:var(--mono);white-space:nowrap}
 @media (max-width:700px){
   .mapwrap{aspect-ratio:auto;height:auto}
   #map{position:static;height:auto;aspect-ratio:1100/640}
-  .loopcap{position:static;width:auto;margin:8px 12px}
+  .legend{position:static;flex-direction:row;flex-wrap:wrap;gap:4px 12px;margin:6px 12px;background:none}
   .hud .st{padding-left:0;border-left:0}
   .hud .acts{margin-left:0}
   .brand small{display:none}
@@ -362,17 +363,17 @@ td.mono{font-family:var(--mono);white-space:nowrap}
         <button class="btn ghost" id="howBtn">How it works</button>
       </div>
       <div class="hud" id="hud"></div>
+      <div class="loopcap hide" id="loopCap"></div>
       <div class="mapwrap" id="mapwrap">
-        <svg id="map" viewBox="0 0 1100 640" preserveAspectRatio="xMidYMid meet" role="img" aria-label="Network map of AI company deals"></svg>
-        <div class="loopcap hide" id="loopCap"></div>
-      </div>
+        <svg id="map" viewBox="0 8 1100 612" preserveAspectRatio="xMidYMid meet" role="img" aria-label="Network map of AI company deals"></svg>
       <div class="legend" id="legend">
           <span><svg width="26" height="8"><path d="M1 4H25" stroke="#C9C4BC" stroke-width="2.5"/></svg>sells to</span>
           <span><svg width="26" height="8"><path d="M1 4H25" stroke="#F7931E" stroke-width="1.6" stroke-dasharray="5 3"/></svg>invests in</span>
           <span><svg width="26" height="8"><path d="M2 4H25" stroke="#C9C4BC" stroke-width="2" stroke-dasharray="0.1 4" stroke-linecap="round"/></svg>undisclosed / est.</span>
           <span><svg width="44" height="8"><defs><linearGradient id="lg"><stop offset="0" stop-color="#4A4952"/><stop offset=".5" stop-color="#F7931E"/><stop offset="1" stop-color="#E8445A"/></linearGradient></defs><rect width="44" height="5" y="1.5" fill="url(#lg)"/></svg>ring = OpenAI exposure</span>
           <span>size = revenue</span>
-          <span class="sp"></span><span>click any node or arrow for the source</span>
+          <span>click a node or arrow</span>
+      </div>
       </div>
     </section>
 
@@ -706,7 +707,7 @@ const S = {
 // ============================================================
 const NS = 'http://www.w3.org/2000/svg';
 const POS = {
-  tsm: [95, 235], skh: [95, 445],
+  tsm: [95, 225], skh: [95, 415],
   amd: [315, 120], nvda: [315, 330], avgo: [315, 530],
   msft: [590, 110], crwv: [590, 222], orcl: [590, 330], googl: [590, 432], amzn: [590, 545],
   openai: [845, 330], sb: [1025, 330]
@@ -781,11 +782,11 @@ function buildMap() {
     const core = el('circle', { r, class: 'core', fill: '#121216', stroke: exposureColor(TIED[id]), 'stroke-width': id === 'sb' ? 1.5 : 2.6 }, g);
     if (id === 'sb') core.setAttribute('stroke-dasharray', '3 3');
     const big = r >= 17;
-    const t1 = el('text', { class: 'tick', 'text-anchor': 'middle', y: big ? 4 : r + 14 }, g); t1.textContent = id === 'openai' ? 'OpenAI' : id === 'skh' ? 'SK HYNIX' : id === 'sb' ? 'SOFTBANK' : c.ticker;
-    const t2 = el('text', { class: 'rev', 'text-anchor': 'middle', y: big ? r + 13 : r + 26 }, g); t2.textContent = c.revenue_usd_b ? fB(c.revenue_usd_b) : 'investor';
+    const t1 = el('text', { class: 'tick', 'text-anchor': 'middle', y: big ? 4.5 : r + 15 }, g); t1.textContent = id === 'openai' ? 'OpenAI' : id === 'skh' ? 'SK HYNIX' : id === 'sb' ? 'SOFTBANK' : c.ticker;
+    const t2 = el('text', { class: 'rev', 'text-anchor': 'middle', y: big ? r + 14 : r + 29 }, g); t2.textContent = c.revenue_usd_b ? fB(c.revenue_usd_b) : 'investor';
     const bg = el('g', { transform: `translate(0,${-r - 13})`, opacity: 0 }, g);
-    const br = el('rect', { class: 'badge-r', x: -26, y: -9, width: 52, height: 16 }, bg);
-    const bt = el('text', { class: 'badge-t', 'text-anchor': 'middle', y: 3 }, bg);
+    const br = el('rect', { class: 'badge-r', x: -28, y: -11, width: 56, height: 19 }, bg);
+    const bt = el('text', { class: 'badge-t', 'text-anchor': 'middle', y: 3.5 }, bg);
     g.addEventListener('click', e => { e.stopPropagation(); select('node', id); });
     g.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); select('node', id); } });
     g.addEventListener('mousemove', e => showTip(e, nodeTip(id)));
@@ -846,12 +847,12 @@ function paintMap() {
       n.core.setAttribute('stroke', '#E8445A');
       n.bg.setAttribute('opacity', 1);
       n.bt.textContent = '-' + fP(p, p < 0.01 ? 2 : 1);
-      const w = Math.max(44, n.bt.textContent.length * 7 + 10); n.br.setAttribute('x', -w / 2); n.br.setAttribute('width', w);
+      const w = Math.max(44, n.bt.textContent.length * 8 + 12); n.br.setAttribute('x', -w / 2); n.br.setAttribute('width', w);
     } else {
       n.core.setAttribute('fill', isOrigin ? '#2a0f15' : '#121216');
       n.core.setAttribute('stroke', isOrigin ? '#E8445A' : exposureColor(TIED[id]));
       n.bg.setAttribute('opacity', isOrigin ? 1 : 0);
-      if (isOrigin) { n.bt.textContent = (S.res.sc.kind === 'demand' ? 'cuts ' : 'short ') + fP(S.res.sc.severity, 0); const w = n.bt.textContent.length * 7 + 10; n.br.setAttribute('x', -w / 2); n.br.setAttribute('width', w); }
+      if (isOrigin) { n.bt.textContent = (S.res.sc.kind === 'demand' ? 'cuts ' : 'short ') + fP(S.res.sc.severity, 0); const w = n.bt.textContent.length * 8 + 12; n.br.setAttribute('x', -w / 2); n.br.setAttribute('width', w); }
     }
     n.halo.setAttribute('stroke', isOrigin ? 'rgba(232,68,90,.5)' : 'rgba(0,0,0,0)');
   }
@@ -1128,18 +1129,26 @@ function renderLoops() {
   $('#loopCount').title = `${LOOPS.paths} distinct cycles in the money-flow graph, grouped by the investment that closes them`;
   const cap = $('#loopCap');
   $('#loopBtn').setAttribute('aria-pressed', S.loops);
-  if (!S.loops) { cap.classList.add('hide'); return; }
+  if (!S.loops) { cap.classList.add('hide'); $('#hud').classList.remove('hide'); return; }
   const lp = LOOPS.loops[S.loopIdx];
   const variants = lp.cycles.length - lp.core.length;
-  cap.innerHTML = `<div style="display:flex;justify-content:space-between"><span class="lbl" style="color:var(--accent)">Money loop ${lp.meta.n} · ${S.loopIdx + 1} of ${LOOPS.loops.length}</span><span class="lbl mono">${lp.cycles.length} cycle${lp.cycles.length > 1 ? 's' : ''}</span></div>
+  cap.innerHTML = `<div class="qq"><span class="lbl" style="color:var(--accent)">Money loop ${lp.meta.n} · ${S.loopIdx + 1} of ${LOOPS.loops.length} · ${lp.cycles.length} cycle${lp.cycles.length > 1 ? 's' : ''} found</span>
     <div class="t">${esc(lp.meta.t)}</div>
-    ${lp.pathStr.slice(0, 5).map(p => `<div class="p">${esc(p)}</div>`).join('')}
-    <div class="note">${esc(lp.meta.c)}${variants > 0 ? ` Plus ${variants} longer variant${variants > 1 ? 's' : ''}.` : ''}</div>
-    <div class="nav"><button class="btn" id="lpPrev">Prev</button><button class="btn" id="lpNext">Next</button><span class="sp"></span><button class="btn ghost" id="lpClose">Hide loops</button></div>`;
+    <div class="p">${esc(compactPaths(lp))}</div>
+    <div class="note">${esc(lp.meta.c)}${variants > 0 ? ` Plus ${variants} longer variant${variants > 1 ? 's' : ''}.` : ''}</div></div>
+    <div class="nav"><button class="btn" id="lpPrev">Prev</button><button class="btn" id="lpNext">Next</button><button class="btn ghost" id="lpClose">Hide loops</button></div>`;
+  $('#hud').classList.add('hide');
   cap.classList.remove('hide');
   $('#lpPrev').onclick = () => { S.loopIdx = (S.loopIdx + LOOPS.loops.length - 1) % LOOPS.loops.length; renderLoops(); paintMap(); };
   $('#lpNext').onclick = () => { S.loopIdx = (S.loopIdx + 1) % LOOPS.loops.length; renderLoops(); paintMap(); };
   $('#lpClose').onclick = () => toggleLoops(false);
+}
+function compactPaths(lp) {
+  const ps = lp.pathStr.map(p => p.split(' > '));
+  if (ps.length === 1) return lp.pathStr[0];
+  const n = ps[0].length;
+  if (!ps.every(p => p.length === n)) return lp.pathStr.join('  |  ');
+  return ps[0].map((_, i) => { const u = [...new Set(ps.map(p => p[i]))]; return u.length > 1 ? '{' + u.join(' | ') + '}' : u[0]; }).join(' > ');
 }
 function toggleLoops(on) {
   S.loops = on ?? !S.loops;
