@@ -1,0 +1,12 @@
+{
+  "name": "upstream-demo",
+  "version": "1.0.0",
+  "description": "Upstream: type what could go wrong, see which of your stocks it hits.",
+  "private": true,
+  "scripts": {
+    "start": "node server.js",
+    "embed": "node tools/embed.mjs"
+  },
+  "engines": { "node": ">=18" },
+  "license": "MIT"
+}
