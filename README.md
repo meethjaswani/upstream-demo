@@ -7,12 +7,13 @@ Investors think they own several different AI stocks, but many depend on the sam
 ## How the demo works
 
 - Frontend only. `index.html` is self-contained; all data is hardcoded in a `DATA` object and mirrors `data/*.json`.
-- The network map is a fixed layout: suppliers, chips, clouds, OpenAI, investors. Solid arrows are "sells to", dashed are "invests in", dotted are undisclosed or estimated.
-- Pick a portfolio, type a scenario (or use a preset). The shock math runs in the browser on the data: demand shocks flow upstream, damped 0.6 per hop, up to 4 hops. Equity hit = stake value x valuation drop (1.5 x shock, capped at 100%).
-- Money loops are found with a cycle search over the combined supply and equity graph.
-- Running a scenario plays it on the map: the shock burns along each deal hop by hop, each hit company shows its loss, and the last step shows investors writing down their stakes.
-- Choke points are found by failing each company in full, as a buyer and as a supplier, and ranking by revenue at risk times companies hit. The top three are marked with a diamond.
-- The agent trace tab is a recorded run, not a live agent.
+- The map reads like a supply chain screen: suppliers on the left, the company in the middle, customers on the right. Pick any company from the dropdown to centre the map on it. Solid arrows are "sells to", dashed orange are "invests in", dotted are estimated.
+- Click a company or an arrow to see the deal, the amount, the quote and the source. The Sources button lists every document used.
+- Pick a portfolio and type a scenario, or use a preset. The shock math runs in the browser: demand shocks flow to suppliers, damped 0.6 per hop, up to 4 hops. Stake hit = stake value x valuation drop (1.5 x shock, capped at 100%).
+- The scenario plays on the map hop by hop, and the report on the right fills in as each company is hit.
+- Money loops are found with a cycle search over the combined supply and investment graph.
+- Choke points (diamond) are found by failing each company in full and ranking by revenue at risk times companies hit.
+- "How the AI got this" in the report is a recorded run, not a live agent.
 
 ## Real vs estimated
 

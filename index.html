@@ -8,498 +8,289 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
-<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' fill='%230A0A0C'/%3E%3Cpath d='M7 24 L16 8 L25 24' fill='none' stroke='%23F7931E' stroke-width='3.5'/%3E%3Cpath d='M12 24 L16 17 L20 24' fill='none' stroke='%23E8445A' stroke-width='3'/%3E%3C/svg%3E">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' fill='%23FFFFFF'/%3E%3Cpath d='M7 24 L16 8 L25 24' fill='none' stroke='%23F7931E' stroke-width='3.5'/%3E%3Cpath d='M12 24 L16 17 L20 24' fill='none' stroke='%23D92D4A' stroke-width='3'/%3E%3C/svg%3E">
 <style>
 :root{
-  --bg:#09090B;--bg2:#0D0D10;--panel:#111115;--panel2:#16161B;--panel3:#1C1C22;
-  --line:#22222A;--line2:#2E2E37;--line3:#3D3D48;
-  --text:#F1ECE4;--text2:#C9C4BC;--muted:#8B8993;--dim:#5D5C66;
-  --accent:#F7931E;--accent2:#FFB45C;--accentbg:rgba(247,147,30,.12);
-  --danger:#E8445A;--dangerbg:rgba(232,68,90,.13);
-  --sans:'Inter Tight',ui-sans-serif,system-ui,-apple-system,'Segoe UI',sans-serif;
-  --mono:'JetBrains Mono',ui-monospace,'SF Mono',Menlo,monospace;
-  --drawer-h:27vh;
+  --bg:#F3F1EC;--panel:#FFFFFF;--map:#FBFAF7;--ink:#16171B;--muted:#6B6862;--dim:#9B978F;
+  --line:#E2DED6;--line2:#CBC6BB;--accent:#F7931E;--accent-ink:#A85800;--accent-bg:#FFF3E0;
+  --danger:#D92D4A;--danger-bg:#FCEBEE;
+  --sans:'Inter Tight',system-ui,-apple-system,'Segoe UI',sans-serif;--mono:'JetBrains Mono',ui-monospace,Menlo,monospace;
 }
 *{box-sizing:border-box}
-html,body{margin:0;background:var(--bg);color:var(--text);font-family:var(--sans);font-size:13px;line-height:1.4;-webkit-font-smoothing:antialiased}
-body{font-variant-numeric:tabular-nums}
-.mono,.num{font-family:var(--mono);font-variant-numeric:tabular-nums}
-button{font:inherit;color:inherit;background:none;border:0;cursor:pointer;padding:0}
-button:focus-visible,input:focus-visible,select:focus-visible,a:focus-visible{outline:1px solid var(--accent);outline-offset:1px}
-a{color:var(--accent);text-decoration:none}
-a:hover{text-decoration:underline}
-.lbl{font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);font-weight:600}
+html,body{margin:0;height:100%}
+body{background:var(--bg);color:var(--ink);font:400 13.5px/1.45 var(--sans);-webkit-font-smoothing:antialiased;font-variant-numeric:tabular-nums}
+button{font:inherit;color:inherit;cursor:pointer}
+a{color:var(--accent-ink)}
 .hide{display:none!important}
+.mono{font-family:var(--mono)}
+.lbl{font:600 10.5px var(--sans);letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
+.note{font-size:12px;color:var(--muted)}
+:focus-visible{outline:2px solid var(--accent);outline-offset:1px}
 
-/* ---------- app grid ---------- */
-.app{display:grid;grid-template-rows:auto auto minmax(0,1fr) auto;min-height:100vh}
-@media (min-width:1100px){ .app{height:100vh} }
-
-/* ---------- top bar ---------- */
-.top{display:grid;grid-template-columns:260px minmax(0,1fr) auto;align-items:center;gap:20px;padding:0 16px;height:52px;border-bottom:1px solid var(--line);background:var(--bg)}
-.brand{display:flex;align-items:center;gap:10px;font-weight:800;font-size:17px;letter-spacing:-.01em;cursor:pointer;user-select:none}
-.brand svg{flex:none}
-.brand small{font-weight:500;font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);border-left:1px solid var(--line2);padding-left:10px}
-.cmd{position:relative;max-width:720px;width:100%;justify-self:center}
-.cmd .box{display:flex;align-items:center;gap:10px;height:34px;border:1px solid var(--line2);background:var(--panel);padding:0 10px}
-.cmd .box:focus-within{border-color:var(--accent)}
-.cmd input{flex:1;min-width:0;background:none;border:0;color:var(--text);font:500 13px var(--sans);outline:none}
-.cmd input::placeholder{color:var(--dim)}
-kbd{font:500 10px var(--mono);color:var(--muted);border:1px solid var(--line2);padding:1px 5px}
-.menu{position:absolute;left:0;right:0;top:37px;background:var(--panel2);border:1px solid var(--line3);z-index:40;box-shadow:0 12px 32px rgba(0,0,0,.6)}
-.menu button{display:flex;width:100%;gap:10px;align-items:center;padding:8px 12px;text-align:left;border-bottom:1px solid var(--line)}
-.menu button:last-child{border-bottom:0}
-.menu button:hover,.menu button.on{background:var(--panel3)}
-.menu .k{font:600 10px var(--mono);color:var(--muted);letter-spacing:.06em;min-width:74px;text-transform:uppercase}
-.menu .run .k{color:var(--danger)}
-.snap{display:flex;align-items:center;gap:8px;font:500 10.5px var(--mono);color:var(--text2);border:1px solid var(--line2);padding:5px 9px;white-space:nowrap}
-.snap i{width:6px;height:6px;background:var(--accent);display:inline-block}
-
-/* ---------- ticker ---------- */
-.ticker{display:flex;overflow-x:auto;border-bottom:1px solid var(--line);background:var(--bg2);scrollbar-width:none}
-.ticker::-webkit-scrollbar{display:none}
-.tk{flex:none;display:flex;align-items:baseline;gap:8px;padding:7px 14px;border-right:1px solid var(--line);font-family:var(--mono);font-size:11px;white-space:nowrap}
-.tk:hover{background:var(--panel)}
-.tk b{font-weight:700;color:var(--text)}
-.tk span{color:var(--muted)}
-.tk em{font-style:normal;color:var(--accent)}
-.tk em.hi{color:var(--danger)}
-
-/* ---------- main 3 columns ---------- */
-.main{display:grid;grid-template-columns:240px minmax(0,1fr) 310px;min-height:0}
-.col{min-height:0;overflow:auto;scrollbar-width:thin;scrollbar-color:var(--line3) transparent}
-.left{border-right:1px solid var(--line);padding:14px 14px 18px}
-.right{border-left:1px solid var(--line);padding:14px 16px 18px;background:var(--bg2)}
-.sec{margin-bottom:16px}
-.sec-h{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}
-
-/* portfolio */
-.chips{display:grid;grid-template-columns:1fr 1fr;gap:4px}
-.chip{display:flex;flex-direction:column;align-items:flex-start;gap:1px;padding:6px 8px;border:1px solid var(--line2);background:var(--panel);text-align:left;position:relative}
-.chip b{font:700 11.5px var(--mono)}
-.chip span{font-size:10.5px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%}
-.chip[aria-pressed=true]{border-color:var(--accent);background:var(--accentbg)}
-.chip[aria-pressed=true] b{color:var(--accent2)}
-.chip[aria-pressed=true]::after{content:"";position:absolute;right:6px;top:7px;width:6px;height:6px;background:var(--accent)}
-.chip:hover{border-color:var(--line3)}
-.chip .hit{font:600 10px var(--mono);color:var(--danger)}
-.headline{font-size:19px;line-height:1.22;font-weight:700;letter-spacing:-.015em;margin:4px 0 10px}
-.headline em{font-style:normal;color:var(--accent)}
-.hold{display:grid;grid-template-columns:62px 1fr 52px;align-items:center;gap:8px;padding:5px 0;border-bottom:1px solid var(--line);font-family:var(--mono);font-size:11px;cursor:pointer}
-.hold:hover b{color:var(--accent2)}
-.hold .bar{height:4px;background:var(--line);position:relative}
-.hold .bar i{position:absolute;left:0;top:0;bottom:0}
-.hold .v{text-align:right;color:var(--text2)}
-.note{color:var(--muted);font-size:11px;line-height:1.45}
-.pfimpact{border:1px solid var(--danger);background:var(--dangerbg);padding:10px;margin-top:10px}
-.pfimpact .big{font:700 22px var(--mono);color:var(--danger);letter-spacing:-.02em}
-
-/* ---------- center / map ---------- */
-.center{display:flex;flex-direction:column;min-height:0;min-width:0;background:
-  radial-gradient(ellipse at 76% 50%,rgba(247,147,30,.05),transparent 55%),var(--bg)}
-.mapbar{display:flex;align-items:center;gap:8px;flex-wrap:wrap;padding:8px 12px;border-bottom:1px solid var(--line)}
-.mapbar h1{font-size:13px;font-weight:700;margin:0 8px 0 0;letter-spacing:-.005em}
-.mapbar .meta{font:500 11px var(--mono);color:var(--muted)}
+/* top bar */
+.top{height:50px;display:flex;align-items:center;gap:18px;padding:0 18px;background:var(--panel);border-top:3px solid var(--accent);border-bottom:1px solid var(--line2)}
+.brand{display:flex;align-items:center;gap:8px;font:800 19px var(--sans);letter-spacing:-.02em;background:none;border:0;padding:0}
+.views{display:flex;height:100%;margin-left:10px}
+.views button{background:none;border:0;border-bottom:2px solid transparent;padding:0 14px;height:100%;font-weight:600;color:var(--muted);display:flex;align-items:center;gap:7px}
+.views button:hover{color:var(--ink)}
+.views button[aria-selected="true"]{color:var(--ink);border-bottom-color:var(--ink)}
+.views b,.btn b{font:600 11px var(--mono);color:var(--accent-ink);background:var(--accent-bg);padding:1px 5px}
 .sp{flex:1}
-.btn{display:inline-flex;align-items:center;gap:6px;height:28px;padding:0 10px;border:1px solid var(--line2);background:var(--panel);font-size:11.5px;font-weight:600;white-space:nowrap}
-.btn:hover{border-color:var(--line3);background:var(--panel2)}
-.btn[aria-pressed=true]{border-color:var(--accent);color:var(--accent2);background:var(--accentbg)}
-.btn.primary{border-color:var(--danger);background:var(--danger);color:#fff}
-.btn.primary:hover{background:#f05a6e}
-.btn.ghost{background:none}
-.btn svg{flex:none}
-.loopcount{font:600 11px var(--mono);color:var(--accent)}
-.mapwrap{position:relative;flex:1;min-height:0}
-#map{position:absolute;inset:0;width:100%;height:100%;display:block}
-.hud{display:flex;align-items:center;gap:14px;flex-wrap:wrap;padding:8px 12px;border-bottom:1px solid var(--line);background:linear-gradient(90deg,rgba(232,68,90,.08),transparent 60%);min-height:50px}
-.hud.cta{background:linear-gradient(90deg,rgba(247,147,30,.07),transparent 60%)}
-.hud .q{font-size:15px;font-weight:700;letter-spacing:-.01em;line-height:1.2}
-.hud .qq{display:flex;flex-direction:column;gap:2px;min-width:0}
-.hud .pips{display:flex;gap:3px;width:90px}
-.hud .pips i{flex:1;height:3px;background:var(--line2)}
-.hud .pips i.on{background:var(--danger)}
-.hud .st{display:flex;flex-direction:column;font-family:var(--mono);font-size:10px;color:var(--muted);letter-spacing:.06em;text-transform:uppercase;padding-left:14px;border-left:1px solid var(--line2)}
-.hud .st b{color:var(--text);font-size:15px;letter-spacing:-.01em;text-transform:none}
-.hud .st b.d{color:var(--danger);font-size:18px}
-.hud .st b.a{color:var(--accent2)}
-.hud .acts{display:flex;gap:6px;margin-left:auto}
-.legend{position:absolute;left:10px;bottom:8px;display:flex;flex-direction:column;gap:3px;font:500 10px var(--mono);color:var(--muted);padding:6px 8px;background:rgba(9,9,11,.72);border:1px solid var(--line);pointer-events:none}
-.legend span{display:inline-flex;align-items:center;gap:6px}
-.loopcap{display:flex;align-items:center;gap:14px;flex-wrap:wrap;padding:8px 12px;border-bottom:1px solid var(--line);background:linear-gradient(90deg,rgba(247,147,30,.12),transparent 70%);min-height:50px}
-.loopcap .qq{flex:1;min-width:240px}
-.loopcap .t{font-weight:700;font-size:15px;margin:1px 0 2px}
-.loopcap .p{font:600 11.5px var(--mono);color:var(--accent2);word-break:break-word}
-.loopcap .nav{display:flex;gap:6px;align-items:center}
+.snap{font:500 11px var(--mono);color:var(--muted);display:flex;align-items:center;gap:7px;white-space:nowrap}
+.snap i{width:7px;height:7px;background:var(--accent);display:inline-block}
+.btn{height:30px;padding:0 12px;background:var(--panel);border:1px solid var(--line2);font-weight:600;font-size:12.5px;display:inline-flex;align-items:center;gap:7px;white-space:nowrap}
+.btn:hover{border-color:var(--ink)}
+.btn.primary{background:var(--ink);border-color:var(--ink);color:#fff}
+.btn.primary:hover{background:#000}
+.btn.ghost{border-color:transparent;color:var(--muted)}
+.btn.ghost:hover{color:var(--ink);border-color:var(--line2)}
 
-/* svg */
-.lane-t{font:700 11px var(--sans);letter-spacing:.2em;fill:#6b6a74;text-transform:uppercase}
+/* layout */
+.main{display:grid;grid-template-columns:minmax(0,1fr) 430px;height:calc(100vh - 50px)}
+.stage{display:flex;flex-direction:column;min-width:0;min-height:0;background:var(--map)}
+.cap{min-height:74px;display:flex;align-items:center;gap:22px;padding:12px 22px;border-bottom:1px solid var(--line)}
+.cap .tx{flex:1;min-width:0}
+.cap h1{margin:2px 0 0;font:700 20px/1.2 var(--sans);letter-spacing:-.01em}
+.cap p{margin:2px 0 0;color:var(--muted);font-size:13px}
+.cap .kp{display:flex;flex-direction:column;border-left:1px solid var(--line);padding-left:16px}
+.cap .kp b{font:700 19px var(--mono);letter-spacing:-.02em}
+.cap .kp b.neg{color:var(--danger)}
+.cap .acts{display:flex;gap:6px}
+.pips{display:flex;gap:4px;margin-top:6px}
+.pips i{width:26px;height:3px;background:var(--line2)}
+.pips i.on{background:var(--danger)}
+.cks{display:flex;gap:10px;flex:2}
+.ck{flex:1;text-align:left;background:var(--panel);border:1px solid var(--line2);padding:8px 12px}
+.ck:hover{border-color:var(--ink)}
+.ck .n{font-weight:700;font-size:14px}
+.ck .n span{font-weight:500;color:var(--muted);font-size:12px;margin-left:4px}
+.ck .v{font:700 14px var(--mono);color:var(--danger)}
+.ck .v span{font:500 11px var(--mono);color:var(--muted)}
+.ck .go{font:600 10.5px var(--sans);letter-spacing:.1em;text-transform:uppercase;color:var(--accent-ink);margin-top:2px}
+.mapwrap{flex:1;min-height:0;position:relative}
+#map{position:absolute;inset:0;width:100%;height:100%}
+.legend{display:flex;flex-wrap:wrap;gap:6px 20px;padding:9px 22px;border-top:1px solid var(--line);font-size:12px;color:var(--muted)}
+.legend span{display:inline-flex;align-items:center;gap:7px}
+
+/* map svg */
+.lane-t{font:600 10.5px var(--sans);letter-spacing:.16em;fill:#A29E96;text-transform:uppercase}
 .node{cursor:pointer}
-.node .tick{font:700 13px var(--mono);fill:var(--text);paint-order:stroke;stroke:var(--bg);stroke-width:3px;stroke-linejoin:round}
-.node .rev{font:500 11.5px var(--mono);fill:var(--muted);paint-order:stroke;stroke:var(--bg);stroke-width:3px;stroke-linejoin:round}
-.node.pf .tick{fill:var(--accent2)}
-.node.dim{opacity:.18}
-.node .selring{fill:none;stroke:var(--text);stroke-width:1.2;opacity:0}
-.node.sel .selring{opacity:1}
-.node.match .selring{opacity:1;stroke:var(--accent);stroke-dasharray:3 3}
-.node:hover .core{filter:brightness(1.35)}
-.edge{fill:none;transition:opacity .25s}
-.edge.dim{opacity:.07}
-.ehit{fill:none;stroke:transparent;stroke-width:12;cursor:pointer}
+.node .core{transition:fill .25s,stroke .25s}
+.node .tick{font:700 13px var(--mono);fill:var(--ink);paint-order:stroke;stroke:var(--map);stroke-width:4px;stroke-linejoin:round}
+.node .rev{font:500 11px var(--mono);fill:var(--muted);paint-order:stroke;stroke:var(--map);stroke-width:4px;stroke-linejoin:round}
+.node.dim{opacity:.16}
+.node .selring{fill:none;stroke:var(--ink);stroke-width:1.5;opacity:0}
+.node.sel .selring,.node.match .selring{opacity:1}
+.node.match .selring{stroke:var(--accent);stroke-dasharray:3 3}
+.node:hover .core{stroke-width:4}
+.node .choke{fill:none;stroke:var(--ink);stroke-width:1.3;opacity:.7;pointer-events:none}
+.node .choke-t{font:700 9.5px var(--sans);letter-spacing:.14em;fill:var(--ink);paint-order:stroke;stroke:var(--map);stroke-width:4px;opacity:0;pointer-events:none}
+.node.chokeon .choke,.node.chokeon .choke-t{opacity:1}
+.edge{fill:none;transition:opacity .25s,stroke .25s}
 .edge.flow{animation:flow 1s linear infinite}
 @keyframes flow{to{stroke-dashoffset:-20}}
-.badge-t{font:700 12.5px var(--mono);fill:#ff6b7f}
-.badge-r{fill:#140a0c;stroke:var(--danger);stroke-width:.8}
-.pulse{fill:none;stroke:var(--danger)}
-.choke{fill:none;stroke:#F1ECE4;stroke-width:1.2;opacity:.55;pointer-events:none;transition:opacity .2s,stroke-width .2s}
-.node.chokeon .choke{opacity:1;stroke-width:2}
-.choke-t{font:700 9.5px var(--mono);letter-spacing:.12em;fill:#F1ECE4;paint-order:stroke;stroke:var(--bg);stroke-width:3px;opacity:0;pointer-events:none}
-.node.chokeon .choke-t{opacity:1}
-.chokecap{display:grid;grid-template-columns:auto repeat(3,1fr) auto;gap:0;border-bottom:1px solid var(--line);background:linear-gradient(90deg,rgba(241,236,228,.07),transparent 70%)}
-.chokecap.hide{display:none}
-.chokecap .hd{padding:8px 12px;display:flex;flex-direction:column;justify-content:center;max-width:210px}
-.chokecap .hd .note{font-size:10.5px;color:var(--muted);line-height:1.3;margin-top:2px}
-.chokecap .cp{padding:8px 12px;border-left:1px solid var(--line2);background:none;border-top:0;border-right:0;border-bottom:0;color:inherit;text-align:left;cursor:pointer;font:inherit}
-.chokecap .cp:hover{background:rgba(241,236,228,.06)}
-.chokecap .cp .n{font:700 13px var(--mono)}
-.chokecap .cp .w{font:500 11px var(--sans);color:var(--muted);margin-left:4px}
-.chokecap .cp .v{font:700 15px var(--mono);color:var(--danger)}
-.chokecap .cp .v span{font:500 10.5px var(--mono);color:var(--muted)}
-.chokecap .cp .go{font:600 10px var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--accent2);margin-top:3px}
-.chokecap .x{display:flex;align-items:center;padding:0 12px}
-@media (max-width:900px){.chokecap{grid-template-columns:1fr}.chokecap .cp{border-left:0;border-top:1px solid var(--line2)}.chokecap .x{padding:8px 12px}}
-.burn{fill:none;opacity:.9;stroke-linecap:round;pointer-events:none}
-.floater{font:700 14px var(--mono);paint-order:stroke;stroke:var(--bg);stroke-width:4px;stroke-linejoin:round;pointer-events:none}
-.feed{position:absolute;right:8px;top:26px;width:206px;pointer-events:none;font-family:var(--mono);background:rgba(9,9,11,.82);border:1px solid var(--line2);border-left:2px solid var(--danger);backdrop-filter:blur(3px)}
-.feed.hide{display:none}
-.feed .fh{display:flex;justify-content:space-between;gap:8px;padding:6px 9px;font-size:10px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--danger);border-bottom:1px solid var(--line)}
-.feed .fh span{color:var(--muted);letter-spacing:.04em}
-.feed .fc{padding:5px 9px 6px;font:500 11px var(--sans);color:var(--text);border-bottom:1px solid var(--line);line-height:1.3}
-.feed .fr{display:grid;grid-template-columns:18px 46px 1fr auto;gap:5px;align-items:baseline;padding:3px 9px;font-size:11px;font-variant-numeric:tabular-nums;animation:feedin .35s ease-out}
-.feed .fr i{font-style:normal;color:var(--muted);font-size:9.5px}
-.feed .fr b{color:var(--text)}
-.feed .fr.pf b{color:var(--accent2)}
-.feed .fr u{text-decoration:none;color:#ff6b7f;font-weight:700}
-.feed .fr em{font-style:normal;color:var(--muted);text-align:right}
-.feed .fr.eq u{color:var(--accent2)}
-@keyframes feedin{from{opacity:0;transform:translateX(14px);background:rgba(232,68,90,.28)}to{opacity:1;transform:none;background:transparent}}
+.ehit{fill:none;stroke:transparent;stroke-width:14;cursor:pointer}
+.badge-t{font:700 12px var(--mono);fill:var(--danger)}
+.badge-r{fill:#fff;stroke:var(--danger);stroke-width:1}
+.burn{fill:none;stroke-linecap:round;pointer-events:none}
+.floater{font:700 14px var(--mono);paint-order:stroke;stroke:var(--map);stroke-width:5px;stroke-linejoin:round;pointer-events:none}
+
+/* side panel */
+.side{position:relative;background:var(--panel);border-left:1px solid var(--line2);min-height:0}
+.sidescroll{height:100%;overflow-y:auto}
+.blk{padding:18px 20px;border-bottom:1px solid var(--line)}
+.blk>.lbl{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
+.headline{font:700 21px/1.2 var(--sans);letter-spacing:-.015em;margin:14px 0 0}
+.headline em{font-style:normal;color:var(--accent-ink)}
+.chips{display:flex;flex-wrap:wrap;gap:6px}
+.chip{font:600 12px var(--mono);padding:5px 9px;background:var(--panel);border:1px solid var(--line2);color:var(--muted)}
+.chip:hover{border-color:var(--ink);color:var(--ink)}
+.chip[aria-pressed="true"]{background:var(--accent-bg);border-color:var(--accent);color:var(--ink)}
 .chip.struck{animation:struck .7s ease-out}
-@keyframes struck{0%{box-shadow:0 0 0 0 rgba(232,68,90,.9);background:rgba(232,68,90,.35)}100%{box-shadow:0 0 0 10px rgba(232,68,90,0)}}
+@keyframes struck{0%{background:var(--danger);color:#fff}100%{}}
+.pfline{display:flex;align-items:center;gap:8px;flex-wrap:wrap;font:600 12px var(--mono)}
+.pfline span{padding:2px 6px;background:var(--accent-bg);border:1px solid var(--accent)}
+.ask{display:flex;border:1px solid var(--ink)}
+.ask input{flex:1;min-width:0;border:0;padding:0 12px;height:42px;font:500 15px var(--sans);background:transparent;color:var(--ink);outline:none}
+.ask input::placeholder{color:var(--dim)}
+.ask button{border:0;background:var(--ink);color:#fff;padding:0 18px;font-weight:700;display:flex;align-items:center;gap:7px}
+.ask button:hover{background:#000}
+.presets{display:flex;flex-direction:column;margin-top:10px}
+.preset{text-align:left;background:none;border:0;border-top:1px solid var(--line);padding:9px 2px;font-size:13.5px;display:flex;justify-content:space-between;align-items:center;gap:8px}
+.preset:hover{color:var(--accent-ink)}
+.preset span{font:500 11px var(--mono);color:var(--dim)}
+.interp{margin-top:12px;padding:10px 12px;background:var(--bg);border:1px solid var(--line)}
+.interp .row{display:flex;gap:6px;align-items:center;flex-wrap:wrap;margin-top:6px}
+.interp select{font:600 12.5px var(--sans);height:28px;border:1px solid var(--line2);background:var(--panel);color:var(--ink);padding:0 4px}
+.interp input[type=range]{flex:1;min-width:80px;accent-color:var(--ink)}
+.interp output{font:700 13px var(--mono);min-width:38px;text-align:right}
+.interp .why{font-size:11.5px;color:var(--muted);margin-top:6px}
 
-/* tooltip */
-.tip{position:fixed;z-index:60;pointer-events:none;background:var(--panel2);border:1px solid var(--line3);padding:7px 9px;font-size:11.5px;max-width:280px;box-shadow:0 8px 24px rgba(0,0,0,.6)}
+/* report */
+.rep-h{display:flex;align-items:center;justify-content:space-between;gap:8px}
+.rep-t{font:700 17px/1.25 var(--sans);margin:8px 0 12px}
+.kpis{display:grid;grid-template-columns:repeat(3,1fr);border:1px solid var(--line2)}
+.kpis div{padding:9px 10px;border-left:1px solid var(--line)}
+.kpis div:first-child{border-left:0;background:var(--danger-bg)}
+.kpis b{display:block;font:700 17px var(--mono);letter-spacing:-.02em;margin-top:2px}
+.kpis div:first-child b{color:var(--danger)}
+.lead{margin:12px 0 4px;font-size:14px}
+.lead b{font-family:var(--mono)}
+.sub{margin:18px 0 6px;display:flex;justify-content:space-between;align-items:baseline}
+.rt{width:100%;border-collapse:collapse}
+.rt tr{border-top:1px solid var(--line);cursor:pointer;animation:rowin .35s ease-out}
+.rt tr:hover{background:var(--bg)}
+@keyframes rowin{from{background:var(--danger-bg)}to{background:transparent}}
+.rt td{padding:7px 4px;vertical-align:top}
+.rt .nm b{font:700 12.5px var(--mono)}
+.rt .nm b.own{color:var(--accent-ink)}
+.rt .nm b.own::before{content:'';display:inline-block;width:6px;height:6px;background:var(--accent);margin-right:5px;vertical-align:1px}
+.rt .nm div{font-size:11.5px;color:var(--muted);margin-top:1px}
+.rt .num{text-align:right;font:600 12.5px var(--mono);white-space:nowrap}
+.rt .num.p{color:var(--danger);font-weight:700}
+.rt .bar{width:74px;padding-top:12px}
+.rt .bar i{display:block;height:6px;background:var(--danger);min-width:1px;transition:width .4s}
+.tag{font:600 9.5px var(--mono);letter-spacing:.06em;padding:1px 5px;border:1px solid var(--line2);color:var(--muted);white-space:nowrap}
+.tag.DISCLOSED{border-color:var(--ink);color:var(--ink)}
+.tag.REPORTED{border-color:var(--accent);color:var(--accent-ink)}
+.tag.ESTIMATED{border-style:dashed}
+.tag.lev{border-color:var(--danger);color:var(--danger)}
+.summary{font-size:13.5px;line-height:1.55;margin:0}
+.summary b{font-family:var(--mono);font-size:12.5px}
+details.trace{margin-top:16px;border:1px solid var(--line2)}
+details.trace>summary{padding:9px 12px;font-weight:600;cursor:pointer;display:flex;justify-content:space-between;align-items:center}
+.call{border-top:1px solid var(--line);padding:8px 12px}
+.call .f{font:600 12px var(--mono);display:flex;justify-content:space-between;gap:8px}
+.call .f span{color:var(--dim);font-weight:500}
+.call pre{margin:5px 0 0;font:500 11px/1.45 var(--mono);color:var(--muted);white-space:pre-wrap;word-break:break-word}
+
+/* detail overlay */
+.detail{position:absolute;inset:0;background:var(--panel);overflow-y:auto;padding:18px 20px;z-index:5}
+.dh{display:flex;justify-content:space-between;align-items:flex-start;gap:10px}
+.dh h2{margin:2px 0 0;font:700 20px/1.2 var(--sans)}
+.x{background:none;border:1px solid var(--line2);width:30px;height:30px;font-size:16px;line-height:1;flex:none}
+.x:hover{border-color:var(--ink)}
+.kv{display:grid;grid-template-columns:118px 1fr;gap:7px 10px;margin:14px 0;font-size:13px}
+.kv dt{color:var(--muted)}
+.kv dd{margin:0;font-weight:600}
+.quote{border-left:3px solid var(--accent);padding:8px 12px;background:var(--bg);margin:12px 0;font-size:13.5px}
+.quote small{display:block;color:var(--muted);margin-top:4px;font-size:11.5px}
+.lk{display:flex;justify-content:space-between;gap:8px;width:100%;text-align:left;background:none;border:0;border-top:1px solid var(--line);padding:8px 2px;font-size:13px}
+.lk:hover{color:var(--accent-ink)}
+.lk span{font:600 12px var(--mono);color:var(--muted);white-space:nowrap}
+.facts{margin:6px 0 0;padding-left:18px;font-size:13px}
+
+/* sources drawer */
+.scrim{position:fixed;inset:0;background:rgba(22,23,27,.28);z-index:40}
+.drawer{position:fixed;top:0;right:0;bottom:0;width:min(560px,100vw);background:var(--panel);border-left:1px solid var(--line2);z-index:41;display:flex;flex-direction:column;box-shadow:-12px 0 32px rgba(0,0,0,.12)}
+.drawer .hd{padding:16px 20px 12px;border-bottom:1px solid var(--line)}
+.drawer .hd h2{margin:0;font:700 19px var(--sans)}
+.drawer input[type=search]{width:100%;height:38px;border:1px solid var(--ink);padding:0 12px;font:500 14px var(--sans);margin-top:12px;outline:none;background:var(--panel);color:var(--ink)}
+.types{display:flex;gap:6px;flex-wrap:wrap;margin-top:10px}
+.drawer .list{overflow-y:auto;flex:1}
+.srow{display:block;width:100%;text-align:left;background:none;border:0;border-bottom:1px solid var(--line);padding:11px 20px}
+.srow:hover,.srow.on{background:var(--bg)}
+.srow .m{font:500 11px var(--mono);color:var(--muted);display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.srow .t{font-weight:600;margin:3px 0 2px}
+.srow .u{font-size:12.5px;color:var(--muted)}
+
+/* modal + tip */
+.modal{position:fixed;inset:0;background:rgba(22,23,27,.35);z-index:50;display:flex;align-items:center;justify-content:center;padding:16px}
+.modal .box{background:var(--panel);max-width:560px;width:100%;padding:22px 24px;border-top:3px solid var(--accent);max-height:90vh;overflow:auto}
+.modal h2{margin:0 0 10px;font:700 19px var(--sans)}
+.modal ol{padding-left:18px;margin:0}
+.modal li{margin:7px 0}
+.tip{position:fixed;z-index:60;pointer-events:none;background:var(--ink);color:#fff;padding:7px 10px;font-size:12px;max-width:280px}
 .tip b{font-family:var(--mono)}
-.tip .s{color:var(--muted);font-family:var(--mono);font-size:10.5px;margin-top:2px}
+.tip .s{opacity:.75;font-size:11.5px;margin-top:2px}
 
-/* ---------- detail panel ---------- */
-.dh{display:flex;align-items:flex-start;justify-content:space-between;gap:8px;margin-bottom:10px}
-.dh h2{margin:2px 0 0;font-size:20px;letter-spacing:-.02em;line-height:1.1}
-.dh .tkr{font:700 11px var(--mono);color:var(--accent2)}
-.kpis{display:grid;grid-template-columns:1fr 1fr;border:1px solid var(--line);margin-bottom:12px}
-.kpi{padding:8px 10px;border-right:1px solid var(--line);border-bottom:1px solid var(--line)}
-.kpi:nth-child(2n){border-right:0}
-.kpi:nth-last-child(-n+2){border-bottom:0}
-.kpi .v{font:700 17px var(--mono);letter-spacing:-.02em;margin-top:2px}
-.kpi .v.d{color:var(--danger)}
-.kpi .v.a{color:var(--accent)}
-.kpi .s{font:500 10px var(--mono);color:var(--muted)}
-.ll{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:2px 8px;padding:6px 6px;border-bottom:1px solid var(--line);cursor:pointer;align-items:center}
-.ll:hover{background:var(--panel2)}
-.ll .n{font-size:12px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.ll .n small{color:var(--muted);font-weight:500}
-.ll .a{font:600 11.5px var(--mono);text-align:right}
-.ll .m{grid-column:1/-1;display:flex;gap:6px;align-items:center;font:500 10px var(--mono);color:var(--muted)}
-.tag{display:inline-block;font:700 9px var(--mono);letter-spacing:.08em;padding:1px 5px;border:1px solid}
-.tag.DISCLOSED{color:var(--text);border-color:var(--text2)}
-.tag.REPORTED{color:var(--accent2);border-color:var(--accent)}
-.tag.ESTIMATED{color:var(--muted);border-color:var(--line3);border-style:dashed}
-.tag.lev{color:var(--danger);border-color:var(--danger);background:var(--dangerbg)}
-.tag.pf{color:var(--accent2);border-color:var(--accent);background:var(--accentbg)}
-.quote{border-left:2px solid var(--accent);padding:6px 10px;margin:10px 0;background:var(--panel);font-size:13px;line-height:1.45}
-.quote small{display:block;font:600 9.5px var(--mono);color:var(--muted);letter-spacing:.1em;text-transform:uppercase;margin-bottom:3px}
-.kv{display:grid;grid-template-columns:96px 1fr;gap:6px 10px;font-size:12px;margin:8px 0}
-.kv dt{color:var(--muted);font-size:10px;letter-spacing:.12em;text-transform:uppercase;font-weight:600;padding-top:2px}
-.kv dd{margin:0;font-family:var(--mono);font-size:11.5px;word-break:break-word}
-.flow{display:flex;align-items:center;gap:8px;font:700 13px var(--mono);margin:8px 0 6px;flex-wrap:wrap}
-.flow button{border:1px solid var(--line2);padding:3px 7px;background:var(--panel)}
-.flow button:hover{border-color:var(--accent)}
-.flow .rel{font:600 10px var(--sans);letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
-.facts{margin:0;padding:0;list-style:none}
-.facts li{padding:4px 0 4px 12px;position:relative;font-size:12px;color:var(--text2)}
-.facts li::before{content:"";position:absolute;left:0;top:10px;width:5px;height:1px;background:var(--accent)}
-.bar2{height:5px;background:var(--line);margin-top:6px;position:relative}
-.bar2 i{position:absolute;left:0;top:0;bottom:0}
-.stat-grid{display:grid;grid-template-columns:1fr 1fr;gap:1px;background:var(--line);border:1px solid var(--line);margin:10px 0 14px}
-.stat-grid>div{background:var(--bg2);padding:9px 10px}
-.stat-grid .v{font:700 18px var(--mono)}
-.mini{width:100%;border-collapse:collapse;font-size:11.5px}
-.mini td{padding:5px 4px;border-bottom:1px solid var(--line)}
-.mini td.r{text-align:right;font-family:var(--mono)}
-
-/* ---------- drawer ---------- */
-.drawer{border-top:1px solid var(--line2);background:var(--bg2);display:flex;flex-direction:column;min-height:0}
-@media (min-width:1100px){ .drawer{height:var(--drawer-h)} .drawer.closed{height:37px} }
-.tabs{display:flex;align-items:stretch;border-bottom:1px solid var(--line);height:37px;flex:none;overflow-x:auto;scrollbar-width:none}
-.tab{padding:0 16px;font-size:11px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);border-right:1px solid var(--line);display:flex;align-items:center;gap:8px;white-space:nowrap;position:relative}
-.tab:hover{color:var(--text)}
-.tab[aria-selected=true]{color:var(--text);background:var(--bg)}
-.tab[aria-selected=true]::before{content:"";position:absolute;left:0;right:0;top:0;height:2px;background:var(--accent)}
-.tab .c{font:600 10px var(--mono);color:var(--dim);letter-spacing:0}
-.tab .live{width:6px;height:6px;background:var(--danger)}
-.pane{flex:1;min-height:0;overflow:auto;scrollbar-width:thin;scrollbar-color:var(--line3) transparent}
-.drawer.closed .pane{display:none}
-
-/* filings */
-.ftools{display:flex;gap:8px;align-items:center;padding:8px 12px;border-bottom:1px solid var(--line);flex-wrap:wrap;position:sticky;top:0;background:var(--bg2);z-index:2}
-.ftools input{height:28px;border:1px solid var(--line2);background:var(--panel);color:var(--text);padding:0 9px;font:500 12px var(--sans);width:280px;max-width:100%}
-.ftools input:focus{border-color:var(--accent);outline:none}
-.seg{display:flex;flex-wrap:wrap}
-.seg button{height:28px;padding:0 9px;border:1px solid var(--line2);margin-left:-1px;font:600 10.5px var(--mono);color:var(--muted);background:var(--panel)}
-.seg button[aria-pressed=true]{color:var(--accent2);border-color:var(--accent);position:relative;z-index:1;background:var(--accentbg)}
-table.grid{width:100%;border-collapse:collapse;font-size:12px}
-table.grid th{position:sticky;top:0;background:var(--bg2);text-align:left;font:600 9.5px var(--sans);letter-spacing:.13em;text-transform:uppercase;color:var(--muted);padding:7px 10px;border-bottom:1px solid var(--line2);white-space:nowrap}
-.ftools + table.grid th{top:45px}
-table.grid td{padding:6px 10px;border-bottom:1px solid var(--line);vertical-align:middle}
-table.grid tr.click{cursor:pointer}
-table.grid tr.click:hover td{background:var(--panel)}
-table.grid tr.selr td{background:var(--panel2)}
-table.grid td.n{font-family:var(--mono);text-align:right;white-space:nowrap}
-table.grid th.n{text-align:right}
-td.mono{font-family:var(--mono);white-space:nowrap}
-.typ{font:600 10px var(--mono);color:var(--text2);border:1px solid var(--line2);padding:1px 5px;white-space:nowrap}
-.empty{padding:22px;color:var(--muted);text-align:center}
-
-/* scenario */
-.scen{display:grid;grid-template-columns:330px minmax(0,1fr);min-height:100%}
-.scen-l{border-right:1px solid var(--line);padding:12px}
-.scen-r{min-width:0;display:flex;flex-direction:column}
-.sinput{display:flex;border:1px solid var(--line2);background:var(--panel)}
-.sinput:focus-within{border-color:var(--danger)}
-.sinput input{flex:1;min-width:0;background:none;border:0;color:var(--text);padding:0 10px;height:34px;font:600 12.5px var(--sans);outline:none}
-.sinput .btn{height:34px;border:0}
-.presets{display:flex;flex-direction:column;gap:4px;margin:8px 0 12px}
-.preset{text-align:left;padding:6px 9px;border:1px solid var(--line2);font-size:12px;background:var(--panel);display:flex;justify-content:space-between;gap:8px}
-.preset:hover{border-color:var(--line3)}
-.preset.on{border-color:var(--danger);background:var(--dangerbg)}
-.preset small{font:600 9.5px var(--mono);color:var(--muted)}
-.interp{border:1px solid var(--line2);padding:10px;background:var(--panel)}
-.interp .row{display:grid;grid-template-columns:76px 1fr;gap:8px;align-items:center;margin:6px 0}
-.interp label{font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);font-weight:600}
-.interp select{width:100%;height:28px;background:var(--bg2);border:1px solid var(--line2);color:var(--text);font:500 12px var(--sans);padding:0 6px}
-.rng{display:flex;align-items:center;gap:8px}
-.rng input{flex:1;accent-color:var(--danger);min-width:0}
-.rng output{font:700 12px var(--mono);min-width:44px;text-align:right}
-.interp .why{font:500 10.5px var(--mono);color:var(--muted);margin-top:8px;line-height:1.5}
-.sumbar{padding:12px 14px;border-bottom:1px solid var(--line);display:flex;gap:16px;align-items:center;flex-wrap:wrap}
-.sumbar .txt{font-size:15px;font-weight:600;letter-spacing:-.01em;flex:1;min-width:240px}
-.sumbar .txt b{color:var(--danger);font-family:var(--mono)}
-.sumbar .txt em{font-style:normal;color:var(--accent2)}
-.tbl-wrap{overflow:auto;min-width:0}
-.pctbar{display:inline-block;width:56px;height:5px;background:var(--line);vertical-align:middle;margin-right:7px;position:relative}
-.pctbar i{position:absolute;left:0;top:0;bottom:0;background:var(--danger)}
-.yes{color:var(--accent2);font-weight:700}
-.path{font:500 11px var(--mono);color:var(--text2);white-space:nowrap}
-
-/* trace */
-.trace{display:grid;grid-template-columns:minmax(0,1.25fr) minmax(0,1fr);min-height:100%}
-.trace-l{border-right:1px solid var(--line);padding:10px 12px}
-.trace-r{padding:12px 14px}
-.call{border:1px solid var(--line);margin-bottom:6px;background:var(--panel);opacity:1;transition:opacity .3s}
-.call.pending{opacity:.25}
-.call .h{display:flex;gap:10px;align-items:center;padding:6px 9px;font:600 11.5px var(--mono);cursor:pointer}
-.call .h .i{color:var(--dim);width:16px}
-.call .h .fn{color:var(--accent2)}
-.call .h .ms{margin-left:auto;color:var(--muted);font-weight:500;font-size:10.5px}
-.call pre{margin:0;padding:7px 10px 9px 35px;border-top:1px solid var(--line);font:500 10.5px/1.5 var(--mono);color:var(--text2);white-space:pre-wrap;word-break:break-word;max-height:160px;overflow:auto}
-.call.closed pre{display:none}
-.rec{display:inline-flex;align-items:center;gap:6px;font:700 10px var(--mono);letter-spacing:.1em;color:var(--danger);border:1px solid var(--danger);padding:2px 7px}
-.rec i{width:6px;height:6px;border-radius:50%;background:var(--danger)}
-.explain{font-size:14px;line-height:1.6;color:var(--text);margin-top:10px}
-.explain b{font-family:var(--mono);color:var(--danger);font-weight:600}
-
-/* modal */
-.modal{position:fixed;inset:0;background:rgba(0,0,0,.65);z-index:80;display:flex;align-items:center;justify-content:center;padding:16px}
-.modal .card{background:var(--panel);border:1px solid var(--line3);max-width:620px;width:100%;max-height:86vh;overflow:auto;padding:18px 20px}
-.modal h3{margin:0 0 4px;font-size:18px}
-.modal ol{padding-left:18px;margin:10px 0}
-.modal li{margin:7px 0;color:var(--text2);line-height:1.5}
-.modal li b{color:var(--text)}
-
-/* ---------- responsive ---------- */
-@media (max-width:1280px){ .main{grid-template-columns:220px minmax(0,1fr) 290px} .top{grid-template-columns:200px minmax(0,1fr) auto} }
-@media (max-width:1099px){
-  .top{grid-template-columns:1fr;height:auto;padding:10px 16px;gap:8px}
-  .snap{white-space:normal;justify-self:start}
-  .main{grid-template-columns:1fr}
-  .center{order:-1}
-  .mapwrap{height:auto;aspect-ratio:1100/640;flex:none}
-  .left,.right{border:0;border-top:1px solid var(--line);overflow:visible}
-  .col{overflow:visible}
-  .scen,.trace{grid-template-columns:1fr}
-  .scen-l,.trace-l{border-right:0;border-bottom:1px solid var(--line)}
-  .pane{max-height:none;overflow:visible}
-  .drawer.closed .pane{display:none}
-}
-@media (max-width:700px){
-  .mapwrap{aspect-ratio:auto;height:auto;overflow-x:auto;-webkit-overflow-scrolling:touch}
-  #map{position:static;height:auto;width:760px;max-width:none;aspect-ratio:1100/640}
-  .legend{position:static;flex-direction:row;flex-wrap:wrap;gap:4px 12px;margin:6px 12px;background:none}
-  .feed{position:sticky;left:8px;right:auto;top:auto;width:auto;max-width:300px;margin:6px 8px}
-  .hud .st{padding-left:0;border-left:0}
-  .hud .acts{margin-left:0}
-  .brand small{display:none}
-  .cmd kbd{display:none}
-  .ftools input{width:100%}
+@media (max-width:1100px){.snap{display:none}}
+@media (max-width:900px){
+  .top{height:auto;flex-wrap:wrap;padding:8px 14px;gap:8px 12px}
+  .views{order:5;width:100%;margin:0;height:38px;overflow-x:auto}
+  .main{grid-template-columns:1fr;height:auto}
+  .cap{flex-wrap:wrap;gap:10px;padding:12px 14px}
+  .cks{flex-direction:column;flex:auto;width:100%}
+  .mapwrap{flex:none;overflow-x:auto;-webkit-overflow-scrolling:touch}
+  #map{position:static;width:780px;height:auto;aspect-ratio:1100/740;display:block}
+  .legend{padding:9px 14px}
+  .side{border-left:0;border-top:1px solid var(--line2)}
+  .sidescroll{height:auto;overflow:visible}
+  .detail{position:fixed;z-index:30}
 }
 </style>
 </head>
 <body>
-<div class="app" id="app">
-  <header class="top">
-    <div class="brand" id="brand" title="Reset view" role="button" tabindex="0">
-      <svg width="22" height="22" viewBox="0 0 32 32" aria-hidden="true"><path d="M5 26 L16 6 L27 26" fill="none" stroke="#F7931E" stroke-width="3.5"/><path d="M11 26 L16 17 L21 26" fill="none" stroke="#E8445A" stroke-width="3"/></svg>
-      Upstream <small>AI circular economy</small>
-    </div>
-    <div class="cmd" id="cmdWrap">
-      <div class="box">
-        <svg width="14" height="14" viewBox="0 0 16 16" aria-hidden="true"><circle cx="7" cy="7" r="5" fill="none" stroke="#8B8993" stroke-width="1.5"/><path d="M11 11 L15 15" stroke="#8B8993" stroke-width="1.5"/></svg>
-        <input id="cmd" type="text" autocomplete="off" spellcheck="false" placeholder="Search companies, filings, deals... or type a scenario" aria-label="Search or type a scenario">
-        <kbd>/</kbd>
-      </div>
-      <div class="menu hide" id="cmdMenu" role="listbox"></div>
-    </div>
-    <div class="snap" title="All figures were checked by hand against the cited documents."><i></i>Snapshot: hand-verified from filings and press releases, Oct 2026</div>
-  </header>
+<header class="top">
+  <button class="brand" id="brand" aria-label="Upstream, reset view">
+    <svg width="22" height="22" viewBox="0 0 32 32" aria-hidden="true"><path d="M5 26 L16 6 L27 26" fill="none" stroke="#F7931E" stroke-width="4"/><path d="M11 26 L16 17 L21 26" fill="none" stroke="#D92D4A" stroke-width="3.4"/></svg>
+    Upstream
+  </button>
+  <nav class="views" role="tablist" aria-label="Map view">
+    <button role="tab" data-mode="map" aria-selected="true">Map</button>
+    <button role="tab" data-mode="loops" aria-selected="false">Money loops <b id="nLoops"></b></button>
+  </nav>
+  <span class="sp"></span>
+  <span class="snap"><i></i>Snapshot: hand-verified from filings and press releases, Oct 2026</span>
+  <button class="btn" id="srcBtn">Sources <b id="nSrc"></b></button>
+  <button class="btn ghost" id="howBtn">How it works</button>
+</header>
 
-  <div class="ticker" id="ticker" aria-label="Companies"></div>
-
-  <main class="main">
-    <aside class="col left" id="left">
-      <div class="sec">
-        <div class="sec-h"><span class="lbl">Your portfolio</span><span class="lbl mono" id="pfCount"></span></div>
-        <div class="chips" id="chips"></div>
-      </div>
-      <div class="sec">
-        <div class="headline" id="headline"></div>
-        <div id="holdings"></div>
-        <div class="note" style="margin-top:8px">Bar = share of revenue that traces back to OpenAI's spending, through every supply link in the map.</div>
-        <div id="pfImpact"></div>
-      </div>
-    </aside>
-
-    <section class="center">
-      <div class="mapbar">
-        <h1>Who depends on whom</h1>
-        <span class="meta" id="mapMeta"></span>
-        <span class="sp"></span>
-        <span class="loopcount" id="loopCount"></span>
-        <button class="btn" id="loopBtn" aria-pressed="false">
-          <svg width="13" height="13" viewBox="0 0 16 16" aria-hidden="true"><path d="M3 8a5 5 0 0 1 9-3M13 8a5 5 0 0 1-9 3" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M12 1v4H8M4 15v-4h4" fill="none" stroke="currentColor" stroke-width="1.6"/></svg>
-          Money loops</button>
-        <button class="btn" id="chokeBtn" aria-pressed="false"><svg width="11" height="11" viewBox="0 0 12 12" aria-hidden="true"><path d="M6 1 L11 6 L6 11 L1 6Z" fill="none" stroke="currentColor" stroke-width="1.5"/></svg>Choke points</button>
-        <button class="btn ghost" id="howBtn">How it works</button>
-      </div>
-      <div class="hud" id="hud"></div>
-      <div class="loopcap hide" id="loopCap"></div>
-      <div class="chokecap hide" id="chokeCap"></div>
-      <div class="mapwrap" id="mapwrap">
-        <svg id="map" viewBox="0 8 1100 612" preserveAspectRatio="xMidYMid meet" role="img" aria-label="Network map of AI company deals"></svg>
-      <div class="feed hide" id="feed" aria-live="off"></div>
-      <div class="legend" id="legend">
-          <span><svg width="26" height="8"><path d="M1 4H25" stroke="#C9C4BC" stroke-width="2.5"/></svg>sells to</span>
-          <span><svg width="26" height="8"><path d="M1 4H25" stroke="#F7931E" stroke-width="1.6" stroke-dasharray="5 3"/></svg>invests in</span>
-          <span><svg width="26" height="8"><path d="M2 4H25" stroke="#C9C4BC" stroke-width="2" stroke-dasharray="0.1 4" stroke-linecap="round"/></svg>undisclosed / est.</span>
-          <span><svg width="44" height="8"><defs><linearGradient id="lg"><stop offset="0" stop-color="#4A4952"/><stop offset=".5" stop-color="#F7931E"/><stop offset="1" stop-color="#E8445A"/></linearGradient></defs><rect width="44" height="5" y="1.5" fill="url(#lg)"/></svg>ring = OpenAI exposure</span>
-          <span><svg width="26" height="12"><path d="M13 1 L18 6 L13 11 L8 6Z" fill="none" stroke="#F1ECE4" stroke-width="1.3"/></svg>choke point</span>
-          <span>size = revenue</span>
-          <span>click a node or arrow</span>
-      </div>
-      </div>
-    </section>
-
-    <aside class="col right" id="detail" aria-live="polite"></aside>
-  </main>
-
-  <section class="drawer" id="drawer">
-    <div class="tabs" role="tablist">
-      <button class="tab" role="tab" data-tab="filings" aria-selected="false">Filings <span class="c" id="fCount"></span></button>
-      <button class="tab" role="tab" data-tab="scenario" aria-selected="true">Scenario <span class="live hide" id="scenLive"></span></button>
-      <button class="tab" role="tab" data-tab="trace" aria-selected="false">Agent trace</button>
-      <span class="sp"></span>
-      <button class="tab" id="drawerToggle" aria-label="Collapse drawer" title="Collapse / expand">
-        <svg width="12" height="12" viewBox="0 0 12 12" aria-hidden="true"><path id="dtIcon" d="M2 4 L6 8 L10 4" fill="none" stroke="currentColor" stroke-width="1.6"/></svg>
-      </button>
-    </div>
-
-    <div class="pane hide" id="pane-filings">
-      <div class="ftools">
-        <input id="fq" type="search" placeholder="Filter documents..." aria-label="Filter filings">
-        <div class="seg" id="fType"></div>
-        <span class="sp"></span>
-        <span class="note mono" id="fInfo"></span>
-      </div>
-      <table class="grid" id="fTable"><thead><tr><th>Date</th><th>Type</th><th>Company</th><th>Document</th><th class="n">Links</th><th>Check</th><th>Source</th></tr></thead><tbody></tbody></table>
-    </div>
-
-    <div class="pane" id="pane-scenario">
-      <div class="scen">
-        <div class="scen-l">
-          <div class="sec-h"><span class="lbl">What could go wrong?</span><button class="btn ghost" id="howBtn2" style="height:22px;padding:0 6px;font-size:10.5px">Assumptions</button></div>
-          <form class="sinput" id="sForm">
-            <input id="sText" type="text" autocomplete="off" aria-label="Scenario" value="OpenAI cuts compute spending 40%">
-            <button class="btn primary" type="submit"><svg width="10" height="10" viewBox="0 0 10 10" aria-hidden="true"><path d="M1 0 L9 5 L1 10Z" fill="currentColor"/></svg>Run</button>
-          </form>
-          <div class="presets" id="presets"></div>
-          <div class="interp">
-            <div class="sec-h" style="margin:0"><span class="lbl">AI interpretation</span><span class="lbl mono" id="parserBadge" title="Start server.js with ANTHROPIC_API_KEY for live parsing"></span></div>
-            <div class="row"><label for="iOrigin">Company</label><select id="iOrigin"></select></div>
-            <div class="row"><label for="iTarget">Applies to</label><select id="iTarget"></select></div>
-            <div class="row"><label for="iKind">Type</label><select id="iKind"><option value="demand">Demand shock (buyer cuts spending)</option><option value="supply">Supply shock (seller can't deliver)</option></select></div>
-            <div class="row"><label for="iSev">Severity</label><div class="rng"><input type="range" id="iSev" min="0" max="100" step="5"><output id="oSev"></output></div></div>
-            <div class="row"><label for="iEq">Valuation x</label><div class="rng"><input type="range" id="iEq" min="0.5" max="3" step="0.1" value="1.5"><output id="oEq"></output></div></div>
-            <div class="row"><label for="iDamp">Hop damping</label><div class="rng"><input type="range" id="iDamp" min="0.2" max="1" step="0.05" value="0.6"><output id="oDamp"></output></div></div>
-            <div class="why" id="iWhy"></div>
-          </div>
-        </div>
-        <div class="scen-r">
-          <div class="sumbar" id="sumbar"></div>
-          <div class="tbl-wrap">
-            <table class="grid" id="rTable"><thead><tr><th>Company</th><th>Ticker</th><th>In portfolio</th><th class="n">Revenue at risk</th><th>% of revenue</th><th class="n">Equity hit</th><th>Path</th><th>Confidence</th></tr></thead><tbody></tbody></table>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <div class="pane hide" id="pane-trace">
-      <div class="trace">
-        <div class="trace-l">
-          <div class="sec-h"><span class="rec"><i></i>RECORDED RUN</span><span class="note mono" id="trMeta"></span><button class="btn ghost" id="trReplay" style="height:24px">Replay trace</button></div>
-          <div id="calls"></div>
-        </div>
-        <div class="trace-r">
-          <span class="lbl">explain() output</span>
-          <div class="explain" id="explain"></div>
-          <p class="note" style="margin-top:14px">Recorded run: the tool calls the production agent makes. Returned values are computed live in this page from the snapshot data; the summary is a template filled with those numbers, not generated text.</p>
-        </div>
-      </div>
+<main class="main">
+  <section class="stage">
+    <div class="cap" id="cap"></div>
+    <div class="mapwrap" id="mapwrap"><svg id="map" viewBox="0 8 1100 612" preserveAspectRatio="xMidYMid meet" role="img" aria-label="Network map of AI company deals"></svg></div>
+    <div class="legend">
+      <span><svg width="26" height="8"><path d="M1 4H25" stroke="#8F8A80" stroke-width="2.5"/></svg>sells to</span>
+      <span><svg width="26" height="8"><path d="M1 4H25" stroke="#F7931E" stroke-width="1.8" stroke-dasharray="5 3"/></svg>invests in</span>
+      <span><svg width="26" height="8"><path d="M2 4H25" stroke="#8F8A80" stroke-width="2" stroke-dasharray="0.1 4" stroke-linecap="round"/></svg>estimated</span>
+      <span><svg width="14" height="14"><circle cx="7" cy="7" r="5" fill="#fff" stroke="#D92D4A" stroke-width="2.4"/></svg>redder ring = more revenue tied to OpenAI</span>
+      <span><svg width="14" height="14"><circle cx="7" cy="7" r="5" fill="#FFE2B8" stroke="#8F8A80" stroke-width="1.6"/></svg>you hold it</span>
+      <span><svg width="14" height="14"><path d="M7 1 L13 7 L7 13 L1 7Z" fill="none" stroke="#16171B" stroke-width="1.5"/></svg>choke point</span>
     </div>
   </section>
+
+  <aside class="side">
+    <div class="sidescroll" id="side">
+      <section class="blk" id="pfBlk"></section>
+      <section class="blk" id="scenBlk">
+        <div class="lbl"><span>What could go wrong?</span><span id="parserBadge" style="letter-spacing:.04em;text-transform:none;font-weight:500"></span></div>
+        <form class="ask" id="askForm">
+          <input id="sText" type="text" autocomplete="off" placeholder="Type a scenario, e.g. OpenAI cuts compute spending 40%" aria-label="Scenario">
+          <button type="submit" id="runBtn"><svg width="10" height="10" viewBox="0 0 10 10" aria-hidden="true"><path d="M1 0 L9 5 L1 10Z" fill="currentColor"/></svg>Run</button>
+        </form>
+        <div class="presets" id="presets"></div>
+        <div class="interp hide" id="interp"></div>
+      </section>
+      <section class="blk hide" id="repBlk"></section>
+    </div>
+    <div class="detail hide" id="detail" aria-live="polite"></div>
+  </aside>
+</main>
+
+<div class="scrim hide" id="scrim"></div>
+<div class="drawer hide" id="src" role="dialog" aria-label="Sources">
+  <div class="hd">
+    <div class="dh"><div><span class="lbl">Every number has a document</span><h2 id="srcT">Sources</h2></div><button class="x" id="srcX" aria-label="Close sources">&times;</button></div>
+    <input type="search" id="fq" placeholder="Search companies, filings, deals" aria-label="Search sources">
+    <div class="types" id="types"></div>
+  </div>
+  <div class="list" id="srcList"></div>
 </div>
 
 <div class="modal hide" id="how" role="dialog" aria-modal="true" aria-labelledby="howT">
-  <div class="card">
-    <div class="sec-h"><h3 id="howT">How the shock math works</h3><button class="btn" id="howClose">Close</button></div>
-    <p class="note">Everything below runs in your browser on the data in this page. Only the extraction of deals from documents was done ahead of time.</p>
+  <div class="box">
+    <div class="dh"><h2 id="howT">How it works</h2><button class="x" id="howX" aria-label="Close">&times;</button></div>
     <ol>
-      <li><b>Hop 1, the shock.</b> A demand shock flows upstream, from buyer to seller. Seller's revenue lost = shock x annual value of what the buyer buys from it. Shown as % of the seller's revenue.</li>
-      <li><b>Next hops.</b> Each hit company cuts its own purchases in proportion to its % revenue hit, times a damping factor (default <span class="mono" id="hDamp">0.6</span> per hop, adjustable). Clouds cut GPU orders, chip makers cut TSMC and SK Hynix orders.</li>
-      <li><b>Loops.</b> The graph has cycles, so we iterate up to 4 hops and stop early when no company moves by more than 0.1% of revenue.</li>
-      <li><b>Equity hit</b> (separate from revenue). Investor's stake value x valuation drop. Drop = <span class="mono" id="hEq">1.5</span> x shock (for the company in trouble) or x its % revenue hit (for others), capped at 100%. ESTIMATED, adjustable.</li>
-      <li><b>Annual values.</b> Multi-year contracts are spread evenly over their term. Undisclosed amounts use a stated placeholder (dotted arrows). Each link says how it was estimated.</li>
-      <li><b>Leverage flag.</b> Oracle (free cash flow -$23.7B, $43B debt raised in FY26) and CoreWeave (debt-funded buildout) carry a "Leverage amplifies this" chip: the same revenue gap hurts more when it services debt.</li>
-      <li><b>Supply shock.</b> Flows downstream instead: buyers lose the share of their business that depends on the seller's deliveries, with the same damping.</li>
-      <li><b>Choke points.</b> We fail each company in full, both as a buyer and as a supplier, and rank by revenue at risk times companies hit. The top three are marked with a diamond.</li>
+      <li><b>The map.</b> 12 companies and 26 deals, taken from filings and press releases. Each arrow carries its amount, date, source and a confidence tag.</li>
+      <li><b>The scenario.</b> Your text becomes a company, a size and a type. With a local API key Claude reads it. Without one, a keyword parser does.</li>
+      <li><b>The shock.</b> If a buyer cuts spending, each seller loses that share of what the buyer pays it per year. The math runs in your browser.</li>
+      <li><b>Next hops.</b> Each hit company cuts its own purchases in proportion to its revenue hit, damped by 0.6 per hop, for up to 4 hops. This damping is our assumption.</li>
+      <li><b>Stakes.</b> Shown separately from revenue: stake value times valuation drop, where the drop is assumed to be 1.5 times the shock.</li>
+      <li><b>Money loops.</b> A cycle search over the supply and investment graph.</li>
+      <li><b>Choke points.</b> Each company is failed in full, as a buyer and as a supplier, and ranked by revenue at risk times companies hit. The top three carry a diamond.</li>
     </ol>
-    <p class="note">Not investment advice. A first-order model to show where exposure sits, not a price forecast.</p>
+    <p class="note">The AI steps shown in a report are a recorded run. Not investment advice.</p>
   </div>
 </div>
 <div class="tip hide" id="tip"></div>
@@ -659,7 +450,6 @@ async function checkLive() {
   try { const r = await fetch('api/health', { cache: 'no-store' }); if (r.ok) LIVE = !!(await r.json()).live; } catch (e) { LIVE = false; }
   renderParser();
 }
-function renderParser() { const b = $('#parserBadge'); b.textContent = LIVE ? 'Live: Claude' : 'Offline: keyword parser'; b.style.color = LIVE ? 'var(--accent2)' : 'var(--dim)'; }
 async function parseSmart(text) {
   if (!LIVE) return parseScenario(text);
   try {
@@ -766,784 +556,8 @@ function allPaths(from, to, kind = 'demand', max = 5) {
   return out;
 }
 
-// ============================================================
-//  App state
-// ============================================================
-const S = {
-  pf: new Set(['nvda', 'msft', 'orcl', 'crwv', 'amd']),
-  sel: null,              // {kind:'node'|'link'|'source', id}
-  q: '', fType: 'All',
-  loops: false, loopIdx: 0,
-  sc: null, res: null,    // scenario + result
-  shown: null, hot: new Set(), hop: 0, animating: false, animToken: 0,
-  tab: 'scenario', drawerOpen: true
-};
-
-// ============================================================
-//  Network map (fixed layered layout, hand-built SVG)
-// ============================================================
-const NS = 'http://www.w3.org/2000/svg';
-const POS = {
-  tsm: [95, 225], skh: [95, 415],
-  amd: [315, 120], nvda: [315, 330], avgo: [315, 530],
-  msft: [590, 110], crwv: [590, 222], orcl: [590, 330], googl: [590, 432], amzn: [590, 545],
-  openai: [845, 330], sb: [1025, 330]
-};
-const LANES = [['Suppliers', 95], ['Chips', 315], ['Clouds', 590], ['Buyer', 845], ['Investor', 1025]];
-const R = Object.fromEntries(IDS.map(id => [id, C[id].revenue_usd_b ? 8 + 1.2 * Math.sqrt(C[id].revenue_usd_b) : 13]));
-// explicit control points / bends so arrows never pile up
-const CTRL = { S08: [560, -40], E07: [600, -100], S09: [600, 760], E03: [585, 262], S06: [668, 330] };
-const BEND = { S01: 0.05, E01: -0.16, S03: -0.05, E02: 0.16, S14: 0, S15: 0.2, E05: 0.2, S04: 0.07, E06: 0.07, S07: 0.5, S16: 0.03, S19: 0.03, S10: 0, S11: -0.05, S12: 0.05, S13: 0.02, S17: -0.03, S18: 0.03, E04: 0, S02: 0, S05: -0.06 };
-const exposureColor = t => {
-  const lerp = (a, b, k) => a.map((x, i) => Math.round(x + (b[i] - x) * k));
-  const g = [74, 73, 82], o = [247, 147, 30], r = [232, 68, 90];
-  const k = Math.max(0, Math.min(1, t / 0.6));
-  const c = k < 0.5 ? lerp(g, o, k / 0.5) : lerp(o, r, (k - 0.5) / 0.5);
-  return `rgb(${c.join(',')})`;
-};
-const el = (tag, attrs = {}, parent) => { const e = document.createElementNS(NS, tag); for (const k in attrs) e.setAttribute(k, attrs[k]); if (parent) parent.appendChild(e); return e; };
-const NODE = {}, EDGE = {};
-const CHOKE = findChokes();
-let gParticles, gPulse, gShock, gFloat;
-
-function edgeGeom(l) {
-  const [ax, ay] = POS[l.from], [bx, by] = POS[l.to];
-  let cx, cy;
-  if (CTRL[l.id]) [cx, cy] = CTRL[l.id];
-  else { const b = BEND[l.id] ?? 0.1; cx = (ax + bx) / 2 - (by - ay) * b; cy = (ay + by) / 2 + (bx - ax) * b; }
-  const toward = (x, y, tx, ty, d) => { const L2 = Math.hypot(tx - x, ty - y) || 1; return [x + (tx - x) / L2 * d, y + (ty - y) / L2 * d]; };
-  const [sx, sy] = toward(ax, ay, cx, cy, R[l.from] + 3);
-  const [ex, ey] = toward(bx, by, cx, cy, R[l.to] + 4);
-  return `M${sx.toFixed(1)},${sy.toFixed(1)} Q${cx.toFixed(1)},${cy.toFixed(1)} ${ex.toFixed(1)},${ey.toFixed(1)}`;
-}
-const edgeW = l => l.type === 'supply' ? 1.1 + 1.05 * Math.sqrt(l.annual_usd_b || 0.5) : 1.2 + 0.3 * Math.sqrt(l.stake_value_usd_b || 1);
-const EDGE_BASE = l => l.type === 'supply' ? 'rgba(225,219,210,.34)' : 'rgba(247,147,30,.62)';
-
-function buildMap() {
-  const svg = $('#map');
-  const defs = el('defs', {}, svg);
-  const glow = el('filter', { id: 'glow', x: '-50%', y: '-50%', width: '200%', height: '200%' }, defs);
-  el('feGaussianBlur', { stdDeviation: '4', result: 'b' }, glow);
-  const fm = el('feMerge', {}, glow); el('feMergeNode', { in: 'b' }, fm); el('feMergeNode', { in: 'SourceGraphic' }, fm);
-  // lanes
-  const gl = el('g', {}, svg);
-  LANES.forEach(([t, x], i) => {
-    el('line', { x1: x, x2: x, y1: 36, y2: 625, stroke: '#17171c', 'stroke-width': 1 }, gl);
-    const tx = el('text', { x, y: 22, 'text-anchor': 'middle', class: 'lane-t' }, gl); tx.textContent = t;
-    if (i < LANES.length - 1) { const ax = el('text', { x: (x + LANES[i + 1][1]) / 2, y: 22, 'text-anchor': 'middle', class: 'lane-t', style: 'fill:#3a3942' }, gl); ax.textContent = '>'; }
-  });
-  const gE = el('g', {}, svg);
-  gShock = el('g', {}, svg);
-  const gH = el('g', {}, svg);
-  gParticles = el('g', {}, svg);
-  const gN = el('g', {}, svg);
-  gPulse = el('g', {}, svg);
-  gFloat = el('g', {}, svg);
-  // edges: draw thick first
-  [...DATA.links].sort((a, b) => edgeW(b) - edgeW(a)).forEach(l => {
-    const w = edgeW(l);
-    const mk = el('marker', { id: 'm-' + l.id, viewBox: '0 0 10 10', refX: 8.5, refY: 5, markerUnits: 'userSpaceOnUse', markerWidth: Math.max(8, Math.min(15, w * 1.9)), markerHeight: Math.max(8, Math.min(15, w * 1.9)), orient: 'auto-start-reverse' }, defs);
-    const mp = el('path', { d: 'M0,1 L10,5 L0,9 Z', fill: EDGE_BASE(l) }, mk);
-    const d = edgeGeom(l);
-    const p = el('path', { d, class: 'edge', stroke: EDGE_BASE(l), 'stroke-width': w.toFixed(2), 'marker-end': `url(#m-${l.id})` }, gE);
-    if (isDotted(l)) { p.setAttribute('stroke-dasharray', l.type === 'equity' ? '1 5' : '0.1 ' + Math.max(4, w * 1.6).toFixed(1)); p.setAttribute('stroke-linecap', 'round'); }
-    else if (l.type === 'equity') p.setAttribute('stroke-dasharray', '6 4');
-    const h = el('path', { d, class: 'ehit' }, gH);
-    h.addEventListener('click', e => { e.stopPropagation(); select('link', l.id); });
-    h.addEventListener('mousemove', e => showTip(e, linkTip(l)));
-    h.addEventListener('mouseleave', hideTip);
-    EDGE[l.id] = { p, mp, w, dash: p.getAttribute('stroke-dasharray') };
-  });
-  // nodes
-  for (const id of IDS) {
-    const c = C[id], [x, y] = POS[id], r = R[id];
-    const g = el('g', { class: 'node', transform: `translate(${x},${y})`, tabindex: 0, role: 'button', 'aria-label': c.name }, gN);
-    const halo = el('circle', { r: r + 9, fill: 'none', stroke: 'rgba(232,68,90,0)', 'stroke-width': 1 }, g);
-    const sel = el('circle', { r: r + 5, class: 'selring' }, g);
-    const core = el('circle', { r, class: 'core', fill: '#121216', stroke: exposureColor(TIED[id]), 'stroke-width': id === 'sb' ? 1.5 : 2.6 }, g);
-    if (id === 'sb') core.setAttribute('stroke-dasharray', '3 3');
-    const big = r >= 17;
-    const ck = CHOKE.find(c => c.id === id);
-    if (ck) {
-      const q = r + 11;
-      el('path', { d: `M0,${-q} L${q},0 L0,${q} L${-q},0Z`, class: 'choke' }, g);
-      const ct = el('text', { class: 'choke-t', 'text-anchor': 'middle', y: q + (big ? 26 : 44) }, g); ct.textContent = 'CHOKE POINT';
-    }
-    const t1 = el('text', { class: 'tick', 'text-anchor': 'middle', y: big ? 4.5 : r + 19 }, g); t1.textContent = id === 'openai' ? 'OpenAI' : id === 'skh' ? 'SK HYNIX' : id === 'sb' ? 'SOFTBANK' : c.ticker;
-    const t2 = el('text', { class: 'rev', 'text-anchor': 'middle', y: big ? r + 14 : r + 32 }, g); t2.textContent = c.revenue_usd_b ? fB(c.revenue_usd_b) : 'investor';
-    const bg = el('g', { transform: `translate(0,${-r - 13})`, opacity: 0 }, g);
-    const br = el('rect', { class: 'badge-r', x: -28, y: -11, width: 56, height: 19 }, bg);
-    const bt = el('text', { class: 'badge-t', 'text-anchor': 'middle', y: 3.5 }, bg);
-    g.addEventListener('click', e => { e.stopPropagation(); select('node', id); });
-    g.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); select('node', id); } });
-    g.addEventListener('mousemove', e => showTip(e, nodeTip(id)));
-    g.addEventListener('mouseleave', hideTip);
-    NODE[id] = { g, core, halo, t1, t2, bg, br, bt };
-  }
-  svg.addEventListener('click', () => { if (S.sel) select(null); });
-}
-
-function nodeTip(id) {
-  const c = C[id];
-  let s = `<b>${esc(c.name)}</b> <span class="mono" style="color:#8B8993">${esc(c.ticker)}</span><div class="s">${c.revenue_usd_b ? 'Revenue ' + fB(c.revenue_usd_b) + ' · ' + esc(c.fiscal_year) : 'Investor'}</div>`;
-  if (id !== 'openai' && c.revenue_usd_b) s += `<div class="s">${fP(TIED[id])} of revenue traces to OpenAI</div>`;
-  if (S.shown && S.shown[id]) s += `<div class="s" style="color:#E8445A">Scenario: -${fP(S.shown[id])} of revenue</div>`;
-  return s;
-}
-function linkTip(l) {
-  const v = l.type === 'supply' ? `${l.amount_usd_b != null ? fB(l.amount_usd_b) + ' total' : 'amount undisclosed'} · ~${fB(l.annual_usd_b)}/yr in model` : `${l.stake_value_usd_b ? fB(l.stake_value_usd_b) + ' stake' : 'value not modelled'}`;
-  return `<b>${esc(short(l.from))} ${l.type === 'supply' ? 'sells to' : 'invests in'} ${esc(short(l.to))}</b><div class="s">${esc(l.label)}</div><div class="s">${v}</div><div class="s">${l.confidence}</div>`;
-}
-function showTip(e, html) {
-  const t = $('#tip'); t.innerHTML = html; t.classList.remove('hide');
-  const w = t.offsetWidth, h = t.offsetHeight;
-  let x = e.clientX + 14, y = e.clientY + 14;
-  if (x + w > innerWidth - 8) x = e.clientX - w - 14;
-  if (y + h > innerHeight - 8) y = e.clientY - h - 14;
-  t.style.left = x + 'px'; t.style.top = y + 'px';
-}
-function hideTip() { $('#tip').classList.add('hide'); }
-
-// one function decides how every node and edge looks
-function paintMap() {
-  const loop = S.loops ? LOOPS.loops[S.loopIdx] : null;
-  const matches = searchMatches();
-  const selLinkIds = new Set();
-  const focusNodes = new Set();
-  if (S.sel?.kind === 'node') { focusNodes.add(S.sel.id); for (const l of DATA.links) if (l.from === S.sel.id || l.to === S.sel.id) { selLinkIds.add(l.id); focusNodes.add(l.from); focusNodes.add(l.to); } }
-  if (S.sel?.kind === 'link') { const l = L[S.sel.id]; selLinkIds.add(l.id); focusNodes.add(l.from); focusNodes.add(l.to); }
-  if (S.sel?.kind === 'source') { for (const l of DATA.links) if (l.source_id === S.sel.id) { selLinkIds.add(l.id); focusNodes.add(l.from); focusNodes.add(l.to); } focusNodes.add(SRC[S.sel.id].company); }
-  const loopNodes = loop ? new Set(loop.core.flatMap(c => c.nodes)) : null;
-  const scen = !!S.shown;
-
-  for (const id of IDS) {
-    const n = NODE[id];
-    let dim = false;
-    n.g.classList.toggle('chokeon', !!S.chokes && CHOKE.some(c => c.id === id));
-    if (loop) dim = !loopNodes.has(id);
-    else if (S.chokes && !scen) dim = !CHOKE.some(c => c.id === id) && !DATA.links.some(l => l.type === 'supply' && ((l.from === id && CHOKE.some(c => c.id === l.to)) || (l.to === id && CHOKE.some(c => c.id === l.from))));
-    else if (S.sel) dim = !focusNodes.has(id);
-    else if (matches) dim = !matches.has(id);
-    n.g.classList.toggle('dim', dim);
-    n.g.classList.toggle('sel', S.sel?.kind === 'node' && S.sel.id === id);
-    n.g.classList.toggle('match', !!matches && matches.has(id) && !S.sel);
-    n.g.classList.toggle('pf', S.pf.has(id));
-    const p = scen ? (S.shown[id] || 0) : 0;
-    const isOrigin = scen && S.res && S.res.sc.origin === id;
-    if (p > 0) {
-      const k = Math.min(1, 0.25 + p / 0.4 * 0.75);
-      n.core.setAttribute('fill', `rgba(232,68,90,${(0.15 + 0.75 * k).toFixed(2)})`);
-      n.core.setAttribute('stroke', '#E8445A');
-      n.bg.setAttribute('opacity', 1);
-      n.bt.textContent = '-' + fP(p, p < 0.01 ? 2 : 1);
-      const w = Math.max(44, n.bt.textContent.length * 8 + 12); n.br.setAttribute('x', -w / 2); n.br.setAttribute('width', w);
-    } else {
-      n.core.setAttribute('fill', isOrigin ? '#2a0f15' : '#121216');
-      n.core.setAttribute('stroke', isOrigin ? '#E8445A' : exposureColor(TIED[id]));
-      n.bg.setAttribute('opacity', isOrigin ? 1 : 0);
-      if (isOrigin) { n.bt.textContent = (S.res.sc.kind === 'demand' ? 'cuts ' : 'short ') + fP(S.res.sc.severity, 0); const w = n.bt.textContent.length * 8 + 12; n.br.setAttribute('x', -w / 2); n.br.setAttribute('width', w); }
-    }
-    n.halo.setAttribute('stroke', isOrigin ? 'rgba(232,68,90,.5)' : 'rgba(0,0,0,0)');
-  }
-  for (const l of DATA.links) {
-    const e = EDGE[l.id];
-    let color = EDGE_BASE(l), op = 1, w = e.w, flow = false, dash = e.dash;
-    if (loop) {
-      if (loop.links.has(l.id)) { color = '#F7931E'; w = Math.max(2.2, e.w); flow = true; dash = l.type === 'equity' ? '6 4' : '10 6'; }
-      else op = 0.06;
-    } else if (scen && S.hot.has(l.id)) { color = '#E8445A'; }
-    else if (S.chokes && !scen) { const a = CHOKE.some(c => c.id === l.from), b = CHOKE.some(c => c.id === l.to); if (l.type === 'supply' && (a || b)) { color = 'rgba(241,236,228,.8)'; } else op = 0.07; }
-    else if (S.sel) { if (selLinkIds.has(l.id)) { color = S.sel.kind === 'link' ? '#FFFFFF' : (l.type === 'supply' ? 'rgba(241,236,228,.85)' : '#F7931E'); } else op = 0.07; }
-    else if (matches) { op = (matches.has(l.from) || matches.has(l.to)) ? 1 : 0.08; }
-    else if (scen) op = 0.35;
-    e.p.setAttribute('stroke', color); e.mp.setAttribute('fill', color);
-    e.p.setAttribute('stroke-width', w.toFixed(2));
-    e.p.style.opacity = op;
-    if (dash) e.p.setAttribute('stroke-dasharray', dash); else e.p.removeAttribute('stroke-dasharray');
-    e.p.classList.toggle('flow', flow);
-  }
-}
-
-// ============================================================
-//  Selection + detail panel
-// ============================================================
-function select(kind, id) {
-  S.sel = kind ? { kind, id } : null;
-  if (kind && S.loops) { /* keep loops mode but selection wins visually */ }
-  renderDetail(); paintMap(); renderFilings();
-}
-function linkRow(l, side) {
-  const other = side === 'out' ? l.to : l.from;
-  const amt = l.type === 'supply' ? (l.annual_usd_b != null ? fB(l.annual_usd_b) + '/yr' : '-') : (l.stake_value_usd_b ? fB(l.stake_value_usd_b) : 'n/a');
-  const rel = l.type === 'equity' ? (side === 'out' ? 'invests in' : 'investor') : (side === 'out' ? 'sells to' : 'buys from');
-  return `<div class="ll" data-link="${l.id}"><div class="n">${esc(short(other))} <small>· ${rel}</small></div><div class="a">${amt}</div><div class="m">${tagHTML(l.confidence)}${isDotted(l) ? '<span>dotted</span>' : ''}<span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc(l.label)}</span></div></div>`;
-}
-function renderDetail() {
-  const d = $('#detail');
-  if (!S.sel) { d.innerHTML = overviewHTML(); bindDetail(); return; }
-  if (S.sel.kind === 'node') d.innerHTML = companyHTML(S.sel.id);
-  else if (S.sel.kind === 'link') d.innerHTML = linkHTML(L[S.sel.id]);
-  else d.innerHTML = sourceHTML(SRC[S.sel.id]);
-  bindDetail();
-}
-function overviewHTML() {
-  const flows = SUP.reduce((s, l) => s + l.annual_usd_b, 0);
-  const cnt = k => DATA.links.filter(l => l.confidence === k).length;
-  const top = IDS.filter(id => id !== 'openai' && C[id].revenue_usd_b).sort((a, b) => TIED[b] - TIED[a]);
-  return `<div class="lbl">Network overview</div>
-  <div class="headline" style="font-size:17px;margin-top:6px">12 companies, ${DATA.links.length} deals, every one with a source.</div>
-  <div class="stat-grid">
-    <div><div class="lbl">Supply flows</div><div class="v">${fB(flows)}<span class="note">/yr</span></div></div>
-    <div><div class="lbl">Money loops</div><div class="v" style="color:var(--accent)">${LOOPS.loops.length}</div></div>
-    <div><div class="lbl">Sells-to links</div><div class="v">${SUP.length}</div></div>
-    <div><div class="lbl">Invests-in links</div><div class="v">${EQ.length}</div></div>
-  </div>
-  <div class="lbl" style="margin-bottom:4px">Confidence</div>
-  <table class="mini"><tr><td>${tagHTML('DISCLOSED')}</td><td class="note">${CONF_TXT.DISCLOSED}</td><td class="r">${cnt('DISCLOSED')}</td></tr>
-  <tr><td>${tagHTML('REPORTED')}</td><td class="note">${CONF_TXT.REPORTED}</td><td class="r">${cnt('REPORTED')}</td></tr>
-  <tr><td>${tagHTML('ESTIMATED')}</td><td class="note">Our assumption, with the method stated.</td><td class="r">${cnt('ESTIMATED')}</td></tr></table>
-  <div class="lbl" style="margin:16px 0 4px">Most exposed to OpenAI</div>
-  ${top.slice(0, 6).map(id => `<div class="hold" data-node="${id}"><b>${esc(tick(id))}</b><div class="bar"><i style="width:${Math.min(100, TIED[id] * 100)}%;background:${exposureColor(TIED[id])}"></i></div><span class="v">${fP(TIED[id])}</span></div>`).join('')}
-  <p class="note" style="margin-top:12px">Click any company or arrow on the map for the numbers and the source.</p>`;
-}
-function companyHTML(id) {
-  const c = C[id];
-  const out = DATA.links.filter(l => l.from === id), inn = DATA.links.filter(l => l.to === id);
-  const sells = out.filter(l => l.type === 'supply').sort((a, b) => b.annual_usd_b - a.annual_usd_b);
-  const buys = inn.filter(l => l.type === 'supply').sort((a, b) => b.annual_usd_b - a.annual_usd_b);
-  const eqo = out.filter(l => l.type === 'equity'), eqi = inn.filter(l => l.type === 'equity');
-  const direct = SUP.filter(l => l.from === id && l.to === 'openai').reduce((s, l) => s + l.annual_usd_b, 0);
-  const res = S.res && S.shown ? S.res.rows.find(r => r.id === id) : null;
-  const src = c.revenue_source_id ? SRC[c.revenue_source_id] : null;
-  const top = sells[0];
-  return `<div class="dh"><div><div class="tkr">${esc(c.ticker)}${S.pf.has(id) ? ' <span class="tag pf">IN PORTFOLIO</span>' : ''}</div><h2>${esc(c.name)}</h2><div class="note">${esc(c.sells)}</div></div>
-    ${c.listed ? `<button class="btn" data-pf="${id}" aria-pressed="${S.pf.has(id)}">${S.pf.has(id) ? 'Holding' : '+ Portfolio'}</button>` : ''}</div>
-  ${c.leverage_flag ? `<div style="margin-bottom:10px"><span class="tag lev">LEVERAGE AMPLIFIES THIS</span> <span class="note">${esc(c.leverage_flag)}</span></div>` : ''}
-  <div class="kpis">
-    <div class="kpi"><div class="lbl">Revenue</div><div class="v">${c.revenue_usd_b ? fB(c.revenue_usd_b) : 'n/a'}</div><div class="s">${esc(c.fiscal_year || 'investor')}</div></div>
-    <div class="kpi"><div class="lbl">Tied to OpenAI</div><div class="v a">${id === 'openai' ? '-' : c.revenue_usd_b ? fP(TIED[id]) : 'n/a'}</div><div class="s">${direct ? fB(direct) + '/yr direct' : id === 'openai' ? 'the buyer' : 'indirect only'}</div></div>
-    ${res ? `<div class="kpi"><div class="lbl">Scenario hit</div><div class="v d">-${fP(res.pct)}</div><div class="s">${fB(res.loss)}/yr revenue</div></div><div class="kpi"><div class="lbl">Equity hit</div><div class="v d">${res.eq ? '-' + fB(res.eq) : '$0'}</div><div class="s">stake value</div></div>`
-      : `<div class="kpi"><div class="lbl">Biggest customer</div><div class="v" style="font-size:14px">${top ? esc(short(top.to)) : '-'}</div><div class="s">${top ? fB(top.annual_usd_b) + '/yr' : 'no sales in map'}</div></div><div class="kpi"><div class="lbl">Links</div><div class="v">${out.length + inn.length}</div><div class="s">${sells.length} out · ${buys.length} in · ${eqo.length + eqi.length} equity</div></div>`}
-  </div>
-  <ul class="facts">${c.facts.map(f => `<li>${esc(f)}</li>`).join('')}</ul>
-  ${sells.length ? `<div class="lbl" style="margin:14px 0 2px">Who it depends on (customers)</div>${sells.map(l => linkRow(l, 'out')).join('')}` : ''}
-  ${buys.length ? `<div class="lbl" style="margin:14px 0 2px">Who it buys from</div>${buys.map(l => linkRow(l, 'in')).join('')}` : ''}
-  ${eqo.length + eqi.length ? `<div class="lbl" style="margin:14px 0 2px">Investments</div>${eqo.map(l => linkRow(l, 'out')).join('')}${eqi.map(l => linkRow(l, 'in')).join('')}` : ''}
-  <div class="lbl" style="margin:14px 0 4px">Revenue source</div>
-  <div class="note">${esc(c.revenue_source)} ${tagHTML(c.revenue_confidence)}${src ? `<br><a href="${esc(src.url)}" target="_blank" rel="noopener">Open document</a> · <a href="#" data-src="${src.id}">Show in filings</a>` : ''}</div>`;
-}
-function linkHTML(l) {
-  const isS = l.type === 'supply';
-  return `<div class="lbl">${isS ? 'Supply deal' : 'Investment'} · ${l.id}</div>
-  <div class="flow"><button data-node="${l.from}">${esc(short(l.from))}</button><span class="rel">${isS ? 'sells to' : 'invests in'}</span><button data-node="${l.to}">${esc(short(l.to))}</button></div>
-  <div class="note" style="margin-bottom:10px">${esc(l.label)}</div>
-  <div class="kpis">
-    <div class="kpi"><div class="lbl">${isS ? 'Deal amount' : 'Amount'}</div><div class="v">${l.amount_usd_b != null ? fB(l.amount_usd_b) : '<span style="font-size:13px">undisclosed</span>'}</div><div class="s">${esc(l.period)}</div></div>
-    <div class="kpi"><div class="lbl">${isS ? 'Used in model' : 'Stake value'}</div><div class="v a">${isS ? fB(l.annual_usd_b) + '<span class="note">/yr</span>' : (l.stake_value_usd_b ? fB(l.stake_value_usd_b) : '<span style="font-size:13px">not modelled</span>')}</div><div class="s">${tagHTML(l.amount_confidence)}</div></div>
-  </div>
-  <dl class="kv">
-    <dt>Confidence</dt><dd>${tagHTML(l.confidence)}<div class="note" style="font-family:var(--sans);margin-top:3px">${CONF_TXT[l.confidence]}</div></dd>
-    <dt>Date</dt><dd>${esc(l.date)}</dd>
-    <dt>Checked</dt><dd>${verTag(l.verification)}<div class="note" style="font-family:var(--sans);margin-top:3px">${esc(SRC[l.source_id]?.verified_note || '')}</div></dd>
-    ${l.consideration ? `<dt>Paid in</dt><dd>${l.consideration === 'cash' ? 'cash' : 'shares issued in the deal'}</dd>` : ''}
-  </dl>
-  <div class="quote"><small>${l.quote_kind === 'verbatim' ? 'Quote' : 'Paraphrase'}</small>${l.quote_kind === 'verbatim' ? '"' + esc(l.quote) + '"' : esc(l.quote)}</div>
-  ${l.estimate_note ? `<div class="lbl" style="margin-top:12px">How we got the number</div><div class="note" style="margin-top:4px">${esc(l.estimate_note)}</div>` : ''}
-  <div class="lbl" style="margin-top:14px">Source</div>
-  <div style="margin-top:4px;font-size:12.5px">${esc(l.source_title)}</div>
-  <div style="margin-top:4px;word-break:break-all;font:500 11px var(--mono)"><a href="${esc(l.source_url)}" target="_blank" rel="noopener">${esc(l.source_url)}</a></div>
-  <div style="margin-top:10px;display:flex;gap:6px;flex-wrap:wrap"><button class="btn" data-src="${l.source_id}">Show in filings</button><button class="btn" data-node="${l.from}">${esc(short(l.from))}</button><button class="btn" data-node="${l.to}">${esc(short(l.to))}</button></div>`;
-}
-function sourceHTML(s) {
-  const ls = DATA.links.filter(l => l.source_id === s.id);
-  const cs = DATA.companies.filter(c => c.revenue_source_id === s.id);
-  return `<div class="lbl">Source document</div>
-  <h2 style="font-size:17px;margin:6px 0 6px;line-height:1.25">${esc(s.title)}</h2>
-  <div style="display:flex;gap:6px;align-items:center;margin-bottom:10px"><span class="typ">${esc(s.type)}</span><span class="mono note">${esc(s.date)}</span></div>
-  <div class="quote"><small>What we took from it</small>${esc(s.used_for)}</div>
-  <div style="margin:6px 0">${verTag(s.verification)} <span class="note">${esc(s.verified_note)}</span></div>
-  <div style="word-break:break-all;font:500 11px var(--mono);margin:8px 0 14px"><a href="${esc(s.url)}" target="_blank" rel="noopener">${esc(s.url)}</a></div>
-  ${cs.length ? `<div class="lbl" style="margin-bottom:2px">Revenue figure for</div>${cs.map(c => `<div class="ll" data-node="${c.id}"><div class="n">${esc(c.name)}</div><div class="a">${fB(c.revenue_usd_b)}</div></div>`).join('')}` : ''}
-  ${ls.length ? `<div class="lbl" style="margin:12px 0 2px">Links citing it (${ls.length})</div>${ls.map(l => `<div class="ll" data-link="${l.id}"><div class="n">${esc(short(l.from))} > ${esc(short(l.to))} <small>· ${l.type === 'supply' ? 'sells to' : 'invests in'}</small></div><div class="a">${tagHTML(l.confidence)}</div></div>`).join('')}` : ''}`;
-}
-function bindDetail() {
-  const d = $('#detail');
-  d.querySelectorAll('[data-link]').forEach(b => b.addEventListener('click', () => select('link', b.dataset.link)));
-  d.querySelectorAll('[data-node]').forEach(b => b.addEventListener('click', () => select('node', b.dataset.node)));
-  d.querySelectorAll('[data-src]').forEach(b => b.addEventListener('click', e => { e.preventDefault(); openFilingsFor(b.dataset.src); }));
-  d.querySelectorAll('[data-pf]').forEach(b => b.addEventListener('click', () => togglePf(b.dataset.pf)));
-}
-
-// ============================================================
-//  Portfolio
-// ============================================================
-const PF_IDS = ['msft', 'nvda', 'orcl', 'crwv', 'amzn', 'googl', 'amd', 'avgo', 'tsm', 'skh', 'sb'];
-function togglePf(id) {
-  S.pf.has(id) ? S.pf.delete(id) : S.pf.add(id);
-  renderPortfolio(); paintMap(); renderDetail(); if (S.res) { renderResults(); renderTicker(); }
-}
-function renderPortfolio() {
-  const res = S.res && S.shown ? S.res : null;
-  $('#chips').innerHTML = PF_IDS.map(id => {
-    const r = res?.rows.find(x => x.id === id);
-    const hit = r && (r.pct > 0 ? `<span class="hit">-${fP(r.pct)}</span>` : r.eq ? `<span class="hit">-${fB(r.eq)} eq.</span>` : '');
-    return `<button class="chip" data-id="${id}" aria-pressed="${S.pf.has(id)}"><b>${esc(C[id].ticker)}</b><span>${esc(short(id))}</span>${hit || ''}</button>`;
-  }).join('');
-  $('#chips').querySelectorAll('.chip').forEach(b => b.addEventListener('click', () => togglePf(b.dataset.id)));
-  const hold = [...S.pf].filter(id => C[id]);
-  $('#pfCount').textContent = hold.length + ' / ' + PF_IDS.length;
-  const dep = hold.filter(id => (C[id].revenue_usd_b && TIED[id] >= DEPEND_T) || EQ.some(l => l.from === id && l.to === 'openai'));
-  const hl = $('#headline');
-  if (!hold.length) hl.innerHTML = 'Pick the stocks you own to see what they <em>really</em> depend on.';
-  else if (!dep.length) hl.innerHTML = `None of your ${hold.length} holdings depend on OpenAI paying its bills.`;
-  else hl.innerHTML = `<em>${dep.length === hold.length && hold.length > 1 ? 'All ' + dep.length : dep.length} of your ${hold.length}</em> holding${hold.length > 1 ? 's' : ''} depend${dep.length === 1 && hold.length === 1 ? 's' : ''} on OpenAI paying its bills.`;
-  const rows = hold.sort((a, b) => (TIED[b] || 0) - (TIED[a] || 0)).map(id => {
-    const t = C[id].revenue_usd_b ? TIED[id] : null;
-    const stake = EQ.filter(l => l.from === id && l.to === 'openai' && l.stake_value_usd_b).reduce((s, l) => s + l.stake_value_usd_b, 0);
-    return `<div class="hold" data-node="${id}" title="${esc(C[id].name)}"><b>${esc(C[id].ticker)}</b><div class="bar"><i style="width:${t != null ? Math.min(100, t * 100) : 0}%;background:${exposureColor(t || 0)}"></i></div><span class="v">${t != null ? fP(t) : stake ? fB(stake) + ' eq' : 'n/a'}</span></div>`;
-  }).join('');
-  $('#holdings').innerHTML = rows;
-  $('#holdings').querySelectorAll('.hold').forEach(r => r.addEventListener('click', () => select('node', r.dataset.node)));
-  // scenario impact box
-  const box = $('#pfImpact');
-  if (res) {
-    const pr = res.rows.filter(r => S.pf.has(r.id));
-    const tot = pr.reduce((s, r) => s + r.loss, 0), eq = pr.reduce((s, r) => s + r.eq, 0);
-    box.innerHTML = `<div class="pfimpact"><div class="lbl" style="color:var(--danger)">Scenario impact on your holdings</div><div class="big">-${fB(tot)}<span style="font-size:12px">/yr</span></div><div class="note">revenue at risk${eq ? `, plus <span class="mono" style="color:var(--text)">-${fB(eq)}</span> in stake value` : ''}</div></div>`;
-  } else box.innerHTML = '';
-}
-document.addEventListener('click', e => { const h = e.target.closest('#detail .hold'); if (h) select('node', h.dataset.node); });
-
-// ============================================================
-//  Ticker strip
-// ============================================================
-function renderTicker() {
-  const res = S.res && S.shown ? S.res : null;
-  $('#ticker').innerHTML = IDS.map(id => {
-    const c = C[id], r = res?.rows.find(x => x.id === id);
-    const right = r && r.pct > 0 ? `<em class="hi">-${fP(r.pct)}</em>` : c.revenue_usd_b && id !== 'openai' ? `<em title="share of revenue tied to OpenAI">${fP(TIED[id], 0)} OAI</em>` : '';
-    return `<button class="tk" data-node="${id}"><b>${esc(id === 'openai' ? 'OPENAI' : c.ticker)}</b><span>${c.revenue_usd_b ? fB(c.revenue_usd_b) + (id === 'openai' ? ' ann.' : '') : 'investor'}</span>${right}</button>`;
-  }).join('');
-  $('#ticker').querySelectorAll('.tk').forEach(b => b.addEventListener('click', () => select('node', b.dataset.node)));
-}
-
-// ============================================================
-//  Search + filings
-// ============================================================
-function searchMatches() {
-  const q = S.q.trim().toLowerCase();
-  if (!q || q.length < 2) return null;
-  const m = new Set();
-  for (const c of DATA.companies) if ([c.name, c.ticker, c.id, short(c.id)].some(x => x.toLowerCase().includes(q))) m.add(c.id);
-  for (const s of filteredSources()) { m.add(s.company); }
-  for (const l of DATA.links) if ([l.label, l.source_title, l.quote].some(x => (x || '').toLowerCase().includes(q))) { m.add(l.from); m.add(l.to); }
-  return m;
-}
-function filteredSources(ignoreType) {
-  const q = S.q.trim().toLowerCase();
-  return DATA.sources.filter(s => {
-    if (!ignoreType && S.fType !== 'All' && s.type !== S.fType) return false;
-    if (!q) return true;
-    const hay = [s.title, s.type, s.used_for, s.date, C[s.company]?.name, C[s.company]?.ticker, short(s.company)].join(' ').toLowerCase();
-    return q.split(/\s+/).every(w => hay.includes(w));
-  }).sort((a, b) => b.date.localeCompare(a.date));
-}
-function renderFilings() {
-  const types = ['All', ...Array.from(new Set(DATA.sources.map(s => s.type)))];
-  const typeOrder = ['All', '10-K', '10-Q', '8-K', 'press release', 'news'];
-  types.sort((a, b) => typeOrder.indexOf(a) - typeOrder.indexOf(b));
-  $('#fType').innerHTML = types.map(t => `<button data-t="${esc(t)}" aria-pressed="${S.fType === t}">${esc(t)}</button>`).join('');
-  $('#fType').querySelectorAll('button').forEach(b => b.addEventListener('click', () => { S.fType = b.dataset.t; renderFilings(); paintMap(); }));
-  const list = filteredSources();
-  $('#fCount').textContent = DATA.sources.length;
-  $('#fInfo').textContent = `${list.length} of ${DATA.sources.length} documents`;
-  const tb = $('#fTable tbody');
-  tb.innerHTML = list.length ? list.map(s => {
-    const n = DATA.links.filter(l => l.source_id === s.id).length + DATA.companies.filter(c => c.revenue_source_id === s.id).length;
-    return `<tr class="click${S.sel?.kind === 'source' && S.sel.id === s.id ? ' selr' : ''}" data-src="${s.id}"><td class="mono">${esc(s.date)}</td><td><span class="typ">${esc(s.type)}</span></td><td class="mono">${esc(C[s.company]?.ticker === 'PRIVATE' ? 'OpenAI' : C[s.company]?.ticker)}</td><td>${esc(s.title)}</td><td class="n">${n}</td><td>${verTag(s.verification)}</td><td><a href="${esc(s.url)}" target="_blank" rel="noopener" class="mono" style="font-size:11px">open</a></td></tr>`;
-  }).join('') : `<tr><td colspan="7" class="empty">No documents match "${esc(S.q)}".</td></tr>`;
-  tb.querySelectorAll('tr.click').forEach(tr => tr.addEventListener('click', e => { if (e.target.closest('a')) return; select('source', tr.dataset.src); }));
-}
-function openFilingsFor(srcId) { setTab('filings'); select('source', srcId); const tr = $(`#fTable tr[data-src="${srcId}"]`); if (tr) tr.scrollIntoView({ block: 'nearest' }); }
-function setQuery(q, from) {
-  S.q = q;
-  if (from !== 'cmd') $('#cmd').value = q;
-  if (from !== 'fq') $('#fq').value = q;
-  renderFilings(); paintMap();
-}
-
-// command bar
-const SCEN_RE = /\b(cut|cuts|miss|misses|missed|default|defaults|fail|fails|drop|drops|halve|halves|collapse|collapses|stop|stops|delay|delays|cancel|cancels|shortage|outage|pull|pulls|slash|slashes|reduce|reduces)\b|%/i;
-let menuIdx = 0;
-function cmdItems(q) {
-  const items = [];
-  const t = q.trim(); if (!t) return items;
-  if (SCEN_RE.test(t)) items.push({ k: 'Scenario', run: true, label: `Run: "${t}"`, act: () => runFromText(t) });
-  const ql = t.toLowerCase();
-  DATA.companies.filter(c => [c.name, c.ticker, short(c.id)].some(x => x.toLowerCase().includes(ql))).slice(0, 4).forEach(c => items.push({ k: 'Company', label: `${c.name} <span class="mono note">${esc(c.ticker)}</span>`, act: () => { select('node', c.id); closeMenu(); } }));
-  const fs = filteredSources(true);
-  if (fs.length) items.push({ k: 'Filings', label: `${fs.length} document${fs.length > 1 ? 's' : ''} match`, act: () => { setTab('filings'); openDrawer(); closeMenu(); } });
-  if (!SCEN_RE.test(t) && t.length > 3) items.push({ k: 'Scenario', run: true, label: `Run as scenario: "${t}"`, act: () => runFromText(t) });
-  return items;
-}
-function renderMenu() {
-  const items = cmdItems($('#cmd').value);
-  const m = $('#cmdMenu');
-  if (!items.length || document.activeElement !== $('#cmd')) { m.classList.add('hide'); return; }
-  menuIdx = Math.min(menuIdx, items.length - 1);
-  m.innerHTML = items.map((it, i) => `<button type="button" class="${it.run ? 'run' : ''}${i === menuIdx ? ' on' : ''}" data-i="${i}"><span class="k">${it.k}</span><span>${it.run ? esc(it.label) : it.label}</span></button>`).join('');
-  m.querySelectorAll('button').forEach(b => b.addEventListener('mousedown', e => { e.preventDefault(); items[+b.dataset.i].act(); }));
-  m.classList.remove('hide');
-}
-function closeMenu() { $('#cmdMenu').classList.add('hide'); }
-
-// ============================================================
-//  Drawer tabs
-// ============================================================
-function setTab(t) {
-  S.tab = t;
-  $$('.tab[data-tab]').forEach(b => b.setAttribute('aria-selected', b.dataset.tab === t));
-  ['filings', 'scenario', 'trace'].forEach(x => $('#pane-' + x).classList.toggle('hide', x !== t));
-  openDrawer();
-}
-function openDrawer() { S.drawerOpen = true; $('#drawer').classList.remove('closed'); $('#dtIcon').setAttribute('d', 'M2 4 L6 8 L10 4'); }
-function toggleDrawer() {
-  S.drawerOpen = !S.drawerOpen;
-  $('#drawer').classList.toggle('closed', !S.drawerOpen);
-  $('#dtIcon').setAttribute('d', S.drawerOpen ? 'M2 4 L6 8 L10 4' : 'M2 8 L6 4 L10 8');
-}
-
-// ============================================================
-//  Money loops UI
-// ============================================================
-function renderLoops() {
-  $('#loopCount').textContent = `${LOOPS.loops.length} money loops found`;
-  $('#loopCount').title = `${LOOPS.paths} distinct cycles in the money-flow graph, grouped by the investment that closes them`;
-  const cap = $('#loopCap');
-  $('#loopBtn').setAttribute('aria-pressed', S.loops);
-  if (!S.loops) { cap.classList.add('hide'); $('#hud').classList.remove('hide'); return; }
-  const lp = LOOPS.loops[S.loopIdx];
-  const variants = lp.cycles.length - lp.core.length;
-  cap.innerHTML = `<div class="qq"><span class="lbl" style="color:var(--accent)">Money loop ${lp.meta.n} · ${S.loopIdx + 1} of ${LOOPS.loops.length} · ${lp.cycles.length} cycle${lp.cycles.length > 1 ? 's' : ''} found</span>
-    <div class="t">${esc(lp.meta.t)}</div>
-    <div class="p">${esc(compactPaths(lp))}</div>
-    <div class="note">${esc(lp.meta.c)}${variants > 0 ? ` Plus ${variants} longer variant${variants > 1 ? 's' : ''}.` : ''}</div></div>
-    <div class="nav"><button class="btn" id="lpPrev">Prev</button><button class="btn" id="lpNext">Next</button><button class="btn ghost" id="lpClose">Hide loops</button></div>`;
-  $('#hud').classList.add('hide');
-  cap.classList.remove('hide');
-  $('#lpPrev').onclick = () => { S.loopIdx = (S.loopIdx + LOOPS.loops.length - 1) % LOOPS.loops.length; renderLoops(); paintMap(); };
-  $('#lpNext').onclick = () => { S.loopIdx = (S.loopIdx + 1) % LOOPS.loops.length; renderLoops(); paintMap(); };
-  $('#lpClose').onclick = () => toggleLoops(false);
-}
-function compactPaths(lp) {
-  const ps = lp.pathStr.map(p => p.split(' > '));
-  if (ps.length === 1) return lp.pathStr[0];
-  const n = ps[0].length;
-  if (!ps.every(p => p.length === n)) return lp.pathStr.join('  |  ');
-  return ps[0].map((_, i) => { const u = [...new Set(ps.map(p => p[i]))]; return u.length > 1 ? '{' + u.join(' | ') + '}' : u[0]; }).join(' > ');
-}
-const CHOKE_WHY = c => c.kind === 'demand' ? 'the one buyer' : 'no substitute supplier';
-function renderChokes() {
-  const cap = $('#chokeCap');
-  $('#chokeBtn').setAttribute('aria-pressed', !!S.chokes);
-  if (!S.chokes) { cap.classList.add('hide'); return; }
-  cap.innerHTML = `<div class="hd"><span class="lbl" style="color:var(--text)">${CHOKE.length} choke points</span><div class="note">Each company failed in full, ranked by damage x reach.</div></div>` +
-    CHOKE.map((c, i) => `<button class="cp" data-i="${i}"><div class="n">${esc(short(c.id))} <span class="w">${CHOKE_WHY(c)}</span></div><div class="v">-${fB(c.usd)}/yr <span>${c.reach} companies hit</span></div><div class="go">Simulate failure</div></button>`).join('') +
-    `<div class="x"><button class="btn ghost" id="ckClose">Hide</button></div>`;
-  cap.classList.remove('hide');
-  cap.querySelectorAll('.cp').forEach(b => b.onclick = () => {
-    const c = CHOKE[+b.dataset.i];
-    S.sc = { origin: c.id, severity: 1, kind: c.kind, target: null, notes: ['choke point test: full failure'] };
-    S.sc.text = describe(S.sc); $('#sText').value = S.sc.text;
-    scenarioToControls(S.sc); renderInterp(); play();
-  });
-  $('#ckClose').onclick = () => toggleChokes(false);
-}
-function toggleChokes(on) {
-  S.chokes = on ?? !S.chokes;
-  if (S.chokes) { if (S.loops) toggleLoops(false); S.sel = null; renderDetail(); }
-  renderChokes(); paintMap();
-}
-function toggleLoops(on) {
-  S.loops = on ?? !S.loops;
-  if (S.loops && S.chokes) { S.chokes = false; renderChokes(); }
-  if (S.loops) { S.sel = null; renderDetail(); }
-  renderLoops(); paintMap();
-}
-
-// ============================================================
-//  Scenario UI + animation
-// ============================================================
-const PRESETS = [
-  { t: 'OpenAI cuts compute spending 40%', k: 'hero' },
-  { t: 'OpenAI misses its Oracle payments', k: '' },
-  { t: 'Microsoft cuts CoreWeave contracts 50%', k: '' }
-];
-function fillSelects() {
-  $('#iOrigin').innerHTML = IDS.map(id => `<option value="${id}">${esc(C[id].name)}</option>`).join('');
-}
-function fillTargets() {
-  const o = $('#iOrigin').value, k = $('#iKind').value;
-  const opts = k === 'demand' ? [...new Set(SUP.filter(l => l.to === o).map(l => l.from))] : [...new Set(SUP.filter(l => l.from === o).map(l => l.to))];
-  const cur = $('#iTarget').value;
-  $('#iTarget').innerHTML = `<option value="">${k === 'demand' ? 'All its suppliers' : 'All its customers'}</option>` + opts.map(id => `<option value="${id}">${k === 'demand' ? 'Only purchases from ' : 'Only deliveries to '}${esc(short(id))}</option>`).join('');
-  $('#iTarget').value = opts.includes(cur) ? cur : '';
-}
-function controlsToScenario() {
-  return { text: $('#sText').value, origin: $('#iOrigin').value, target: $('#iTarget').value, kind: $('#iKind').value, severity: +$('#iSev').value / 100, notes: S.sc?.notes || [] };
-}
-function scenarioToControls(sc) {
-  $('#iOrigin').value = sc.origin; $('#iKind').value = sc.kind; fillTargets(); $('#iTarget').value = sc.target || '';
-  $('#iSev').value = Math.round(sc.severity * 100); syncOutputs();
-}
-function syncOutputs() {
-  $('#oSev').textContent = $('#iSev').value + '%';
-  $('#oEq').textContent = (+$('#iEq').value).toFixed(1) + 'x';
-  $('#oDamp').textContent = (+$('#iDamp').value).toFixed(2);
-  $('#hDamp').textContent = (+$('#iDamp').value).toFixed(2);
-  $('#hEq').textContent = (+$('#iEq').value).toFixed(1);
-}
-function describe(sc) {
-  const sev = fP(sc.severity, 0);
-  if (sc.kind === 'demand') return `${short(sc.origin)} cuts ${sc.target ? 'purchases from ' + short(sc.target) : 'compute spending'} ${sev}`;
-  return `${short(sc.origin)} can't deliver ${sev}${sc.target ? ' to ' + short(sc.target) : ''}`;
-}
-function renderInterp() {
-  const sc = S.sc; if (!sc) return;
-  const json = `{ company: "${sc.origin}", applies_to: ${sc.target ? '"' + sc.target + '"' : 'all'}, shock: ${sc.severity.toFixed(2)}, type: "${sc.kind}_shock" }`;
-  $('#iWhy').innerHTML = esc(json) + (sc.notes?.length ? '<br><span style="color:var(--accent2)">note: ' + esc(sc.notes.join('; ')) + '</span>' : '');
-  $$('.preset').forEach(b => b.classList.toggle('on', b.dataset.t === sc.text));
-}
-function compute() {
-  S.res = runShock(S.sc, +$('#iEq').value, +$('#iDamp').value);
-}
-async function runFromText(text) {
-  closeMenu(); $('#cmd').blur();
-  S.q = ''; $('#cmd').value = ''; $('#fq').value = ''; renderFilings();
-  $('#sText').value = text;
-  S.sc = await parseSmart(text);
-  scenarioToControls(S.sc);
-  renderInterp();
-  await play();
-}
-const HOP_CAP = (sc, i) => i === 0
-  ? (sc.kind === 'demand' ? `${short(sc.origin)} pays less. Suppliers lose revenue.` : `${short(sc.origin)} cannot deliver. Customers go short.`)
-  : (sc.kind === 'demand' ? 'Hit companies cut their own orders.' : 'Short companies deliver less.');
-async function play() {
-  compute();
-  if (S.loops) toggleLoops(false);
-  if (S.chokes) { S.chokes = false; renderChokes(); }
-  S.sel = null; renderDetail();
-  setTab('scenario');
-  const res = S.res, my = ++S.animToken, dead = () => my !== S.animToken;
-  const rev = res.sc.kind === 'demand';
-  S.animating = true; S.shown = {}; S.hot = new Set(); S.hop = 0; S.feed = []; S.feedCap = 'Shock starts at ' + short(res.sc.origin) + '.'; S.hudFrom = { risk: 0, pf: 0 };
-  gParticles.innerHTML = ''; gPulse.innerHTML = ''; gShock.innerHTML = ''; gFloat.innerHTML = '';
-  $('#scenLive').classList.remove('hide');
-  renderHud(); paintMap(); renderResults(true); renderPortfolio(); renderTicker(); renderFeed();
-  blast(res.sc.origin); pulse(res.sc.origin);
-  await sleep(900);
-  let prev = {};
-  for (let i = 0; i < res.hops.length; i++) {
-    if (dead()) return;
-    S.hop = i + 1;
-    const h = res.hops[i];
-    S.feedCap = HOP_CAP(res.sc, i); renderFeed();
-    for (const f of h.fired) {
-      const size = Math.min(1, 0.35 + Math.sqrt(f.usd) / 5);
-      burn(f.link, rev, 700, '#ff5a70');
-      for (let k = 0; k < 3; k++) setTimeout(() => { if (!dead()) particle(f.link, rev, size * (1 - k * 0.22), '#E8445A', 700); }, k * 110);
-    }
-    await sleep(720);
-    if (dead()) return;
-    for (const f of h.fired) S.hot.add(f.link);
-    S.shown = h.pct; paintMap(); renderHud(); renderTicker(); renderPortfolio();
-    const hit = Object.keys(h.loss).filter(id => (h.loss[id] || 0) - (prev[id] || 0) > 1e-6).sort((x, y) => (h.loss[y] - (prev[y] || 0)) - (h.loss[x] - (prev[x] || 0)));
-    const delta = Object.fromEntries(hit.map(id => [id, h.loss[id] - (prev[id] || 0)]));
-    hit.forEach((id, k) => setTimeout(() => {
-      if (dead()) return;
-      const d = delta[id];
-      impact(id, '#E8445A'); floater(id, '-' + fB(d) + '/yr', '#ff6b7f'); strike(id);
-      S.feed.unshift({ hop: i + 1, id, pct: h.pct[id], usd: d }); renderFeed();
-    }, k * 70));
-    prev = h.loss;
-    await sleep(Math.max(560, hit.length * 70 + 380));
-  }
-  if (dead()) return;
-  // the loop closes: the investors' stakes are worth less
-  const inv = Object.entries(res.eq);
-  if (inv.length) {
-    S.feedCap = 'The loop closes. Stakes are written down.'; renderFeed();
-    for (const [, es] of inv) for (const e of es) { burn(e.link, true, 800, '#F7931E'); particle(e.link, true, 0.9, '#F7931E', 800); }
-    await sleep(820);
-    if (dead()) return;
-    inv.forEach(([id, es], k) => setTimeout(() => {
-      if (dead()) return;
-      const usd = es.reduce((a, e) => a + e.usd, 0);
-      impact(id, '#F7931E'); floater(id, '-' + fB(usd) + ' stake', '#FFB45E', (S.shown[id] ? 20 : 0)); strike(id);
-      S.feed.unshift({ hop: 'EQ', id, usd, eq: true }); renderFeed();
-    }, k * 90));
-    await sleep(inv.length * 90 + 700);
-  }
-  if (dead()) return;
-  S.animating = false; S.shown = res.pct; S.feedCap = `Settled. ${res.rows.filter(r => r.loss > 0).length} companies lose revenue.`;
-  renderAll(); renderFeed();
-}
-function renderFeed() {
-  const f = $('#feed'); if (!S.res || !S.feed) { f.classList.add('hide'); f.innerHTML = ''; return; }
-  f.classList.remove('hide');
-  const n = S.res.hops.length;
-  f.innerHTML = `<div class="fh">Shock feed<span>${S.animating ? (S.hop ? 'hop ' + S.hop + ' / ' + n : 'origin') : 'settled'}</span></div><div class="fc">${esc(S.feedCap || '')}</div>` +
-    S.feed.slice(0, 5).map(r => `<div class="fr${S.pf.has(r.id) ? ' pf' : ''}${r.eq ? ' eq' : ''}"><i>${r.eq ? 'EQ' : 'H' + r.hop}</i><b>${esc(C[r.id].listed ? C[r.id].ticker.split('.')[0] : short(r.id))}</b><u>${r.eq ? 'stake' : '-' + fP(r.pct, r.pct < 0.01 ? 2 : 1)}</u><em>-${fB(r.usd)}${r.eq ? '' : '/yr'}</em></div>`).join('');
-}
-function strike(id) { const c = $(`#chips .chip[data-id="${id}"]`); if (c) { c.classList.remove('struck'); void c.offsetWidth; c.classList.add('struck'); } }
-function anim(dur, fn, done) { const t0 = performance.now(); const step = now => { const t = Math.min(1, (now - t0) / dur); fn(t); if (t < 1) requestAnimationFrame(step); else done && done(); }; requestAnimationFrame(step); }
-function blast(id) {
-  const [x, y] = POS[id];
-  const c = el('circle', { cx: x, cy: y, r: 20, fill: 'rgba(232,68,90,.22)', 'pointer-events': 'none' }, gPulse);
-  anim(1100, t => { c.setAttribute('r', 20 + t * 520); c.setAttribute('opacity', (1 - t).toFixed(2)); }, () => c.remove());
-}
-function burn(linkId, reverse, dur, color) {
-  const e = EDGE[linkId], len = e.p.getTotalLength();
-  const b = el('path', { d: e.p.getAttribute('d'), class: 'burn', stroke: color, 'stroke-width': (e.w + 2).toFixed(2), filter: 'url(#glow)', 'stroke-dasharray': `${len} ${len}`, 'stroke-dashoffset': reverse ? -len : len }, gShock);
-  anim(dur, t => { const k = t < .5 ? 2 * t * t : 1 - Math.pow(-2 * t + 2, 2) / 2; b.setAttribute('stroke-dashoffset', ((reverse ? -len : len) * (1 - k)).toFixed(1)); },
-    () => anim(600, t => b.setAttribute('opacity', (1 - t).toFixed(2)), () => b.remove()));
-}
-function impact(id, color) {
-  const [x, y] = POS[id], r0 = R[id], n = NODE[id];
-  const c = el('circle', { cx: x, cy: y, r: r0, fill: 'none', stroke: color, 'stroke-width': 3, 'pointer-events': 'none', filter: 'url(#glow)' }, gPulse);
-  anim(750, t => { c.setAttribute('r', r0 + t * 46); c.setAttribute('opacity', (1 - t).toFixed(2)); c.setAttribute('stroke-width', (3 - 2.4 * t).toFixed(2)); }, () => c.remove());
-  anim(420, t => n.core.setAttribute('r', (r0 * (1 + 0.28 * Math.sin(Math.PI * t))).toFixed(2)), () => n.core.setAttribute('r', r0));
-}
-function floater(id, text, color, dy = 0) {
-  const [x, y] = POS[id], r0 = R[id];
-  const right = x < 980;
-  const off = Math.max(r0 + 10, 22);
-  const t = el('text', { x: x + (right ? off : -off), y: y + 18 + dy, class: 'floater', fill: color, 'text-anchor': right ? 'start' : 'end' }, gFloat);
-  t.textContent = text;
-  anim(1900, k => { t.setAttribute('transform', `translate(0,${(-20 * (1 - Math.pow(1 - k, 3))).toFixed(1)})`); t.setAttribute('opacity', k < .7 ? 1 : ((1 - k) / .3).toFixed(2)); }, () => t.remove());
-}
-// keeps the settled map alive: faint pulses keep moving along the deals that carried the shock
-setInterval(() => {
-  if (!S.res || S.animating || S.loops || document.hidden || !S.hot.size) return;
-  const rev = S.res.sc.kind === 'demand';
-  [...S.hot].forEach((id, k) => setTimeout(() => { if (S.res && !S.animating && !S.loops) particle(id, rev, 0.1, 'rgba(255,107,127,.75)', 1300); }, k * 60));
-}, 2600);
-function showInstant() { // recompute after a slider / dropdown edit, no animation
-  S.animToken++; S.animating = false;
-  compute();
-  S.shown = S.res.pct; S.hot = new Set(S.res.hops.flatMap(h => h.fired.map(f => f.link))); S.hop = S.res.hops.length;
-  S.feed = null; S.hudFrom = null;
-  $('#scenLive').classList.remove('hide');
-  renderAll(); renderFeed();
-}
-function clearScenario() {
-  S.animToken++; S.animating = false; S.res = null; S.shown = null; S.hot = new Set(); S.hop = 0;
-  $('#scenLive').classList.add('hide');
-  S.feed = null; S.hudFrom = null;
-  gParticles.innerHTML = ''; gPulse.innerHTML = ''; gShock.innerHTML = ''; gFloat.innerHTML = '';
-  renderAll(); renderFeed();
-}
-function renderAll() { renderHud(); paintMap(); renderResults(); renderPortfolio(); renderTicker(); renderDetail(); renderTrace(); renderInterp(); }
-
-function pulse(id) {
-  const [x, y] = POS[id]; const r0 = R[id];
-  for (let k = 0; k < 3; k++) {
-    const c = el('circle', { cx: x, cy: y, r: r0, class: 'pulse', 'stroke-width': 2 }, gPulse);
-    const t0 = performance.now() + k * 220;
-    const step = now => { const t = (now - t0) / 1100; if (t < 0) return requestAnimationFrame(step); if (t >= 1) { c.remove(); return; } c.setAttribute('r', r0 + t * 70); c.setAttribute('opacity', (1 - t).toFixed(2)); requestAnimationFrame(step); };
-    requestAnimationFrame(step);
-  }
-}
-function particle(linkId, reverse, size, color = '#E8445A', dur = 560) {
-  const path = EDGE[linkId].p, len = path.getTotalLength();
-  const c = el('circle', { r: 2 + 4 * size, fill: color, filter: 'url(#glow)', 'pointer-events': 'none' }, gParticles);
-  const t0 = performance.now();
-  const step = now => {
-    let t = Math.min(1, (now - t0) / dur); const e = t < .5 ? 2 * t * t : 1 - Math.pow(-2 * t + 2, 2) / 2;
-    const pt = path.getPointAtLength(len * (reverse ? 1 - e : e));
-    c.setAttribute('cx', pt.x); c.setAttribute('cy', pt.y);
-    if (t < 1) requestAnimationFrame(step); else c.remove();
-  };
-  requestAnimationFrame(step);
-}
-
-function renderHud() {
-  const h = $('#hud');
-  const play_ = '<svg width="10" height="10" viewBox="0 0 10 10" aria-hidden="true"><path d="M1 0 L9 5 L1 10Z" fill="currentColor"/></svg>';
-  if (!S.res) {
-    h.className = 'hud cta';
-    h.innerHTML = `<div class="qq"><span class="lbl" style="color:var(--accent)">Type what could go wrong</span><span class="q">See which of your stocks it hits.</span></div>
-      <div class="acts"><button class="btn primary" id="heroRun" style="height:32px">${play_}Run: OpenAI cuts compute spending 40%</button></div>`;
-    $('#heroRun').onclick = () => runFromText(PRESETS[0].t);
-    return;
-  }
-  const res = S.res, n = res.hops.length;
-  const snap = S.hop ? res.hops[S.hop - 1] : null;
-  const atRisk = snap ? Object.values(snap.loss).reduce((s, v) => s + v, 0) : 0;
-  const hitN = snap ? Object.keys(snap.loss).length : 0;
-  const pfL = snap ? Object.entries(snap.loss).filter(([id]) => S.pf.has(id)).reduce((s, [, v]) => s + v, 0) : 0;
-  h.className = 'hud';
-  h.innerHTML = `<div class="qq"><span class="lbl" style="color:var(--danger)">Scenario${S.animating ? ' · running' : ''} · ${S.hop ? 'Hop ' + S.hop + ' / ' + n : 'Origin'}</span><span class="q">${esc(describe(res.sc))}</span><div class="pips">${res.hops.map((_, i) => `<i class="${i < S.hop ? 'on' : ''}"></i>`).join('')}</div></div>
-    <div class="st">Revenue at risk<b class="d" id="hudRisk">-${fB(atRisk)}/yr</b></div>
-    <div class="st">Companies hit<b>${hitN}</b></div>
-    <div class="st">Your holdings<b class="a" id="hudPf">-${fB(pfL)}/yr</b></div>
-    <div class="acts"><button class="btn" id="hudReplay"><svg width="12" height="12" viewBox="0 0 16 16" aria-hidden="true"><path d="M3 8a5 5 0 1 0 2-4" fill="none" stroke="currentColor" stroke-width="1.7"/><path d="M2 1v4h4" fill="none" stroke="currentColor" stroke-width="1.7"/></svg>Replay</button><button class="btn" id="hudTable">Results</button><button class="btn ghost" id="hudClear">Clear</button></div>`;
-  if (S.animating && S.hudFrom) {
-    const f = S.hudFrom, a = $('#hudRisk'), b = $('#hudPf'), tok = S.animToken;
-    if (atRisk > f.risk + 1e-6) anim(600, t => { if (tok === S.animToken && a.isConnected) a.textContent = '-' + fB(f.risk + (atRisk - f.risk) * t) + '/yr'; });
-    if (pfL > f.pf + 1e-6) anim(600, t => { if (tok === S.animToken && b.isConnected) b.textContent = '-' + fB(f.pf + (pfL - f.pf) * t) + '/yr'; });
-    S.hudFrom = { risk: atRisk, pf: pfL };
-  }
-  $('#hudReplay').onclick = () => play();
-  $('#hudClear').onclick = () => clearScenario();
-  $('#hudTable').onclick = () => { setTab('scenario'); $('#pane-scenario').scrollTop = 0; $('#drawer').scrollIntoView({ behavior: 'smooth', block: 'nearest' }); };
-}
-
-function renderResults(running) {
-  const tb = $('#rTable tbody'), sb = $('#sumbar');
-  if (!S.res) {
-    sb.innerHTML = `<div class="txt" style="color:var(--muted)">Run a scenario to see which companies lose revenue, by how much, and through which deals.</div><button class="btn primary" id="sbRun">Run hero scenario</button>`;
-    $('#sbRun').onclick = () => runFromText(PRESETS[0].t);
-    tb.innerHTML = `<tr><td colspan="8" class="empty">No scenario run yet.</td></tr>`;
-    return;
-  }
-  if (running) {
-    sb.innerHTML = `<div class="txt">Propagating <span class="mono" style="color:var(--danger)">${esc(describe(S.res.sc))}</span> through ${SUP.length} supply links...</div>`;
-    tb.innerHTML = `<tr><td colspan="8" class="empty">Running, results appear when the shock settles.</td></tr>`;
-    return;
-  }
-  const res = S.res;
-  const hold = [...S.pf];
-  const pr = res.rows.filter(r => S.pf.has(r.id));
-  const tot = pr.reduce((s, r) => s + r.loss, 0), eq = pr.reduce((s, r) => s + r.eq, 0);
-  // holdings that are hit through at least one company the user does not own
-  const viaOthers = pr.filter(r => (res.contrib[r.id] || []).some(c => c.from !== res.sc.origin && !S.pf.has(c.from)));
-  sb.innerHTML = `<div class="txt">Your ${hold.length} holding${hold.length === 1 ? '' : 's'} lose an estimated <b>${fB(tot)}/yr</b> of revenue${eq ? ` and <b>${fB(eq)}</b> of stake value` : ''}; <em>${viaOthers.length} of them</em> through companies you don't own.</div>
-    <div class="mono note">Total, all companies: <span style="color:var(--danger)">${fB(res.total)}/yr</span> · ${res.hops.length} hops · damping ${res.damp.toFixed(2)}</div>
-    <button class="btn" id="sbReplay">Replay</button><button class="btn ghost" id="sbClear">Clear</button>`;
-  $('#sbReplay').onclick = () => play();
-  $('#sbClear').onclick = () => clearScenario();
-  tb.innerHTML = res.rows.map(r => {
-    const c = C[r.id];
-    return `<tr class="click" data-node="${r.id}">
-      <td><b>${esc(c.name)}</b>${c.leverage_flag && r.loss > 0 ? ` <span class="tag lev" title="${esc(c.leverage_flag)}">LEVERAGE AMPLIFIES THIS</span>` : ''}</td>
-      <td class="mono">${esc(c.ticker)}</td>
-      <td>${S.pf.has(r.id) ? '<span class="yes">yes</span>' : '<span class="note">no</span>'}</td>
-      <td class="n">${r.loss ? fB(r.loss) + '/yr' : '-'}</td>
-      <td class="mono"><span class="pctbar"><i style="width:${Math.min(100, r.pct / 0.4 * 100)}%"></i></span>${r.loss ? fP(r.pct, r.pct < 0.01 ? 2 : 1) : '-'}</td>
-      <td class="n">${r.eq ? '-' + fB(r.eq) : '-'}</td>
-      <td class="path">${r.viaEquity ? 'stake in ' + esc(short(L[res.eq[r.id][0].link].to)) : r.path.map(short).map(esc).join(' > ')}</td>
-      <td>${tagHTML(r.conf)}</td></tr>`;
-  }).join('') || `<tr><td colspan="8" class="empty">No company is hit by this scenario.</td></tr>`;
-  tb.querySelectorAll('tr.click').forEach(tr => tr.addEventListener('click', () => select('node', tr.dataset.node)));
-}
-
-// ============================================================
-//  Agent trace (recorded run; values from the live computation)
-// ============================================================
 function traceSteps() {
-  const res = S.res || runShock(parseScenario(PRESETS[0].t), +$('#iEq').value, +$('#iDamp').value);
+  const res = S.res || runShock(parseScenario(PRESETS[0]));
   const sc = res.sc, o = short(sc.origin);
   const fs = DATA.sources.filter(s => [s.title, s.used_for].join(' ').toLowerCase().includes(o.toLowerCase()));
   const rel = sc.kind === 'demand' ? 'customers_of' : 'suppliers_of';
@@ -1565,7 +579,7 @@ function traceSteps() {
   ];
 }
 function explainText() {
-  const res = S.res || runShock(parseScenario(PRESETS[0].t), +$('#iEq').value, +$('#iDamp').value);
+  const res = S.res || runShock(parseScenario(PRESETS[0]));
   const r = res.rows.filter(x => x.loss);
   if (!r.length) return 'This scenario does not move revenue for any company in the map.';
   const byPct = r[0], second = r[1];
@@ -1584,76 +598,444 @@ function explainText() {
   if (lev.length) s += `${lev.map(x => esc(short(x.id))).join(' and ')} fund${lev.length === 1 ? 's' : ''} this buildout with debt, so the gap hurts more than the percentage suggests.`;
   return s;
 }
-let traceToken = 0;
-function renderTrace(animate) {
-  const steps = traceSteps();
-  const total = steps.reduce((s, x) => s + x.ms, 0);
-  $('#trMeta').textContent = `${steps.length} tool calls · ${(total / 1000).toFixed(2)}s`;
-  $('#calls').innerHTML = steps.map((s, i) => `<div class="call${animate ? ' pending' : ''}" data-i="${i}"><div class="h" role="button" tabindex="0"><span class="i">${String(i + 1).padStart(2, '0')}</span><span><span class="fn">${s.fn}</span>(${esc(s.args)})</span><span class="ms">${s.ms} ms</span></div><pre>${esc(s.out)}</pre></div>`).join('');
-  $('#calls').querySelectorAll('.call .h').forEach(h => {
-    const t = () => h.parentElement.classList.toggle('closed');
-    h.addEventListener('click', t); h.addEventListener('keydown', e => { if (e.key === 'Enter') t(); });
+
+// ============================================================
+//  Interface
+// ============================================================
+const S = {
+  pf: new Set(['nvda', 'msft', 'orcl', 'crwv', 'amd']), focus: 'openai',
+  sel: null, srcSel: null, loops: false, loopIdx: 0,
+  sc: null, res: null, shown: null, hot: new Set(), hop: 0, animating: false, animToken: 0, live: {}, liveEq: {}, cap: '',
+  q: '', fType: 'All', srcOpen: false
+};
+const PRESETS = ['OpenAI cuts compute spending 40%', 'OpenAI misses its Oracle payments', 'Microsoft cuts CoreWeave contracts 50%'];
+const PF_IDS = ['msft', 'nvda', 'orcl', 'crwv', 'amzn', 'googl', 'amd', 'avgo', 'tsm', 'skh', 'sb'];
+const CHOKE = findChokes();
+const INK = '#16171B', RED = '#D92D4A', ORANGE = '#F7931E';
+const NS = 'http://www.w3.org/2000/svg', W = 1100, H = 740;
+const el = (tag, attrs = {}, parent) => { const e = document.createElementNS(NS, tag); for (const k in attrs) e.setAttribute(k, attrs[k]); if (parent) parent.appendChild(e); return e; };
+const R = Object.fromEntries(IDS.map(id => [id, C[id].revenue_usd_b ? 7 + 0.75 * Math.sqrt(C[id].revenue_usd_b) : 12]));
+const exposureColor = t => {
+  const lerp = (a, b, k) => a.map((x, i) => Math.round(x + (b[i] - x) * k));
+  const g = [168, 162, 152], o = [247, 147, 30], r = [217, 45, 74], k = Math.max(0, Math.min(1, t / 0.6));
+  return `rgb(${(k < 0.5 ? lerp(g, o, k / 0.5) : lerp(o, r, (k - 0.5) / 0.5)).join(',')})`;
+};
+const describe = sc => sc.kind === 'demand'
+  ? `${short(sc.origin)} cuts ${sc.target ? 'purchases from ' + short(sc.target) : 'compute spending'} ${fP(sc.severity, 0)}`
+  : `${short(sc.origin)} can't deliver ${fP(sc.severity, 0)}${sc.target ? ' to ' + short(sc.target) : ''}`;
+function renderParser() { $('#parserBadge').textContent = LIVE ? 'Read by Claude (live)' : 'Keyword parser (offline)'; }
+
+// ---------- layout: suppliers | company | customers, like a supply chain screen ----------
+let P = {}, NODE = {}, EDGE = {}, gParticles, gPulse, gShock, gFloat;
+const COL_NAME = { '-3': 'Further upstream', '-2': "Suppliers' suppliers", '-1': 'Suppliers', '0': 'Company', '1': 'Customers', '2': "Customers' customers", '3': 'Further downstream' };
+function layout(focus) {
+  const bfs = next => { const d = { [focus]: 0 }; let fr = [focus]; for (let k = 1; fr.length; k++) { const nx = []; for (const v of fr) for (const w of next(v)) if (d[w] == null) { d[w] = k; nx.push(w); } fr = nx; } return d; };
+  const up = bfs(v => SUP.filter(l => l.to === v).map(l => l.from)), down = bfs(v => SUP.filter(l => l.from === v).map(l => l.to));
+  const flow = (a, b) => SUP.filter(l => l.from === a && l.to === b).reduce((s, l) => s + l.annual_usd_b, 0);
+  const col = {};
+  for (const id of IDS) {
+    if (id === focus) { col[id] = 0; continue; }
+    const u = up[id], d = down[id];
+    if (u != null && d != null && u === d) col[id] = flow(focus, id) > flow(id, focus) ? d : -u;
+    else if (u != null && (d == null || u < d)) col[id] = Math.max(-3, -u);
+    else if (d != null) col[id] = Math.min(3, d);
+  }
+  const used = [...new Set(Object.values(col))].sort((a, b) => a - b);
+  const inv = IDS.filter(id => col[id] == null && EQ.some(l => (l.from === id && col[l.to] != null)));
+  const cols = used.map(c => ({ name: COL_NAME[c], ids: IDS.filter(id => col[id] === c) }));
+  if (inv.length) cols.push({ name: 'Investors', ids: inv });
+  const pos = {}, lanes = [];
+  cols.forEach((c, i) => {
+    const x = cols.length === 1 ? W / 2 : 110 + i * (W - 220) / (cols.length - 1);
+    lanes.push([c.name, x]);
+    const n = c.ids.length, top = 56, span = H - 96;
+    c.ids.forEach((id, k) => { pos[id] = { x, y: top + span * (k + 0.5) / n }; });
   });
-  $('#explain').innerHTML = animate ? '' : explainText();
-  if (animate) {
-    const my = ++traceToken;
-    (async () => {
-      for (const c of $$('#calls .call')) { await sleep(380); if (my !== traceToken) return; c.classList.remove('pending'); }
-      await sleep(300); if (my === traceToken) $('#explain').innerHTML = explainText();
-    })();
+  return { pos, lanes };
+}
+function edgeD(l) {
+  const a = P[l.from], b = P[l.to]; if (!a || !b) return null;
+  const ra = R[l.from] + 3, rb = R[l.to] + 7, eq = l.type === 'equity', o = eq ? -9 : 0;
+  if (b.x - a.x > 40) { const dx = (b.x - a.x) * (eq ? 0.3 : 0.45); return `M${a.x + ra},${a.y + o} C${a.x + ra + dx},${a.y + o} ${b.x - rb - dx},${b.y + o} ${b.x - rb},${b.y + o}`; }
+  if (Math.abs(b.x - a.x) <= 40) { const s = eq ? -1 : 1, k = 46 + Math.abs(b.y - a.y) * 0.22; return `M${a.x + s * ra},${a.y} C${a.x + s * (ra + k)},${a.y} ${b.x + s * (rb + k)},${b.y} ${b.x + s * rb},${b.y}`; }
+  const up = eq ? -1 : 1, cy = up < 0 ? Math.min(a.y, b.y) - 120 : Math.max(a.y, b.y) + 120;
+  return `M${a.x},${a.y + up * ra} C${a.x},${cy} ${b.x},${cy} ${b.x},${b.y + up * rb}`;
+}
+const edgeW = l => l.type === 'supply' ? 1 + 0.8 * Math.sqrt(l.annual_usd_b || 0.5) : 1.7;
+const EDGE_BASE = l => l.type === 'supply' ? '#A9A398' : ORANGE;
+
+function buildMap() {
+  const svg = $('#map'); svg.innerHTML = ''; NODE = {}; EDGE = {}; svg.setAttribute('viewBox', `0 0 ${W} ${H}`);
+  const lay = layout(S.focus); P = lay.pos;
+  const defs = el('defs', {}, svg), gl = el('g', {}, svg);
+  lay.lanes.forEach(([t, x]) => {
+    el('line', { x1: x, x2: x, y1: 40, y2: H - 6, stroke: '#ECE8E0', 'stroke-width': 1 }, gl);
+    el('text', { x, y: 26, 'text-anchor': 'middle', class: 'lane-t', style: t === 'Company' ? 'fill:#16171B' : '' }, gl).textContent = t;
+  });
+  const gE = el('g', {}, svg); gShock = el('g', {}, svg); const gH = el('g', {}, svg); gParticles = el('g', {}, svg);
+  const gN = el('g', {}, svg); gPulse = el('g', {}, svg); gFloat = el('g', {}, svg);
+  [...DATA.links].sort((a, b) => edgeW(b) - edgeW(a)).forEach(l => {
+    const d = edgeD(l); if (!d) return;
+    const w = edgeW(l), ms = Math.max(8, Math.min(14, w * 1.9));
+    const mk = el('marker', { id: 'm-' + l.id, viewBox: '0 0 10 10', refX: 8.5, refY: 5, markerUnits: 'userSpaceOnUse', markerWidth: ms, markerHeight: ms, orient: 'auto-start-reverse' }, defs);
+    const mp = el('path', { d: 'M0,1 L10,5 L0,9 Z', fill: EDGE_BASE(l) }, mk);
+    const p = el('path', { d, class: 'edge', stroke: EDGE_BASE(l), 'stroke-width': w.toFixed(2), 'marker-end': `url(#m-${l.id})` }, gE);
+    const dash = l.type === 'equity' ? '6 4' : isDotted(l) ? '0.1 ' + Math.max(4, w * 1.6).toFixed(1) : null;
+    if (dash) { p.setAttribute('stroke-dasharray', dash); if (l.type !== 'equity') p.setAttribute('stroke-linecap', 'round'); }
+    const h = el('path', { d, class: 'ehit' }, gH);
+    h.addEventListener('click', e => { e.stopPropagation(); select('link', l.id); });
+    h.addEventListener('mousemove', e => showTip(e, linkTip(l))); h.addEventListener('mouseleave', hideTip);
+    EDGE[l.id] = { p, mp, w, dash };
+  });
+  for (const id of IDS) {
+    if (!P[id]) continue;
+    const { x, y } = P[id], r = R[id];
+    const g = el('g', { class: 'node', transform: `translate(${x},${y})`, tabindex: 0, role: 'button', 'aria-label': C[id].name }, gN);
+    el('circle', { r: r + 5, class: 'selring' }, g);
+    if (CHOKE.some(c => c.id === id)) { const q = r + 10; el('path', { d: `M0,${-q} L${q},0 L0,${q} L${-q},0Z`, class: 'choke' }, g); }
+    const core = el('circle', { r, class: 'core', fill: '#fff', 'stroke-width': id === S.focus ? 4 : 2.6 }, g);
+    const t1 = el('text', { class: 'tick', 'text-anchor': 'middle', y: r + (CHOKE.some(c => c.id === id) ? 26 : 17) }, g); t1.textContent = short(id);
+    const bg = el('g', { transform: `translate(0,${-r - 14})`, opacity: 0 }, g);
+    const br = el('rect', { class: 'badge-r', x: -28, y: -11, width: 56, height: 19 }, bg), bt = el('text', { class: 'badge-t', 'text-anchor': 'middle', y: 3.5 }, bg);
+    g.addEventListener('click', e => { e.stopPropagation(); select('node', id); });
+    g.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); select('node', id); } });
+    g.addEventListener('mousemove', e => showTip(e, nodeTip(id))); g.addEventListener('mouseleave', hideTip);
+    NODE[id] = { g, core, bg, br, bt };
+  }
+  paintMap();
+}
+function nodeTip(id) {
+  const c = C[id];
+  return `<b>${esc(c.name)}</b><div class="s">${c.revenue_usd_b ? 'Revenue ' + fB(c.revenue_usd_b) : 'Investor'}${id !== 'openai' && c.revenue_usd_b ? ' · ' + fP(TIED[id]) + ' tied to OpenAI' : ''}</div><div class="s">Click for details</div>`;
+}
+function linkTip(l) {
+  return `<b>${esc(short(l.from))} ${l.type === 'supply' ? 'sells to' : 'invests in'} ${esc(short(l.to))}</b><div class="s">${esc(l.label)}</div><div class="s">Click for the source</div>`;
+}
+function showTip(e, html) {
+  const t = $('#tip'); t.innerHTML = html; t.classList.remove('hide');
+  let x = e.clientX + 14, y = e.clientY + 14;
+  if (x + t.offsetWidth > innerWidth - 8) x = e.clientX - t.offsetWidth - 14;
+  if (y + t.offsetHeight > innerHeight - 8) y = e.clientY - t.offsetHeight - 14;
+  t.style.left = x + 'px'; t.style.top = y + 'px';
+}
+function hideTip() { $('#tip').classList.add('hide'); }
+
+function srcMatches() {
+  if (!S.srcOpen || (!S.q && S.fType === 'All')) return null;
+  const m = new Set();
+  for (const s of filteredSources()) { m.add(s.company); for (const l of DATA.links) if (l.source_id === s.id) { m.add(l.from); m.add(l.to); } }
+  return m;
+}
+function paintMap() {
+  const loop = S.loops ? LOOPS.loops[S.loopIdx] : null, loopNodes = loop ? new Set(loop.core.flatMap(c => c.nodes)) : null;
+  const scen = !!S.shown, m = srcMatches(), selL = new Set(), selN = new Set();
+  const addL = l => { selL.add(l.id); selN.add(l.from); selN.add(l.to); };
+  if (S.sel?.kind === 'node') { selN.add(S.sel.id); DATA.links.filter(l => l.from === S.sel.id || l.to === S.sel.id).forEach(addL); }
+  if (S.sel?.kind === 'link') addL(L[S.sel.id]);
+  if (S.srcSel) { selN.add(SRC[S.srcSel].company); DATA.links.filter(l => l.source_id === S.srcSel).forEach(addL); }
+  const focusing = !!(S.sel || S.srcSel);
+  for (const id in NODE) {
+    const n = NODE[id];
+    const dim = loop ? !loopNodes.has(id) : focusing ? !selN.has(id) : m ? !m.has(id) : false;
+    n.g.classList.toggle('dim', dim);
+    n.g.classList.toggle('sel', S.sel?.kind === 'node' && S.sel.id === id);
+    const p = scen ? (S.shown[id] || 0) : 0, origin = scen && S.res && S.res.sc.origin === id;
+    const badge = txt => { n.bg.setAttribute('opacity', 1); n.bt.textContent = txt; const w = Math.max(44, txt.length * 7.6 + 12); n.br.setAttribute('x', -w / 2); n.br.setAttribute('width', w); };
+    if (p > 0) {
+      n.core.setAttribute('fill', `rgba(217,45,74,${(0.14 + 0.62 * Math.min(1, 0.2 + p / 0.4 * 0.8)).toFixed(2)})`); n.core.setAttribute('stroke', RED);
+      badge('-' + fP(p, p < 0.01 ? 2 : 1));
+    } else {
+      n.core.setAttribute('fill', S.pf.has(id) ? '#FFE2B8' : '#fff');
+      n.core.setAttribute('stroke', origin ? RED : id === S.focus ? INK : exposureColor(TIED[id]));
+      if (origin) badge((S.res.sc.kind === 'demand' ? 'cuts ' : 'short ') + fP(S.res.sc.severity, 0)); else n.bg.setAttribute('opacity', 0);
+    }
+  }
+  for (const id in EDGE) {
+    const l = L[id], e = EDGE[id];
+    let color = EDGE_BASE(l), op = l.type === 'equity' ? 0.75 : 1, w = e.w, flow = false, dash = e.dash;
+    if (loop) { if (loop.links.has(id)) { color = ORANGE; w = Math.max(2.6, e.w); flow = true; dash = l.type === 'equity' ? '6 4' : '10 6'; op = 1; } else op = 0.07; }
+    else if (scen && S.hot.has(id)) { color = RED; op = 1; }
+    else if (focusing) { if (selL.has(id)) { color = l.type === 'supply' ? INK : ORANGE; op = 1; } else op = 0.08; }
+    else if (m) { if (!(m.has(l.from) && m.has(l.to))) op = 0.08; }
+    else if (scen) op = 0.28;
+    e.p.setAttribute('stroke', color); e.mp.setAttribute('fill', color); e.p.setAttribute('stroke-width', w.toFixed(2)); e.p.style.opacity = op;
+    if (dash) e.p.setAttribute('stroke-dasharray', dash); else e.p.removeAttribute('stroke-dasharray');
+    e.p.classList.toggle('flow', flow);
   }
 }
+function setFocus(id) { if (!C[id] || id === S.focus) return; S.focus = id; buildMap(); renderCap(); }
 
-// ============================================================
-//  Wire up
-// ============================================================
+// ---------- caption above the map ----------
+function renderCap() {
+  const c = $('#cap');
+  $$('.views button').forEach(b => b.setAttribute('aria-selected', String((b.dataset.mode === 'loops') === S.loops)));
+  if (S.loops) {
+    const lp = LOOPS.loops[S.loopIdx];
+    c.innerHTML = `<div class="tx"><span class="lbl" style="color:var(--accent-ink)">Money loop ${S.loopIdx + 1} of ${LOOPS.loops.length}</span><h1>${esc(lp.meta.t)}</h1><p>${esc(lp.meta.c)}</p></div>
+      <div class="acts"><button class="btn" id="lpPrev">Prev</button><button class="btn" id="lpNext">Next</button></div>`;
+    const step = d => { S.loopIdx = (S.loopIdx + LOOPS.loops.length + d) % LOOPS.loops.length; renderCap(); paintMap(); };
+    $('#lpPrev').onclick = () => step(-1); $('#lpNext').onclick = () => step(1);
+    return;
+  }
+  if (S.res) {
+    const n = S.res.hops.length, risk = Object.values(S.live).reduce((s, v) => s + v.loss, 0);
+    c.innerHTML = `<div class="tx"><span class="lbl" style="color:var(--danger)">${S.animating ? (S.hop ? `Hop ${S.hop} of ${n}` : 'Shock starts') : 'Scenario settled'}</span><h1>${esc(describe(S.res.sc))}</h1><p>${esc(S.cap)}</p><div class="pips">${S.res.hops.map((_, i) => `<i class="${i < S.hop ? 'on' : ''}"></i>`).join('')}</div></div>
+      <div class="kp"><span class="lbl">Revenue at risk</span><b class="neg">-${fB(risk)}/yr</b></div>`;
+    return;
+  }
+  c.innerHTML = `<div class="tx"><span class="lbl">Supply chain of</span><h1><select id="focusSel" aria-label="Company" style="font:inherit;border:0;border-bottom:2px solid var(--accent);background:transparent;color:var(--ink);padding:0 2px;cursor:pointer">${IDS.filter(id => SUP.some(l => l.from === id || l.to === id)).map(id => `<option value="${id}"${id === S.focus ? ' selected' : ''}>${esc(short(id))}</option>`).join('')}</select></h1>
+    <p>Suppliers on the left, customers on the right. Click a company or an arrow to see the deal and its source.</p></div>`;
+  $('#focusSel').onchange = e => { S.sel = null; renderDetail(); setFocus(e.target.value); };
+}
+
+// ---------- selection + detail ----------
+function select(kind, id) { S.sel = kind ? { kind, id } : null; renderDetail(); paintMap(); }
+const lkRow = l => `<button class="lk" data-link="${l.id}">${esc(short(l.from))} ${l.type === 'supply' ? 'sells to' : 'invests in'} ${esc(short(l.to))}<span>${l.type === 'supply' ? (l.annual_usd_b ? '~' + fB(l.annual_usd_b) + '/yr' : 'undisclosed') : (l.stake_value_usd_b ? fB(l.stake_value_usd_b) : 'stake')}</span></button>`;
+function renderDetail() {
+  const d = $('#detail');
+  if (!S.sel) { d.classList.add('hide'); d.innerHTML = ''; return; }
+  let h = '';
+  if (S.sel.kind === 'node') {
+    const id = S.sel.id, c = C[id], ck = CHOKE.find(x => x.id === id), row = S.res && !S.animating ? S.res.rows.find(r => r.id === id) : null;
+    const ls = DATA.links.filter(l => l.from === id || l.to === id);
+    h = `<div class="dh"><div><span class="lbl">${c.listed ? esc(c.ticker) : 'Private'}</span><h2>${esc(c.name)}</h2></div><button class="x" id="dX" aria-label="Close">&times;</button></div>
+      <dl class="kv"><dt>Revenue</dt><dd>${c.revenue_usd_b ? fB(c.revenue_usd_b) + ' <span class="note">' + esc(c.fiscal_year) + '</span>' : 'Investor only'}</dd>
+      <dt>Sells</dt><dd>${esc(c.sells || 'n/a')}</dd>
+      ${id !== 'openai' && c.revenue_usd_b ? `<dt>Tied to OpenAI</dt><dd>${fP(TIED[id])} of revenue</dd>` : ''}
+      ${row ? `<dt>In this scenario</dt><dd style="color:var(--danger)">${row.loss ? '-' + fB(row.loss) + '/yr (' + fP(row.pct) + ')' : ''}${row.eq ? ' -' + fB(row.eq) + ' stake value' : ''}</dd>` : ''}
+      ${ck ? `<dt>Choke point</dt><dd>If it ${ck.kind === 'demand' ? 'stops paying' : 'stops delivering'}, ${fB(ck.usd)}/yr is at risk across ${ck.reach} companies</dd>` : ''}
+      ${c.leverage_flag ? `<dt>Leverage</dt><dd>${esc(c.leverage_flag)}</dd>` : ''}</dl>
+      ${id !== S.focus && SUP.some(l => l.from === id || l.to === id) ? `<button class="btn" id="dFocus">Centre the map on ${esc(short(id))}</button>` : ''}
+      <div class="sub"><span class="lbl">Deals (${ls.length})</span></div>${ls.map(lkRow).join('')}
+      ${c.facts?.length ? `<div class="sub"><span class="lbl">From the filings</span></div><ul class="facts">${c.facts.map(f => `<li>${esc(f)}</li>`).join('')}</ul>` : ''}`;
+  } else {
+    const l = L[S.sel.id];
+    h = `<div class="dh"><div><span class="lbl">${l.type === 'supply' ? 'Sells to' : 'Invests in'}</span><h2>${esc(short(l.from))} &rarr; ${esc(short(l.to))}</h2></div><button class="x" id="dX" aria-label="Close">&times;</button></div>
+      <dl class="kv"><dt>Deal</dt><dd>${esc(l.label)}</dd>
+      <dt>Amount</dt><dd>${l.amount_usd_b != null ? fB(l.amount_usd_b) : 'undisclosed'}${l.period ? ' <span class="note">' + esc(l.period) + '</span>' : ''}</dd>
+      ${l.type === 'supply' ? `<dt>Per year in model</dt><dd>~${fB(l.annual_usd_b)}/yr</dd>` : ''}
+      <dt>Date</dt><dd>${esc(l.date)}</dd>
+      <dt>Confidence</dt><dd>${tagHTML(l.confidence)} <span class="note">${esc(CONF_TXT[l.confidence])}</span></dd></dl>
+      <div class="quote">${esc(l.quote)}<small>${l.quote_kind === 'paraphrase' ? 'Paraphrase of the source' : 'Quoted from the source'}</small></div>
+      ${l.estimate_note ? `<p class="note"><b>How we estimated:</b> ${esc(l.estimate_note)}</p>` : ''}
+      <div class="sub"><span class="lbl">Source</span>${verTag(l.verification)}</div>
+      <p style="margin:0 0 10px"><a href="${esc(l.source_url)}" target="_blank" rel="noopener">${esc(l.source_title)}</a></p>
+      <button class="btn" id="dSrc">Show in sources</button>`;
+  }
+  d.innerHTML = h; d.classList.remove('hide'); d.scrollTop = 0;
+  $('#dX').onclick = () => select(null);
+  d.querySelectorAll('.lk').forEach(b => b.onclick = () => select('link', b.dataset.link));
+  if ($('#dFocus')) $('#dFocus').onclick = () => { const id = S.sel.id; clearScenario(); if (S.loops) setLoops(false); setFocus(id); select('node', id); };
+  if ($('#dSrc')) $('#dSrc').onclick = () => { const sid = L[S.sel.id].source_id; openSources(sid); };
+}
+
+// ---------- portfolio ----------
+function renderPortfolio() {
+  const hold = [...S.pf];
+  const dep = hold.filter(id => (C[id].revenue_usd_b && TIED[id] >= DEPEND_T) || EQ.some(l => l.from === id && l.to === 'openai'));
+  $('#pfBlk').innerHTML = `<div class="lbl"><span>Your portfolio</span><span>${hold.length} of ${PF_IDS.length} held</span></div>
+    <div class="chips" id="chips">${PF_IDS.map(id => `<button class="chip" data-id="${id}" aria-pressed="${S.pf.has(id)}" title="${esc(C[id].name)}">${esc(C[id].ticker)}</button>`).join('')}</div>
+    ${S.res ? '' : `<p class="headline">${hold.length ? `<em>${dep.length === hold.length && hold.length > 1 ? 'All ' + dep.length : dep.length + ' of your ' + hold.length}</em> ${dep.length === hold.length && hold.length > 1 ? 'of your holdings depend' : 'holding' + (hold.length === 1 ? '' : 's') + ' depend' + (dep.length === 1 ? 's' : '')} on OpenAI paying its bills.` : 'Pick the stocks you hold.'}</p>`}`;
+  $$('#chips .chip').forEach(b => b.onclick = () => { S.pf.has(b.dataset.id) ? S.pf.delete(b.dataset.id) : S.pf.add(b.dataset.id); renderPortfolio(); paintMap(); renderReport(); });
+}
+
+// ---------- scenario ----------
+function renderInterp() {
+  $('#presets').classList.toggle('hide', !!S.sc);
+  const b = $('#interp'); if (!S.sc) { b.classList.add('hide'); return; }
+  const sc = S.sc;
+  b.classList.remove('hide');
+  b.innerHTML = `<span class="lbl">AI interpretation. Edit to rerun.</span>
+    <div class="row"><select id="iOrigin" aria-label="Company">${IDS.filter(id => SUP.some(l => l.from === id || l.to === id)).map(id => `<option value="${id}"${id === sc.origin ? ' selected' : ''}>${esc(short(id))}</option>`).join('')}</select>
+    <select id="iKind" aria-label="Type"><option value="demand"${sc.kind === 'demand' ? ' selected' : ''}>buys less</option><option value="supply"${sc.kind === 'supply' ? ' selected' : ''}>can't deliver</option></select>
+    <input type="range" id="iSev" min="0" max="100" step="5" value="${Math.round(sc.severity * 100)}" aria-label="Severity"><output>${fP(sc.severity, 0)}</output></div>
+    ${sc.target ? `<div class="why">Only the deal with ${esc(short(sc.target))}.</div>` : ''}${sc.notes?.length ? `<div class="why">${esc(sc.notes.join('; '))}</div>` : ''}`;
+  const edit = () => {
+    const o = $('#iOrigin').value, k = $('#iKind').value, changed = o !== sc.origin || k !== sc.kind;
+    S.sc = { ...sc, origin: o, kind: k, severity: +$('#iSev').value / 100, target: changed ? '' : sc.target, notes: changed ? ['edited by you'] : sc.notes };
+    S.sc.text = describe(S.sc); $('#sText').value = S.sc.text; showInstant();
+  };
+  $('#iOrigin').onchange = edit; $('#iKind').onchange = edit; $('#iSev').onchange = edit;
+  $('#iSev').oninput = e => { e.target.nextElementSibling.textContent = e.target.value + '%'; };
+}
+async function runFromText(text) {
+  text = (text || '').trim(); if (!text) { $('#sText').focus(); return; }
+  $('#sText').value = text; $('#sText').blur();
+  S.sc = await parseSmart(text);
+  renderInterp(); await play();
+}
+function prepare() {
+  S.res = runShock(S.sc);
+  if (S.loops) setLoops(false, true);
+  S.sel = null; S.srcSel = null; renderDetail();
+  if (S.focus !== S.res.sc.origin) { S.focus = S.res.sc.origin; buildMap(); }
+}
+const HOP_CAP = (sc, i) => i === 0
+  ? (sc.kind === 'demand' ? `${short(sc.origin)} pays less, so its suppliers lose revenue.` : `${short(sc.origin)} cannot deliver, so its customers go short.`)
+  : (sc.kind === 'demand' ? 'Hit companies cut their own orders, so the shock moves to their suppliers.' : 'Short companies deliver less, so the shock moves to their customers.');
+async function play() {
+  prepare();
+  const res = S.res, my = ++S.animToken, dead = () => my !== S.animToken, rev = res.sc.kind === 'demand';
+  S.animating = true; S.shown = {}; S.hot = new Set(); S.hop = 0; S.live = {}; S.liveEq = {}; S.cap = 'The shock starts at ' + short(res.sc.origin) + '.';
+  [gParticles, gPulse, gShock, gFloat].forEach(g => g.innerHTML = '');
+  renderCap(); paintMap(); renderPortfolio(); renderReport();
+  $('#repBlk').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  blast(res.sc.origin);
+  await sleep(900);
+  let prev = {};
+  for (let i = 0; i < res.hops.length; i++) {
+    if (dead()) return;
+    const h = res.hops[i]; S.hop = i + 1; S.cap = HOP_CAP(res.sc, i); renderCap();
+    for (const f of h.fired) { burn(f.link, rev, 700, RED); particle(f.link, rev, Math.min(1, 0.35 + Math.sqrt(f.usd) / 5), RED, 700); }
+    await sleep(720);
+    if (dead()) return;
+    for (const f of h.fired) S.hot.add(f.link);
+    S.shown = h.pct; paintMap();
+    const hit = Object.keys(h.loss).filter(id => h.loss[id] - (prev[id] || 0) > 1e-6).sort((x, y) => (h.loss[y] - (prev[y] || 0)) - (h.loss[x] - (prev[x] || 0)));
+    const delta = Object.fromEntries(hit.map(id => [id, h.loss[id] - (prev[id] || 0)]));
+    hit.forEach((id, k) => setTimeout(() => {
+      if (dead()) return;
+      impact(id, RED); floater(id, '-' + fB(delta[id]) + '/yr', RED); strike(id);
+      S.live[id] = { pct: h.pct[id], loss: h.loss[id] }; renderReport(); renderCap();
+    }, k * 80));
+    prev = h.loss;
+    await sleep(Math.max(600, hit.length * 80 + 420));
+  }
+  if (dead()) return;
+  const inv = Object.entries(res.eq).filter(([id]) => P[id]);
+  if (inv.length) {
+    S.cap = 'The loop closes: investors write down their stakes.'; renderCap();
+    for (const [, es] of inv) for (const e of es) if (EDGE[e.link]) { burn(e.link, true, 800, ORANGE); particle(e.link, true, 0.8, ORANGE, 800); }
+    await sleep(820);
+    if (dead()) return;
+    inv.forEach(([id, es], k) => setTimeout(() => {
+      if (dead()) return;
+      const usd = es.reduce((a, e) => a + e.usd, 0);
+      impact(id, ORANGE); floater(id, '-' + fB(usd) + ' stake', '#A85800', true); strike(id);
+      S.liveEq[id] = usd; renderReport();
+    }, k * 90));
+    await sleep(inv.length * 90 + 700);
+  }
+  if (dead()) return;
+  settle();
+}
+function settle() {
+  const res = S.res;
+  S.animating = false; S.shown = res.pct; S.hop = res.hops.length; S.hot = new Set(res.hops.flatMap(h => h.fired.map(f => f.link)));
+  S.live = Object.fromEntries(res.rows.filter(r => r.loss).map(r => [r.id, { pct: r.pct, loss: r.loss }]));
+  S.liveEq = Object.fromEntries(res.rows.filter(r => r.eq).map(r => [r.id, r.eq]));
+  S.cap = `${res.rows.filter(r => r.loss > 0).length} companies lose revenue. The full report is on the right.`;
+  renderCap(); paintMap(); renderPortfolio(); renderReport(); renderDetail();
+}
+function showInstant() { S.animToken++; prepare(); [gParticles, gPulse, gShock, gFloat].forEach(g => g.innerHTML = ''); renderInterp(); settle(); }
+function clearScenario() {
+  S.animToken++; S.animating = false; S.res = null; S.sc = null; S.shown = null; S.hot = new Set(); S.hop = 0; S.live = {}; S.liveEq = {};
+  [gParticles, gPulse, gShock, gFloat].forEach(g => g && (g.innerHTML = ''));
+  $('#sText').value = ''; renderInterp(); renderCap(); paintMap(); renderPortfolio(); renderReport(); renderDetail();
+}
+
+// ---------- report ----------
+function renderReport() {
+  const b = $('#repBlk'); if (!S.res) { b.classList.add('hide'); b.innerHTML = ''; return; }
+  const res = S.res, run = S.animating;
+  const rows = res.rows.filter(r => S.live[r.id]).map(r => ({ ...r, ...S.live[r.id] })).sort((a, b) => b.pct - a.pct);
+  const held = rows.filter(r => S.pf.has(r.id)), pfLoss = held.reduce((s, r) => s + r.loss, 0), all = rows.reduce((s, r) => s + r.loss, 0);
+  const eqRows = Object.entries(S.liveEq).sort((a, b) => b[1] - a[1]), pfEq = eqRows.filter(([id]) => S.pf.has(id)).reduce((s, [, v]) => s + v, 0);
+  const via = held.filter(r => (res.contrib[r.id] || []).some(c => c.from !== res.sc.origin && !S.pf.has(c.from)));
+  const n = S.pf.size;
+  b.classList.remove('hide');
+  b.innerHTML = `<div class="rep-h"><span class="lbl" style="color:var(--danger)">Report${run ? ' · running' : ''}</span><div style="display:flex;gap:6px"><button class="btn" id="rReplay">Replay</button><button class="btn ghost" id="rClear">Clear</button></div></div>
+    <div class="rep-t">${esc(describe(res.sc))}</div>
+    <div class="kpis"><div><span class="lbl">Your holdings</span><b>-${fB(pfLoss)}/yr</b></div><div><span class="lbl">All companies</span><b>-${fB(all)}/yr</b></div><div><span class="lbl">Your stakes</span><b>-${fB(pfEq)}</b></div></div>
+    ${run ? '' : `<p class="lead">Your ${n} holding${n === 1 ? '' : 's'} lose an estimated <b>${fB(pfLoss)}/yr</b> of revenue; ${via.length} of them through companies you don't own.</p>`}
+    <div class="sub"><span class="lbl">Revenue at risk, by company</span><span class="note">% of revenue</span></div>
+    <table class="rt"><tbody>${rows.map(r => `<tr data-node="${r.id}"><td class="nm"><b class="${S.pf.has(r.id) ? 'own' : ''}">${esc(tick(r.id))}</b>${C[r.id].leverage_flag ? ' <span class="tag lev" title="' + esc(C[r.id].leverage_flag) + '">LEVERAGE AMPLIFIES THIS</span>' : ''}<div>${r.path.map(short).map(esc).join(' &rsaquo; ')} ${tagHTML(r.conf)}</div></td>
+      <td class="bar"><i style="width:${Math.max(2, Math.min(100, r.pct / 0.4 * 100))}%"></i></td><td class="num p">-${fP(r.pct, r.pct < 0.01 ? 2 : 1)}</td><td class="num">${fB(r.loss)}</td></tr>`).join('') || '<tr><td class="note">Waiting for the first hit.</td></tr>'}</tbody></table>
+    ${eqRows.length ? `<div class="sub"><span class="lbl">Stake writedowns</span><span class="note">separate from revenue</span></div><table class="rt"><tbody>${eqRows.map(([id, v]) => `<tr data-node="${id}"><td class="nm"><b class="${S.pf.has(id) ? 'own' : ''}">${esc(tick(id))}</b><div>stake in ${esc([...new Set(res.eq[id].map(e => short(L[e.link].to)))].join(', '))}</div></td><td class="num p">-${fB(v)}</td></tr>`).join('')}</tbody></table>` : ''}
+    ${run ? '' : `<div class="sub"><span class="lbl">Summary</span></div><p class="summary">${explainText()}</p>
+    <details class="trace"><summary>How the AI got this<span class="tag REPORTED">RECORDED RUN</span></summary>${traceSteps().map(s => `<div class="call"><div class="f">${esc(s.fn)}(${esc(s.args)})<span>${s.ms} ms</span></div><pre>${esc(s.out)}</pre></div>`).join('')}</details>
+    <p class="note" style="margin:12px 0 0">The AI calls these tools and never invents a number. Assumptions: 0.6 damping per hop, stake drop 1.5 x shock. Not investment advice.</p>`}`;
+  $('#rReplay').onclick = () => play(); $('#rClear').onclick = () => clearScenario();
+  b.querySelectorAll('tr[data-node]').forEach(tr => tr.onclick = () => select('node', tr.dataset.node));
+}
+
+// ---------- animation helpers ----------
+function anim(dur, fn, done) { const t0 = performance.now(); const step = now => { const t = Math.min(1, (now - t0) / dur); fn(t); if (t < 1) requestAnimationFrame(step); else done && done(); }; requestAnimationFrame(step); }
+function strike(id) { const c = $(`#chips .chip[data-id="${id}"]`); if (c) { c.classList.remove('struck'); void c.offsetWidth; c.classList.add('struck'); } }
+function blast(id) {
+  if (!P[id]) return; const { x, y } = P[id];
+  for (let k = 0; k < 3; k++) { const c = el('circle', { cx: x, cy: y, r: R[id], fill: 'none', stroke: RED, 'stroke-width': 2, 'pointer-events': 'none', opacity: 0 }, gPulse); setTimeout(() => anim(1000, t => { c.setAttribute('r', R[id] + t * 90); c.setAttribute('opacity', (1 - t).toFixed(2)); }, () => c.remove()), k * 220); }
+}
+function burn(linkId, reverse, dur, color) {
+  const e = EDGE[linkId]; if (!e) return; const len = e.p.getTotalLength();
+  const b = el('path', { d: e.p.getAttribute('d'), class: 'burn', stroke: color, 'stroke-width': (e.w + 1.5).toFixed(2), 'stroke-dasharray': `${len} ${len}`, 'stroke-dashoffset': reverse ? -len : len }, gShock);
+  anim(dur, t => { const k = t < .5 ? 2 * t * t : 1 - Math.pow(-2 * t + 2, 2) / 2; b.setAttribute('stroke-dashoffset', ((reverse ? -len : len) * (1 - k)).toFixed(1)); }, () => anim(500, t => b.setAttribute('opacity', (1 - t).toFixed(2)), () => b.remove()));
+}
+function particle(linkId, reverse, size, color, dur) {
+  const e = EDGE[linkId]; if (!e) return; const len = e.p.getTotalLength();
+  const c = el('circle', { r: 3 + 4 * size, fill: color, stroke: '#fff', 'stroke-width': 1.5, 'pointer-events': 'none' }, gParticles);
+  anim(dur, t => { const k = t < .5 ? 2 * t * t : 1 - Math.pow(-2 * t + 2, 2) / 2; const pt = e.p.getPointAtLength(len * (reverse ? 1 - k : k)); c.setAttribute('cx', pt.x); c.setAttribute('cy', pt.y); }, () => c.remove());
+}
+function impact(id, color) {
+  if (!P[id]) return; const { x, y } = P[id], r0 = R[id], n = NODE[id];
+  const c = el('circle', { cx: x, cy: y, r: r0, fill: 'none', stroke: color, 'stroke-width': 3, 'pointer-events': 'none' }, gPulse);
+  anim(750, t => { c.setAttribute('r', r0 + t * 40); c.setAttribute('opacity', (1 - t).toFixed(2)); }, () => c.remove());
+  anim(420, t => n.core.setAttribute('r', (r0 * (1 + 0.25 * Math.sin(Math.PI * t))).toFixed(2)), () => n.core.setAttribute('r', r0));
+}
+function floater(id, text, color, below) {
+  if (!P[id]) return; const { x, y } = P[id], off = Math.max(R[id] + 10, 22);
+  const t = el('text', below ? { x, y: y + R[id] + 58, class: 'floater', fill: color, 'text-anchor': 'middle' } : { x: x + off, y: y + 5, class: 'floater', fill: color, 'text-anchor': 'start' }, gFloat); t.textContent = text;
+  anim(2000, k => { t.setAttribute('transform', `translate(0,${(-14 * (1 - Math.pow(1 - k, 3))).toFixed(1)})`); t.setAttribute('opacity', k < .75 ? 1 : ((1 - k) / .25).toFixed(2)); }, () => t.remove());
+}
+
+// ---------- money loops ----------
+function setLoops(on, quiet) {
+  S.loops = on;
+  if (on) { clearScenario(); S.sel = null; renderDetail(); if (S.focus !== 'openai') { S.focus = 'openai'; buildMap(); } }
+  if (!quiet) { renderCap(); paintMap(); }
+}
+
+// ---------- sources ----------
+function filteredSources() {
+  const q = S.q.trim().toLowerCase();
+  return DATA.sources.filter(s => (S.fType === 'All' || s.type === S.fType) && (!q || [s.title, s.used_for, s.type, C[s.company]?.name, C[s.company]?.ticker].join(' ').toLowerCase().includes(q)));
+}
+function renderSources() {
+  const list = filteredSources().sort((a, b) => b.date.localeCompare(a.date));
+  $('#srcT').textContent = `${list.length} of ${DATA.sources.length} source documents`;
+  $('#types').innerHTML = ['All', ...new Set(DATA.sources.map(s => s.type))].map(t => `<button class="chip" data-t="${esc(t)}" aria-pressed="${S.fType === t}">${esc(t)}</button>`).join('');
+  $$('#types .chip').forEach(b => b.onclick = () => { S.fType = b.dataset.t; renderSources(); paintMap(); });
+  $('#srcList').innerHTML = list.map(s => `<button class="srow${S.srcSel === s.id ? ' on' : ''}" data-src="${s.id}"><div class="m"><span>${esc(s.date)}</span><span class="tag DISCLOSED">${esc(s.type.toUpperCase())}</span><span>${esc(C[s.company]?.name || '')}</span>${verTag(s.verification)}</div><div class="t">${esc(s.title)}</div><div class="u">Used for: ${esc(s.used_for)}</div>${S.srcSel === s.id ? `<div class="u" style="margin-top:4px"><a href="${esc(s.url)}" target="_blank" rel="noopener">Open the document</a></div>` : ''}</button>`).join('') || '<p class="note" style="padding:16px 20px">No document matches.</p>';
+  $$('#srcList .srow').forEach(b => b.onclick = e => { if (e.target.tagName === 'A') return; S.srcSel = S.srcSel === b.dataset.src ? null : b.dataset.src; renderSources(); paintMap(); });
+}
+function openSources(sid) {
+  S.srcOpen = true; S.srcSel = sid || null; S.sel = null; renderDetail();
+  $('#src').classList.remove('hide'); $('#scrim').classList.remove('hide'); renderSources(); paintMap();
+  const on = $('#srcList .srow.on'); if (on) on.scrollIntoView({ block: 'center' }); else $('#fq').focus();
+}
+function closeSources() { S.srcOpen = false; S.srcSel = null; $('#src').classList.add('hide'); $('#scrim').classList.add('hide'); paintMap(); }
+
+// ---------- init ----------
 function init() {
-  buildMap();
-  $('#mapMeta').textContent = `${IDS.length} companies · ${DATA.links.length} links · ${DATA.sources.length} sources`;
-  fillSelects();
-  $('#presets').innerHTML = PRESETS.map(p => `<button class="preset" data-t="${esc(p.t)}"><span>${esc(p.t)}</span>${p.k ? '<small>HERO</small>' : ''}</button>`).join('');
-  $$('.preset').forEach(b => b.addEventListener('click', () => runFromText(b.dataset.t)));
-  $('#sForm').addEventListener('submit', e => { e.preventDefault(); const t = $('#sText').value.trim(); if (t) runFromText(t); });
-  $('#iOrigin').addEventListener('change', () => { fillTargets(); S.sc = { ...controlsToScenario(), notes: ['edited by hand'] }; renderInterp(); showInstant(); });
-  $('#iKind').addEventListener('change', () => { fillTargets(); S.sc = { ...controlsToScenario(), notes: ['edited by hand'] }; renderInterp(); showInstant(); });
-  $('#iTarget').addEventListener('change', () => { S.sc = { ...controlsToScenario(), notes: ['edited by hand'] }; renderInterp(); showInstant(); });
-  ['#iSev', '#iEq', '#iDamp'].forEach(s => $(s).addEventListener('input', () => { syncOutputs(); S.sc = controlsToScenario(); renderInterp(); if (S.res) showInstant(); }));
-  $('#loopBtn').addEventListener('click', () => toggleLoops());
-  $('#chokeBtn').addEventListener('click', () => toggleChokes());
-  const openHow = () => $('#how').classList.remove('hide');
-  $('#howBtn').addEventListener('click', openHow); $('#howBtn2').addEventListener('click', openHow);
-  $('#howClose').addEventListener('click', () => $('#how').classList.add('hide'));
-  $('#how').addEventListener('click', e => { if (e.target.id === 'how') $('#how').classList.add('hide'); });
-  $$('.tab[data-tab]').forEach(b => b.addEventListener('click', () => setTab(b.dataset.tab)));
-  $('#drawerToggle').addEventListener('click', toggleDrawer);
-  $('#trReplay').addEventListener('click', () => renderTrace(true));
-  const reset = () => { S.q = ''; $('#cmd').value = ''; $('#fq').value = ''; S.fType = 'All'; if (S.loops) toggleLoops(false); select(null); };
-  $('#brand').addEventListener('click', reset);
-  $('#brand').addEventListener('keydown', e => { if (e.key === 'Enter') reset(); });
-  // search
-  const cmd = $('#cmd');
-  cmd.addEventListener('input', () => { menuIdx = 0; setQuery(cmd.value, 'cmd'); renderMenu(); if (cmd.value.trim() && !SCEN_RE.test(cmd.value) && S.tab !== 'filings') setTab('filings'); });
-  cmd.addEventListener('focus', renderMenu);
-  cmd.addEventListener('blur', () => setTimeout(closeMenu, 120));
-  cmd.addEventListener('keydown', e => {
-    const items = cmdItems(cmd.value);
-    if (e.key === 'ArrowDown') { e.preventDefault(); menuIdx = Math.min(items.length - 1, menuIdx + 1); renderMenu(); }
-    else if (e.key === 'ArrowUp') { e.preventDefault(); menuIdx = Math.max(0, menuIdx - 1); renderMenu(); }
-    else if (e.key === 'Enter') { e.preventDefault(); if (items[menuIdx]) items[menuIdx].act(); }
-    else if (e.key === 'Escape') { setQuery('', ''); closeMenu(); cmd.blur(); }
-  });
-  $('#fq').addEventListener('input', e => setQuery(e.target.value, 'fq'));
+  $('#nLoops').textContent = LOOPS.loops.length; $('#nSrc').textContent = DATA.sources.length;
+  $('#presets').innerHTML = PRESETS.map((t, i) => `<button class="preset" data-t="${esc(t)}">${esc(t)}<span>${i === 0 ? 'try this' : 'run'}</span></button>`).join('');
+  $$('.preset').forEach(b => b.onclick = () => runFromText(b.dataset.t));
+  $('#askForm').onsubmit = e => { e.preventDefault(); runFromText($('#sText').value || PRESETS[0]); };
+  $$('.views button').forEach(b => b.onclick = () => setLoops(b.dataset.mode === 'loops'));
+  $('#brand').onclick = () => { clearScenario(); S.sel = null; S.loops = false; S.focus = 'openai'; buildMap(); renderCap(); renderDetail(); };
+  $('#srcBtn').onclick = () => openSources(); $('#srcX').onclick = closeSources; $('#scrim').onclick = closeSources;
+  $('#fq').oninput = e => { S.q = e.target.value; renderSources(); paintMap(); };
+  $('#howBtn').onclick = () => $('#how').classList.remove('hide');
+  $('#howX').onclick = () => $('#how').classList.add('hide');
+  $('#how').onclick = e => { if (e.target.id === 'how') $('#how').classList.add('hide'); };
+  $('#map').addEventListener('click', () => { if (S.sel) select(null); });
   document.addEventListener('keydown', e => {
-    if (e.key === '/' && !/INPUT|TEXTAREA|SELECT/.test(document.activeElement.tagName)) { e.preventDefault(); cmd.focus(); }
-    if (e.key === 'Escape') { $('#how').classList.add('hide'); if (S.sel) select(null); }
+    if (e.key !== 'Escape') return;
+    if (!$('#how').classList.contains('hide')) $('#how').classList.add('hide'); else if (S.srcOpen) closeSources(); else if (S.sel) select(null);
   });
-  // default scenario loaded in the controls, not yet run
-  S.sc = parseScenario(PRESETS[0].t); scenarioToControls(S.sc); syncOutputs();
-  renderLoops(); renderFilings(); renderAll(); renderParser(); checkLive();
+  buildMap(); renderCap(); renderPortfolio(); renderInterp(); renderReport(); renderParser(); checkLive();
 }
 init();
-
-(function(){ try { var w=document.querySelector('.mapwrap'); if(w&&w.scrollWidth>w.clientWidth) w.scrollLeft=(w.scrollWidth-w.clientWidth)/2; } catch(e){} })();
 </script>
 </body>
 </html>
