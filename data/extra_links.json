@@ -1,0 +1,399 @@
+{
+ "note": "Hand-added links outside the model bundle, from secondary sources found on 2026-10-07. Read the primary documents before quoting.",
+ "nodes": [
+  {
+   "id": "zeiss",
+   "name": "Carl Zeiss SMT",
+   "ticker": null,
+   "sp": false,
+   "sector": null,
+   "sub": null,
+   "cap": null,
+   "capBasis": null,
+   "capAsOf": null,
+   "capNote": null,
+   "rev": null,
+   "revEnd": null,
+   "region": "Europe",
+   "tier": "core",
+   "inModel": true,
+   "type": "private_company"
+  },
+  {
+   "id": "ajinomoto",
+   "name": "Ajinomoto",
+   "ticker": null,
+   "sp": false,
+   "sector": null,
+   "sub": null,
+   "cap": null,
+   "capBasis": null,
+   "capAsOf": null,
+   "capNote": null,
+   "rev": null,
+   "revEnd": null,
+   "region": "APAC",
+   "tier": "core",
+   "inModel": true,
+   "type": "foreign_company"
+  },
+  {
+   "id": "sibelco",
+   "name": "Sibelco (Spruce Pine quartz)",
+   "ticker": null,
+   "sp": false,
+   "sector": null,
+   "sub": null,
+   "cap": null,
+   "capBasis": null,
+   "capAsOf": null,
+   "capNote": null,
+   "rev": null,
+   "revEnd": null,
+   "region": "Europe",
+   "tier": "core",
+   "inModel": true,
+   "type": "private_company"
+  },
+  {
+   "id": "quartz_corp",
+   "name": "The Quartz Corp (Spruce Pine quartz)",
+   "ticker": null,
+   "sp": false,
+   "sector": null,
+   "sub": null,
+   "cap": null,
+   "capBasis": null,
+   "capAsOf": null,
+   "capNote": null,
+   "rev": null,
+   "revEnd": null,
+   "region": "Europe",
+   "tier": "core",
+   "inModel": true,
+   "type": "private_company"
+  },
+  {
+   "id": "jsr",
+   "name": "JSR Corporation",
+   "ticker": null,
+   "sp": false,
+   "sector": null,
+   "sub": null,
+   "cap": null,
+   "capBasis": null,
+   "capAsOf": null,
+   "capNote": null,
+   "rev": null,
+   "revEnd": null,
+   "region": "APAC",
+   "tier": "core",
+   "inModel": true,
+   "type": "foreign_company"
+  },
+  {
+   "id": "tok",
+   "name": "Tokyo Ohka Kogyo",
+   "ticker": null,
+   "sp": false,
+   "sector": null,
+   "sub": null,
+   "cap": null,
+   "capBasis": null,
+   "capAsOf": null,
+   "capNote": null,
+   "rev": null,
+   "revEnd": null,
+   "region": "APAC",
+   "tier": "core",
+   "inModel": true,
+   "type": "foreign_company"
+  },
+  {
+   "id": "shin_etsu",
+   "name": "Shin-Etsu Chemical",
+   "ticker": null,
+   "sp": false,
+   "sector": null,
+   "sub": null,
+   "cap": null,
+   "capBasis": null,
+   "capAsOf": null,
+   "capNote": null,
+   "rev": null,
+   "revEnd": null,
+   "region": "APAC",
+   "tier": "core",
+   "inModel": true,
+   "type": "foreign_company"
+  }
+ ],
+ "links": [
+  {
+   "id": "supply:zeiss>asml",
+   "from": "zeiss",
+   "to": "asml",
+   "type": "supply",
+   "label": "Sole supplier of EUV optics (lenses, mirrors)",
+   "status": "active",
+   "exist": "REPORTED",
+   "method": "hand_added",
+   "review": "unreviewed",
+   "role": "propagates",
+   "conf": "REPORTED",
+   "basis": "hand_added",
+   "note": "Sole source, as reported from the ASML annual report. Not read in the original by us.",
+   "reliance": 1.0,
+   "relNote": "Sole source, as reported from the ASML annual report. Not read in the original by us."
+  },
+  {
+   "id": "supply:asml>tsmc",
+   "from": "asml",
+   "to": "tsmc",
+   "type": "supply",
+   "label": "Sole supplier of EUV lithography machines",
+   "status": "active",
+   "exist": "REPORTED",
+   "method": "hand_added",
+   "review": "unreviewed",
+   "role": "propagates",
+   "conf": "REPORTED",
+   "basis": "hand_added",
+   "note": "Sole source for EUV machines, which the most advanced chips need.",
+   "reliance": 1.0,
+   "relNote": "Sole source for EUV machines, which the most advanced chips need."
+  },
+  {
+   "id": "supply:jsr>tsmc",
+   "from": "jsr",
+   "to": "tsmc",
+   "type": "supply",
+   "label": "EUV photoresist (industry share, customer not confirmed)",
+   "status": "active",
+   "exist": "DISCLOSED",
+   "method": "hand_added",
+   "review": "unreviewed",
+   "role": "propagates",
+   "conf": "ESTIMATED",
+   "basis": "hand_added",
+   "note": "Inferred from market share. The source does not name TSMC as this company's customer."
+  },
+  {
+   "id": "supply:tok>tsmc",
+   "from": "tok",
+   "to": "tsmc",
+   "type": "supply",
+   "label": "EUV photoresist (industry share, customer not confirmed)",
+   "status": "active",
+   "exist": "DISCLOSED",
+   "method": "hand_added",
+   "review": "unreviewed",
+   "role": "propagates",
+   "conf": "ESTIMATED",
+   "basis": "hand_added",
+   "note": "Inferred from market share. The source does not name TSMC as this company's customer."
+  },
+  {
+   "id": "supply:shin_etsu>tsmc",
+   "from": "shin_etsu",
+   "to": "tsmc",
+   "type": "supply",
+   "label": "EUV photoresist (industry share, customer not confirmed)",
+   "status": "active",
+   "exist": "DISCLOSED",
+   "method": "hand_added",
+   "review": "unreviewed",
+   "role": "propagates",
+   "conf": "ESTIMATED",
+   "basis": "hand_added",
+   "note": "Inferred from market share. The source does not name TSMC as this company's customer."
+  },
+  {
+   "id": "supply:sibelco>tsmc",
+   "from": "sibelco",
+   "to": "tsmc",
+   "type": "supply",
+   "label": "High-purity quartz for wafer crucibles (reaches TSMC through crucible and wafer makers)",
+   "status": "active",
+   "exist": "DISCLOSED",
+   "method": "hand_added",
+   "review": "unreviewed",
+   "role": "propagates",
+   "conf": "ESTIMATED",
+   "basis": "hand_added",
+   "note": "Shortcut: the crucible and wafer makers in between are not in the data."
+  },
+  {
+   "id": "supply:quartz_corp>tsmc",
+   "from": "quartz_corp",
+   "to": "tsmc",
+   "type": "supply",
+   "label": "High-purity quartz for wafer crucibles (reaches TSMC through crucible and wafer makers)",
+   "status": "active",
+   "exist": "DISCLOSED",
+   "method": "hand_added",
+   "review": "unreviewed",
+   "role": "propagates",
+   "conf": "ESTIMATED",
+   "basis": "hand_added",
+   "note": "Shortcut: the crucible and wafer makers in between are not in the data."
+  },
+  {
+   "id": "supply:ajinomoto>nvda",
+   "from": "ajinomoto",
+   "to": "nvda",
+   "type": "supply",
+   "label": "ABF packaging film (reaches the chip maker through substrate makers)",
+   "status": "active",
+   "exist": "DISCLOSED",
+   "method": "hand_added",
+   "review": "unreviewed",
+   "role": "propagates",
+   "conf": "ESTIMATED",
+   "basis": "hand_added",
+   "note": "Shortcut: the substrate makers in between are not in the data."
+  },
+  {
+   "id": "supply:ajinomoto>amd",
+   "from": "ajinomoto",
+   "to": "amd",
+   "type": "supply",
+   "label": "ABF packaging film (reaches the chip maker through substrate makers)",
+   "status": "active",
+   "exist": "DISCLOSED",
+   "method": "hand_added",
+   "review": "unreviewed",
+   "role": "propagates",
+   "conf": "ESTIMATED",
+   "basis": "hand_added",
+   "note": "Shortcut: the substrate makers in between are not in the data."
+  },
+  {
+   "id": "supply:ajinomoto>intc",
+   "from": "ajinomoto",
+   "to": "intc",
+   "type": "supply",
+   "label": "ABF packaging film (reaches the chip maker through substrate makers)",
+   "status": "active",
+   "exist": "DISCLOSED",
+   "method": "hand_added",
+   "review": "unreviewed",
+   "role": "propagates",
+   "conf": "ESTIMATED",
+   "basis": "hand_added",
+   "note": "Shortcut: the substrate makers in between are not in the data."
+  }
+ ],
+ "evidence": {
+  "supply:zeiss>asml": [
+   {
+    "q": "ASML's annual report describes Carl Zeiss SMT as its sole supplier of lenses, mirrors and other optical components, and says ASML could not conduct its business without it.",
+    "kind": "paraphrase",
+    "doc": "news",
+    "filed": null,
+    "url": "https://tomshardware.com/tech-industry/zeiss-expands-german-site-that-caps-asmls-euv-scanner-output",
+    "by": null,
+    "tier": 2
+   }
+  ],
+  "supply:asml>tsmc": [
+   {
+    "q": "ASML is the only maker of EUV lithography machines, and TSMC is its largest customer.",
+    "kind": "paraphrase",
+    "doc": "news",
+    "filed": null,
+    "url": "https://www.fool.com/investing/2024/10/20/better-chip-stock-asml-vs-tsmc",
+    "by": null,
+    "tier": 2
+   }
+  ],
+  "supply:jsr>tsmc": [
+   {
+    "q": "Japanese firms supply about 90% of EUV photoresist; JSR, Tokyo Ohka and Shin-Etsu are the main producers.",
+    "kind": "paraphrase",
+    "doc": "news",
+    "filed": null,
+    "url": "https://asiatimes.com/?p=655728",
+    "by": null,
+    "tier": 2
+   }
+  ],
+  "supply:tok>tsmc": [
+   {
+    "q": "Japanese firms supply about 90% of EUV photoresist; JSR, Tokyo Ohka and Shin-Etsu are the main producers.",
+    "kind": "paraphrase",
+    "doc": "news",
+    "filed": null,
+    "url": "https://asiatimes.com/?p=655728",
+    "by": null,
+    "tier": 2
+   }
+  ],
+  "supply:shin_etsu>tsmc": [
+   {
+    "q": "Japanese firms supply about 90% of EUV photoresist; JSR, Tokyo Ohka and Shin-Etsu are the main producers.",
+    "kind": "paraphrase",
+    "doc": "news",
+    "filed": null,
+    "url": "https://asiatimes.com/?p=655728",
+    "by": null,
+    "tier": 2
+   }
+  ],
+  "supply:sibelco>tsmc": [
+   {
+    "q": "The Spruce Pine mines, run by Sibelco and The Quartz Corp, produce an estimated 70 to 90% of the world's high-purity quartz for semiconductors.",
+    "kind": "paraphrase",
+    "doc": "news",
+    "filed": null,
+    "url": "https://en.wikipedia.org/wiki/High-purity_quartz",
+    "by": null,
+    "tier": 2
+   }
+  ],
+  "supply:quartz_corp>tsmc": [
+   {
+    "q": "The Spruce Pine mines, run by Sibelco and The Quartz Corp, produce an estimated 70 to 90% of the world's high-purity quartz for semiconductors.",
+    "kind": "paraphrase",
+    "doc": "news",
+    "filed": null,
+    "url": "https://en.wikipedia.org/wiki/High-purity_quartz",
+    "by": null,
+    "tier": 2
+   }
+  ],
+  "supply:ajinomoto>nvda": [
+   {
+    "q": "Ajinomoto holds over 95% of the market for ABF, the insulating film used in advanced chip packaging substrates.",
+    "kind": "paraphrase",
+    "doc": "news",
+    "filed": null,
+    "url": "https://www.trendforce.com/news/2025/04/01/news-japanese-firm-ajinomoto-to-invest-jpy-25-billion-by-2030-to-expand-abf-production-for-advanced-packaging/",
+    "by": null,
+    "tier": 2
+   }
+  ],
+  "supply:ajinomoto>amd": [
+   {
+    "q": "Ajinomoto holds over 95% of the market for ABF, the insulating film used in advanced chip packaging substrates.",
+    "kind": "paraphrase",
+    "doc": "news",
+    "filed": null,
+    "url": "https://www.trendforce.com/news/2025/04/01/news-japanese-firm-ajinomoto-to-invest-jpy-25-billion-by-2030-to-expand-abf-production-for-advanced-packaging/",
+    "by": null,
+    "tier": 2
+   }
+  ],
+  "supply:ajinomoto>intc": [
+   {
+    "q": "Ajinomoto holds over 95% of the market for ABF, the insulating film used in advanced chip packaging substrates.",
+    "kind": "paraphrase",
+    "doc": "news",
+    "filed": null,
+    "url": "https://www.trendforce.com/news/2025/04/01/news-japanese-firm-ajinomoto-to-invest-jpy-25-billion-by-2030-to-expand-abf-production-for-advanced-packaging/",
+    "by": null,
+    "tier": 2
+   }
+  ]
+ }
+}

@@ -1,6 +1,6 @@
 // Upstream local server. No dependencies (Node 18+).
 // Serves index.html and exposes POST /api/parse-scenario, which asks Claude to turn a
-// free-text scenario into { origin, target, kind, severity }. The API key stays on this
+// free-text scenario into starting groups { origins, kind, direction, severity }. The API key stays on this
 // machine: it is read from the environment (or a local .env file) and never sent to the browser.
 //
 //   ANTHROPIC_API_KEY=sk-ant-... node server.js     ->  http://localhost:3000
@@ -21,36 +21,52 @@ try {
 const PORT = +process.env.PORT || 3000;
 const KEY = process.env.ANTHROPIC_API_KEY || '';
 const MODEL = process.env.UPSTREAM_MODEL || 'claude-sonnet-5';
-const companies = JSON.parse(fs.readFileSync(path.join(ROOT, 'data/companies.json'), 'utf8'));
-const links = JSON.parse(fs.readFileSync(path.join(ROOT, 'data/links.json'), 'utf8'));
-const IDS = companies.map(c => c.id);
+const graph = JSON.parse(fs.readFileSync(path.join(ROOT, 'data/graph.json'), 'utf8'));
+const inModel = new Set(graph.links.filter(l => l.model_role === 'propagates').flatMap(l => [l.from, l.to]));
+const companies = graph.nodes.filter(n => inModel.has(n.id));
 
-const SYSTEM = `You turn an investor's "what could go wrong" scenario into parameters for a shock model.
-Companies (id: name, ticker): ${companies.map(c => `${c.id}: ${c.name} (${c.ticker})`).join('; ')}.
-Supply links (seller -> buyer): ${links.filter(l => l.type === 'supply').map(l => `${l.from}->${l.to}`).join(', ')}.
-Rules:
-- origin = the company where the problem starts.
-- kind = "demand" if origin buys less / pays less / misses payments (hits its sellers upstream);
-  "supply" if origin cannot deliver what it sells (hits its buyers downstream).
-- target = one counterparty id if the scenario names a single deal, else "".
-  For demand, target must be a seller to origin; for supply, a buyer from origin.
-- severity = fraction 0..1. Use the stated %; "misses payments", "defaults" or "cancels" = 1.0; "halves" = 0.5; unstated = 0.4.
-- Only business scenarios. If the text is political or not about these companies, pick the closest business reading and say so in reason.
+const SYSTEM = `You turn an investor's "what if" scenario into the starting point of a network model of companies.
+The model then spreads the effect along supply links by itself. You only choose where it starts, in which direction and how big.
+You never choose which other companies get affected after that.
+Companies (id: name): ${companies.map(c => `${c.id}: ${c.name}`).join('; ')}.
+
+Return 1 to 4 groups. Each group is a set of companies that the scenario touches first in the same way.
+- origins: 1 to 8 ids from the list, spelled exactly. Only companies the scenario acts on directly.
+- kind: "demand" if the effect then travels to their suppliers (they buy more or less);
+  "supply" if it travels to their customers (they deliver more or less).
+- direction: "negative" (they buy or deliver less, or lose value) or "positive" (they buy or deliver more, or gain value).
+- severity: fraction 0..1.
+- hits_them_directly: false for a company's own decision ("OpenAI cuts compute spending 40%": origins ["openai"], demand,
+  negative, 0.4, false - never add its suppliers). true for an outside event that changes the companies' own business
+  (a war ends, oil falls, a tariff, a rate change, a regulation): then severity is your estimate of the change in their
+  own value, usually 0.03 to 0.25, and you may use several groups with different directions
+  (e.g. oil falls: oil producers negative, airlines positive).
+- label: 2 to 4 words naming the group (e.g. "Oil producers").
+A named group such as "hyperscalers" or "AI compute buyers" means its members, e.g. msft, amzn, googl, meta, orcl, openai.
+If a number in the text measures something else (interest-rate points, a price), do not use it as the severity.
+title: a short neutral headline for the scenario, under 8 words.
+reason: one or two sentences on how you read it and what you assumed.
+If the text is political, model only its business consequences. If nothing company-level fits, return groups [] and say why.
 Always answer by calling set_scenario.`;
 
 const TOOL = {
   name: 'set_scenario',
-  description: 'Structured scenario for the shock model.',
+  description: 'Starting groups for the network model.',
   input_schema: {
     type: 'object',
     properties: {
-      origin: { type: 'string', enum: IDS },
-      target: { type: 'string', enum: ['', ...IDS] },
-      kind: { type: 'string', enum: ['demand', 'supply'] },
-      severity: { type: 'number', minimum: 0, maximum: 1 },
-      reason: { type: 'string', description: 'One short sentence on how you read the scenario.' }
+      title: { type: 'string' },
+      groups: { type: 'array', maxItems: 4, items: { type: 'object', properties: {
+        label: { type: 'string' },
+        origins: { type: 'array', items: { type: 'string' }, maxItems: 8 },
+        kind: { type: 'string', enum: ['demand', 'supply'] },
+        direction: { type: 'string', enum: ['negative', 'positive'] },
+        severity: { type: 'number', minimum: 0, maximum: 1 },
+        hits_them_directly: { type: 'boolean' }
+      }, required: ['label', 'origins', 'kind', 'direction', 'severity', 'hits_them_directly'] } },
+      reason: { type: 'string' }
     },
-    required: ['origin', 'target', 'kind', 'severity', 'reason']
+    required: ['title', 'groups', 'reason']
   }
 };
 
@@ -59,7 +75,7 @@ async function parseWithClaude(text) {
     method: 'POST',
     headers: { 'x-api-key': KEY, 'anthropic-version': '2023-06-01', 'content-type': 'application/json' },
     body: JSON.stringify({
-      model: MODEL, max_tokens: 400, system: SYSTEM,
+      model: MODEL, max_tokens: 900, system: SYSTEM,
       tools: [TOOL], tool_choice: { type: 'tool', name: 'set_scenario' },
       messages: [{ role: 'user', content: String(text).slice(0, 500) }]
     })
@@ -90,7 +106,7 @@ http.createServer(async (req, res) => {
       return send(res, 200, out);
     } catch (e) {
       console.error('[parse] failed:', e.message);
-      return send(res, 502, { error: 'parse failed' });
+      return send(res, 502, { error: /401/.test(e.message) ? 'API key rejected' : /40[34]|model/.test(e.message) ? 'model not available for this key' : 'request failed' });
     }
   }
   // static files, restricted to the project folder

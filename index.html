@@ -25,6 +25,7 @@ a{color:var(--accent-ink)}
 .mono{font-family:var(--mono)}
 .lbl{font:600 10.5px var(--sans);letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
 .note{font-size:12px;color:var(--muted)}
+body.pos{--danger:#0B7A2E;--danger-bg:#E6F3E9}
 :focus-visible{outline:2px solid var(--accent);outline-offset:1px}
 
 /* top bar */
@@ -83,7 +84,7 @@ a{color:var(--accent-ink)}
 .node.sel .selring,.node.match .selring{opacity:1}
 .node.match .selring{stroke:var(--accent);stroke-dasharray:3 3}
 .node:hover .core{stroke-width:4}
-.node .choke{fill:none;stroke:var(--ink);stroke-width:1.3;opacity:.7;pointer-events:none}
+.node .choke{fill:none;stroke:var(--ink);stroke-width:1.6;opacity:0;pointer-events:none}
 .node .choke-t{font:700 9.5px var(--sans);letter-spacing:.14em;fill:var(--ink);paint-order:stroke;stroke:var(--map);stroke-width:4px;opacity:0;pointer-events:none}
 .node.chokeon .choke,.node.chokeon .choke-t{opacity:1}
 .edge{fill:none;transition:opacity .25s,stroke .25s}
@@ -93,6 +94,59 @@ a{color:var(--accent-ink)}
 .badge-t{font:700 12px var(--mono);fill:var(--danger)}
 .badge-r{fill:#fff;stroke:var(--danger);stroke-width:1}
 .burn{fill:none;stroke-linecap:round;pointer-events:none}
+.more-t{font:600 11.5px var(--mono);fill:var(--accent-ink);cursor:pointer;text-decoration:underline}
+.ov-n{stroke:var(--map);stroke-width:1.4;vector-effect:non-scaling-stroke;cursor:pointer;transition:opacity .15s}
+.ov-n.nolink{stroke-width:.8}
+.ov-n.held{stroke:var(--ink);stroke-width:2.6}
+.ov-n.off{opacity:.1}
+.ov-n:hover{stroke:var(--ink);stroke-width:2}
+.ov-l{fill:none;opacity:.34;vector-effect:non-scaling-stroke;pointer-events:none;transition:opacity .15s}
+.ov-l.off{opacity:.03}
+.vp.focus .ov-n{opacity:.13}
+.vp.focus .ov-n.on{opacity:1}
+.vp.focus .ov-l{opacity:.03!important}
+.vp.focus .ov-l.on{opacity:.95!important}
+.ov-t{font-family:var(--mono);font-weight:600;font-size:calc(10.5px / var(--k,1));fill:var(--ink);paint-order:stroke;stroke:var(--map);stroke-width:calc(3px / var(--k,1));stroke-linejoin:round;pointer-events:none}
+.ov-sec{font-family:var(--sans);font-weight:700;font-size:calc(11px / var(--k,1));letter-spacing:.14em;text-transform:uppercase;fill:var(--muted);paint-order:stroke;stroke:var(--map);stroke-width:calc(4px / var(--k,1));stroke-linejoin:round;pointer-events:none}
+#map.panning{cursor:grabbing}
+.gl{position:absolute;inset:0;overflow:hidden;background:radial-gradient(ellipse at 50% 42%,#161B2B 0%,#090B12 62%,#05060A 100%)}
+.gl canvas{width:100%;height:100%;display:block;cursor:grab}
+.gl canvas:active{cursor:grabbing}
+.l3box{position:absolute;inset:0;pointer-events:none;overflow:hidden}
+.l3{position:absolute;left:0;top:0;font:600 11px var(--mono);color:#E6EAF2;text-shadow:0 0 5px #000,0 0 2px #000;white-space:nowrap;opacity:0;transition:opacity .25s}
+.l3.sec{font:700 9.5px var(--sans);letter-spacing:.18em;text-transform:uppercase;color:#6F788A}
+.l3.dn{color:#FF8E9E}.l3.up{color:#79E39A}.l3.h{color:#FFC470}
+.l3.o{color:#fff;font-size:13px;font-weight:700}
+.g3err{color:#fff;padding:24px}
+.zoom{position:absolute;right:12px;bottom:12px;display:flex;flex-direction:column;background:var(--panel);border:1px solid var(--line2)}
+.zoom button{width:34px;height:32px;background:none;border:0;border-bottom:1px solid var(--line);font:600 15px var(--sans)}
+.zoom button:last-child{border-bottom:0;font-size:11px}
+.zoom button:hover{background:var(--bg)}
+.fam{display:inline-flex;align-items:center;gap:7px;background:none;border:1px solid transparent;padding:2px 7px 2px 4px;font-size:12px;color:var(--ink)}
+.fam i{width:11px;height:11px;border-radius:50%;display:inline-block}
+.fam:hover{border-color:var(--line2)}
+.fam[aria-pressed="true"]{border-color:var(--ink);background:var(--panel)}
+.seg{gap:0!important;margin-left:auto}
+.seg button{background:var(--panel);border:1px solid var(--line2);padding:2px 9px;font-size:12px;margin-left:-1px;color:var(--muted)}
+.seg button:first-of-type{margin-left:8px}
+.seg button[aria-pressed="true"]{background:var(--ink);border-color:var(--ink);color:#fff}
+.hub{background:none;border:0;border-bottom:1px solid var(--accent);padding:0;font:600 13px var(--sans);color:var(--ink)}
+.hub:hover{color:var(--accent-ink)}
+.find{position:relative;display:inline-block}
+.cap .find input{width:250px;height:36px;border:1px solid var(--ink);padding:0 12px;font:500 14px var(--sans);background:var(--panel);color:var(--ink);outline:none}
+.ac{position:absolute;top:100%;left:0;min-width:300px;z-index:20;background:var(--panel);border:1px solid var(--ink);box-shadow:0 10px 24px rgba(0,0,0,.14)}
+.cap .ac{left:auto;right:0}
+.ac button{display:grid;grid-template-columns:54px 1fr auto;gap:8px;width:100%;text-align:left;background:none;border:0;border-bottom:1px solid var(--line);padding:8px 10px;font-size:13px;align-items:baseline}
+.ac button.on,.ac button:hover{background:var(--accent-bg)}
+.ac b{font:700 12px var(--mono)}
+.ac em{font:500 11px var(--mono);font-style:normal;color:var(--muted);white-space:nowrap}
+.ac p{margin:0;padding:10px;color:var(--muted);font-size:12.5px}
+.linkbtn{background:none;border:0;padding:0;font:600 10.5px var(--sans);letter-spacing:.12em;text-transform:uppercase;color:var(--accent-ink);text-decoration:underline}
+.node.muted .core{stroke-dasharray:3 3}
+#pfAdd{font:500 12px var(--sans);border:1px dashed var(--line2);padding:5px 9px;width:140px;background:var(--panel);color:var(--ink);outline:none}
+#pfAdd:focus{border-color:var(--ink)}
+.rt .pb{height:4px;background:var(--line);margin-top:5px}
+.rt .pb i{display:block;height:4px;background:var(--danger)}
 .floater{font:700 14px var(--mono);paint-order:stroke;stroke:var(--map);stroke-width:5px;stroke-linejoin:round;pointer-events:none}
 
 /* side panel */
@@ -124,6 +178,9 @@ a{color:var(--accent-ink)}
 .interp select{font:600 12.5px var(--sans);height:28px;border:1px solid var(--line2);background:var(--panel);color:var(--ink);padding:0 4px}
 .interp input[type=range]{flex:1;min-width:80px;accent-color:var(--ink)}
 .interp output{font:700 13px var(--mono);min-width:38px;text-align:right}
+.grp{display:grid;grid-template-columns:48px 1fr;gap:8px;align-items:start;margin-top:8px;padding-top:8px;border-top:1px solid var(--line);font-size:12.5px}
+.grp>b{font:700 13px var(--mono)}
+.kpis.mixed div:first-child{background:var(--bg)}
 .interp .why{font-size:11.5px;color:var(--muted);margin-top:6px}
 
 /* report */
@@ -212,8 +269,9 @@ details.trace>summary{padding:9px 12px;font-weight:600;cursor:pointer;display:fl
   .cap{flex-wrap:wrap;gap:10px;padding:12px 14px}
   .cks{flex-direction:column;flex:auto;width:100%}
   .mapwrap{flex:none;overflow-x:auto;-webkit-overflow-scrolling:touch}
-  #map{position:static;width:780px;height:auto;aspect-ratio:1100/740;display:block}
+  #map{position:static;width:780px;height:auto;aspect-ratio:1100/612;display:block}
   .legend{padding:9px 14px}
+  .gl{position:relative;inset:auto;height:420px}
   .side{border-left:0;border-top:1px solid var(--line2)}
   .sidescroll{height:auto;overflow:visible}
   .detail{position:fixed;z-index:30}
@@ -227,11 +285,13 @@ details.trace>summary{padding:9px 12px;font-weight:600;cursor:pointer;display:fl
     Upstream
   </button>
   <nav class="views" role="tablist" aria-label="Map view">
-    <button role="tab" data-mode="map" aria-selected="true">Map</button>
+    <button role="tab" data-mode="all" aria-selected="true">All companies</button>
+    <button role="tab" data-mode="chain" aria-selected="false">Supply chain</button>
+    <button role="tab" data-mode="3d" aria-selected="false">3D view</button>
     <button role="tab" data-mode="loops" aria-selected="false">Money loops <b id="nLoops"></b></button>
   </nav>
   <span class="sp"></span>
-  <span class="snap"><i></i>Snapshot: verified from filings and press releases, Oct 2026</span>
+  <span class="snap"><i></i><span id="snapT"></span></span>
   <button class="btn" id="srcBtn">Sources <b id="nSrc"></b></button>
   <button class="btn ghost" id="howBtn">How it works</button>
 </header>
@@ -239,15 +299,8 @@ details.trace>summary{padding:9px 12px;font-weight:600;cursor:pointer;display:fl
 <main class="main">
   <section class="stage">
     <div class="cap" id="cap"></div>
-    <div class="mapwrap" id="mapwrap"><svg id="map" viewBox="0 8 1100 612" preserveAspectRatio="xMidYMid meet" role="img" aria-label="Network map of AI company deals"></svg></div>
-    <div class="legend">
-      <span><svg width="26" height="8"><path d="M1 4H25" stroke="#8F8A80" stroke-width="2.5"/></svg>sells to</span>
-      <span><svg width="26" height="8"><path d="M1 4H25" stroke="#F7931E" stroke-width="1.8" stroke-dasharray="5 3"/></svg>invests in</span>
-      <span><svg width="26" height="8"><path d="M2 4H25" stroke="#8F8A80" stroke-width="2" stroke-dasharray="0.1 4" stroke-linecap="round"/></svg>estimated</span>
-      <span><svg width="14" height="14"><circle cx="7" cy="7" r="5" fill="#fff" stroke="#D92D4A" stroke-width="2.4"/></svg>redder ring = more revenue tied to OpenAI</span>
-      <span><svg width="14" height="14"><circle cx="7" cy="7" r="5" fill="#FFE2B8" stroke="#8F8A80" stroke-width="1.6"/></svg>you hold it</span>
-      <span><svg width="14" height="14"><path d="M7 1 L13 7 L7 13 L1 7Z" fill="none" stroke="#16171B" stroke-width="1.5"/></svg>choke point</span>
-    </div>
+    <div class="mapwrap" id="mapwrap"><svg id="map" viewBox="0 8 1100 612" preserveAspectRatio="xMidYMid meet" role="img" aria-label="Network map of companies and who sells to whom"></svg><div class="gl hide" id="gl"></div><div class="zoom hide" id="zoom"><button id="zIn" aria-label="Zoom in">+</button><button id="zOut" aria-label="Zoom out">&minus;</button><button id="zFit">Fit</button></div></div>
+    <div class="legend" id="legend"></div>
   </section>
 
   <aside class="side">
@@ -271,8 +324,8 @@ details.trace>summary{padding:9px 12px;font-weight:600;cursor:pointer;display:fl
 <div class="scrim hide" id="scrim"></div>
 <div class="drawer hide" id="src" role="dialog" aria-label="Sources">
   <div class="hd">
-    <div class="dh"><div><span class="lbl">Every number has a document</span><h2 id="srcT">Sources</h2></div><button class="x" id="srcX" aria-label="Close sources">&times;</button></div>
-    <input type="search" id="fq" placeholder="Search companies, filings, deals" aria-label="Search sources">
+    <div class="dh"><div><span class="lbl">Every link has a filing quote</span><h2 id="srcT">Sources</h2></div><button class="x" id="srcX" aria-label="Close sources">&times;</button></div>
+    <input type="search" id="fq" placeholder="Search a company or a deal" aria-label="Search sources">
     <div class="types" id="types"></div>
   </div>
   <div class="list" id="srcList"></div>
@@ -282,773 +335,25 @@ details.trace>summary{padding:9px 12px;font-weight:600;cursor:pointer;display:fl
   <div class="box">
     <div class="dh"><h2 id="howT">How it works</h2><button class="x" id="howX" aria-label="Close">&times;</button></div>
     <ol>
-      <li><b>The map.</b> 12 companies and 26 deals, taken from filings and press releases. Each arrow carries its amount, date, source and a confidence tag.</li>
-      <li><b>The scenario.</b> Your text becomes a company, a size and a type. With a local API key Claude reads it. Without one, a keyword parser does.</li>
-      <li><b>The shock.</b> If a buyer cuts spending, each seller loses that share of what the buyer pays it per year. The math runs in your browser.</li>
-      <li><b>Next hops.</b> Each hit company cuts its own purchases in proportion to its revenue hit, damped by 0.6 per hop, for up to 4 hops. This damping is our assumption.</li>
-      <li><b>Stakes.</b> Shown separately from revenue: stake value times valuation drop, where the drop is assumed to be 1.5 times the shock.</li>
-      <li><b>Money loops.</b> A cycle search over the supply and investment graph.</li>
-      <li><b>Choke points.</b> Each company is failed in full, as a buyer and as a supplier, and ranked by revenue at risk times companies hit. The top three carry a diamond.</li>
+      <li><b>The graph.</b> Companies are nodes. A link means "A sells to B", taken from filings, press releases or credible reports.</li>
+      <li><b>Link strength.</b> Each link gets a probability that a shock passes through it: <span class="mono">p = base &times; size &times; confidence</span>.
+        <br><b>Base</b> is the disclosed revenue share if one exists. Otherwise it is 1 &divide; the number of buyers the seller has (the weighted cascade of Kempe, Kleinberg and Tardos, 2003).
+        <br><b>Size</b> is &radic;(buyer market cap &divide; seller market cap), capped at 1.
+        <br><b>Confidence</b> is 1.0 for disclosed links, 0.7 for reported and 0.4 for estimated.</li>
+      <li><b>The start.</b> The AI reads your scenario and picks only the starting companies and a severity. It never picks who gets hit.</li>
+      <li><b>The cascade.</b> Each hit company gets one chance to pass the shock along each link, with probability p. This runs 20,000 times with random draws (Monte Carlo). Each company is hit at most once per run, so loops cannot blow up.</li>
+      <li><b>The output.</b> P(hit) is the share of runs in which a company was hit. Predicted drop is severity, times 0.6 for each extra hop, averaged over runs. Market cap at risk is predicted drop &times; market cap.</li>
     </ol>
-    <p class="note">The AI steps shown in a report are a recorded run. Not investment advice.</p>
+    <p class="note"><b>Known limits.</b> Links without a disclosed revenue share count equally. Only signed deals are seen, not expectations. Shocks are treated as independent. The 0.6 damping and the confidence weights are assumptions, applied the same way everywhere.</p>
+    <p class="note" id="covNote"></p>
+    <p class="note">Not investment advice.</p>
   </div>
 </div>
 <div class="tip hide" id="tip"></div>
-
-<script>
-/*DATA:BEGIN*/
-const DATA = {"companies":[{"id":"openai","name":"OpenAI","ticker":"PRIVATE","type":"ai_lab","listed":false,"revenue_usd_b":22.8,"fiscal_year":"Q1 2026 annualised","revenue_confidence":"ESTIMATED","revenue_source":"Motley Fool, Jun 2026: Q1 2026 revenue $5.7B (x4 = $22.8B, our annualisation)","revenue_source_id":"fool-openai","sells":"ChatGPT subscriptions, API access","facts":["Q1 2026 revenue $5.7B","2025 net loss $38.5B","Biggest single buyer of AI compute in this map"],"leverage_flag":null},{"id":"msft","name":"Microsoft","ticker":"MSFT","type":"cloud","listed":true,"revenue_usd_b":331.8,"fiscal_year":"FY2026 (to Jun 2026)","revenue_confidence":"DISCLOSED","revenue_source":"Microsoft FY26 Q4 earnings release, Jul 29 2026","revenue_source_id":"msft-fy26q4","sells":"Azure cloud compute, software","facts":["Azure passed $100B annual revenue","Owns ~27% of OpenAI","CoreWeave's largest customer"],"leverage_flag":null},{"id":"nvda","name":"Nvidia","ticker":"NVDA","type":"chips","listed":true,"revenue_usd_b":215.9,"fiscal_year":"FY2026 (to Jan 2026)","revenue_confidence":"DISCLOSED","revenue_source":"Nvidia FY2026 10-K (nvda-20260125)","revenue_source_id":"nvda-10k","sells":"GPUs (GB200, HBM-based accelerators), networking","facts":["One direct customer = 22% of revenue, another = 14%","10-K: an AI research company bought meaningful volume via Nvidia's cloud customers","Invested $30B in OpenAI, owns ~13% of CoreWeave"],"leverage_flag":null},{"id":"orcl","name":"Oracle","ticker":"ORCL","type":"cloud","listed":true,"revenue_usd_b":67.4,"fiscal_year":"FY2026 (to May 2026)","revenue_confidence":"DISCLOSED","revenue_source":"Oracle Q4 FY26 earnings release, Jun 10 2026","revenue_source_id":"orcl-q4fy26","sells":"Oracle Cloud Infrastructure (OCI), databases","facts":["Remaining performance obligations $638B, >$300B from OpenAI","Raised $43B of debt in FY26","Free cash flow -$23.7B"],"leverage_flag":"FCF -$23.7B and $43B new debt in FY26"},{"id":"crwv","name":"CoreWeave","ticker":"CRWV","type":"cloud","listed":true,"revenue_usd_b":5.13,"fiscal_year":"FY2025","revenue_confidence":"DISCLOSED","revenue_source":"CoreWeave FY2025 10-K","revenue_source_id":"crwv-10k","sells":"GPU cloud capacity","facts":["Microsoft ~67% of FY2025 revenue","Backlog $99.4B at Mar 31 2026","Largest customer 45% of Q1 2026 revenue"],"leverage_flag":"GPU buildout funded largely with debt"},{"id":"amzn","name":"Amazon (AWS)","ticker":"AMZN","type":"cloud","listed":true,"revenue_usd_b":128.7,"fiscal_year":"2025 (AWS segment)","revenue_confidence":"DISCLOSED","revenue_source":"Amazon Q4 2025 results: AWS quarters summed, Q4 $35.6B","revenue_source_id":"amzn-q425","sells":"AWS cloud compute","facts":["AWS backlog $244B","Invested $50B in OpenAI (~5%)","Revenue here = AWS segment only"],"leverage_flag":null},{"id":"googl","name":"Alphabet","ticker":"GOOGL","type":"cloud","listed":true,"revenue_usd_b":402.8,"fiscal_year":"2025","revenue_confidence":"DISCLOSED","revenue_source":"Alphabet Q4 2025 earnings release, Feb 4 2026","revenue_source_id":"googl-q425","sells":"Google Cloud, search ads, TPUs","facts":["Google Cloud revenue $58.7B","Resells CoreWeave capacity to OpenAI (reported)"],"leverage_flag":null},{"id":"amd","name":"AMD","ticker":"AMD","type":"chips","listed":true,"revenue_usd_b":34.6,"fiscal_year":"2025","revenue_confidence":"DISCLOSED","revenue_source":"AMD Q4 2025 earnings release, Feb 3 2026","revenue_source_id":"amd-q425","sells":"GPUs (Instinct MI series), CPUs","facts":["6 GW GPU deal with OpenAI, first 1 GW in 2H 2026","Gave OpenAI a warrant for up to 160M AMD shares"],"leverage_flag":null},{"id":"avgo","name":"Broadcom","ticker":"AVGO","type":"chips","listed":true,"revenue_usd_b":64,"fiscal_year":"FY2025","revenue_confidence":"DISCLOSED","revenue_source":"Broadcom Q4 FY25 earnings release, Dec 11 2025","revenue_source_id":"avgo-q4fy25","sells":"Custom AI accelerators, networking chips","facts":["AI revenue $20B in FY2025","10 GW custom accelerator deal with OpenAI to end-2029"],"leverage_flag":null},{"id":"tsm","name":"TSMC","ticker":"TSM","type":"supplier","listed":true,"revenue_usd_b":122,"fiscal_year":"2025","revenue_confidence":"DISCLOSED","revenue_source":"TSMC 2025 annual report via Taiwan News, Mar 2026 (USD derived: Nvidia NT$726.9B = 19%)","revenue_source_id":"tsm-ar","sells":"Chip manufacturing (foundry)","facts":["Nvidia = 19% of 2025 revenue (NT$726.9B)","Makes chips for Nvidia, AMD and Broadcom"],"leverage_flag":null},{"id":"skh","name":"SK Hynix","ticker":"000660.KS","type":"supplier","listed":true,"revenue_usd_b":67.9,"fiscal_year":"2025","revenue_confidence":"DISCLOSED","revenue_source":"SK Hynix FY25 results, Jan 2026 (KRW 97.15T)","revenue_source_id":"skh-fy25","sells":"HBM memory, DRAM, NAND","facts":["Revenue KRW 97.15T","~70% of Nvidia's 2026 HBM4 demand (reported)"],"leverage_flag":null},{"id":"sb","name":"SoftBank","ticker":"9984.T","type":"investor","listed":true,"revenue_usd_b":null,"fiscal_year":null,"revenue_confidence":null,"revenue_source":"Investor node: revenue not modelled","revenue_source_id":null,"sells":"Investment holding company","facts":["Put $30B into OpenAI's Feb 2026 round","Round: $110B at $730B pre-money, later $122B"],"leverage_flag":null}],"links":[{"id":"S01","from":"msft","to":"openai","type":"supply","label":"Azure compute","amount_usd_b":250,"annual_usd_b":36,"amount_confidence":"ESTIMATED","period":"Oct 2025 - 2032","date":"2025-10-28","confidence":"DISCLOSED","source_id":"msft-10q","source_title":"Microsoft 10-Q, quarter to Sep 30 2025, Note 17","source_url":"https://www.sec.gov/Archives/edgar/data/789019/000119312525256321/msft-20250930.htm","quote":"OpenAI contracted an incremental $250B of Azure services.","quote_kind":"paraphrase","estimate_note":"Annual value is our estimate: $250B spread over ~7 years to 2032 = ~$36B/yr.","verification":"verified"},{"id":"S02","from":"orcl","to":"openai","type":"supply","label":"OCI compute (Stargate)","amount_usd_b":300,"annual_usd_b":60,"amount_confidence":"REPORTED","period":"5 years from 2027","date":"2025-09-10","confidence":"REPORTED","source_id":"wsj-orcl","source_title":"WSJ: OpenAI signs ~$300B Oracle compute deal (Sep 2025)","source_url":"https://www.wsj.com/search?query=Oracle%20OpenAI%20300%20billion","quote":"About $300B of compute over roughly five years, starting 2027.","quote_kind":"paraphrase","estimate_note":"$300B / 5 years = ~$60B/yr. Oracle RPO is $638B, of which >$300B is OpenAI.","verification":"unverified"},{"id":"S03","from":"amzn","to":"openai","type":"supply","label":"AWS compute","amount_usd_b":138,"annual_usd_b":17,"amount_confidence":"ESTIMATED","period":"Nov 2025 - ~2034","date":"2026-02-27","confidence":"DISCLOSED","source_id":"geekwire-amzn","source_title":"GeekWire: Amazon invests $50B in OpenAI, expands AWS deal by $100B","source_url":"https://www.geekwire.com/2026/amazon-invests-50b-in-openai-deepens-aws-partnership-with-expanded-100b-cloud-deal/","quote":"$38B deal (Nov 2025) plus $100B over eight years.","quote_kind":"paraphrase","estimate_note":"~$17B/yr is William Blair's estimate, used as-is.","verification":"unverified"},{"id":"S04","from":"crwv","to":"openai","type":"supply","label":"GPU cloud capacity","amount_usd_b":22.4,"annual_usd_b":4.5,"amount_confidence":"ESTIMATED","period":"2025 - ~2030","date":"2025-09-25","confidence":"DISCLOSED","source_id":"dcd-keybanc","source_title":"DCD: contract values for OpenAI compute (CoreWeave $11.9B + $4B + $6.5B)","source_url":"https://www.datacenterdynamics.com/en/news/oracle-may-need-to-borrow-100bn-for-openai-efforts-says-keybanc-capital-markets/","quote":"Three contracts: $11.9B, $4B and $6.5B, up to $22.4B total.","quote_kind":"paraphrase","estimate_note":"~$4.5B/yr is our estimate: $22.4B over ~5 years.","verification":"unverified"},{"id":"S05","from":"googl","to":"openai","type":"supply","label":"Google Cloud capacity","amount_usd_b":null,"annual_usd_b":2,"amount_confidence":"ESTIMATED","period":"from mid-2025","date":"2025-06-10","confidence":"REPORTED","source_id":"reuters-googl","source_title":"Reuters: OpenAI taps Google Cloud for extra capacity (Jun 2025)","source_url":"https://www.reuters.com/site-search/?query=OpenAI+Google+cloud+deal","quote":"OpenAI added Google Cloud to meet its compute needs.","quote_kind":"paraphrase","estimate_note":"Amount undisclosed. $2B/yr is our placeholder so the link counts in the math; small vs Azure/AWS deals.","verification":"unverified"},{"id":"S06","from":"crwv","to":"googl","type":"supply","label":"Capacity resold to OpenAI","amount_usd_b":null,"annual_usd_b":1,"amount_confidence":"ESTIMATED","period":"from 2025","date":"2025-07-15","confidence":"REPORTED","source_id":"dcd-crwv-googl","source_title":"DCD (citing Reuters): CoreWeave to provide compute for Google's OpenAI deal","source_url":"https://www.datacenterdynamics.com/en/news/coreweave-to-provide-compute-capacity-for-googles-openai-deal-report/","quote":"Google resells CoreWeave capacity to OpenAI.","quote_kind":"paraphrase","estimate_note":"Amount undisclosed. $1B/yr is our placeholder.","verification":"unverified"},{"id":"S07","from":"crwv","to":"msft","type":"supply","label":"GPU cloud capacity","amount_usd_b":3.44,"annual_usd_b":3.44,"amount_confidence":"DISCLOSED","period":"FY2025","date":"2026-03-02","confidence":"DISCLOSED","source_id":"crwv-10k","source_title":"CoreWeave FY2025 10-K, risk factors","source_url":"https://www.sec.gov/Archives/edgar/data/1769628/000176962826000104/crwv-20251231.htm","quote":"Microsoft accounted for about 67% of FY2025 revenue.","quote_kind":"paraphrase","estimate_note":"67% x $5.13B = $3.44B.","verification":"unverified"},{"id":"S08","from":"amd","to":"openai","type":"supply","label":"6 GW of Instinct GPUs","amount_usd_b":null,"annual_usd_b":10,"amount_confidence":"ESTIMATED","period":"first 1 GW in 2H 2026","date":"2025-10-06","confidence":"DISCLOSED","source_id":"amd-openai","source_title":"AMD and OpenAI announce strategic partnership (6 GW)","source_url":"https://newsroom.amd.com/news/amd-and-openai-announce-strategic-partnership-to-d/","quote":"tens of billions of dollars in revenue","quote_kind":"verbatim","estimate_note":"Deal is disclosed; dollar value is not. ~$10B/yr is our estimate from the CFO's 'tens of billions'.","verification":"verified"},{"id":"S09","from":"avgo","to":"openai","type":"supply","label":"10 GW custom accelerators","amount_usd_b":null,"annual_usd_b":5,"amount_confidence":"ESTIMATED","period":"deploy to end-2029","date":"2025-10-13","confidence":"DISCLOSED","source_id":"openai-avgo","source_title":"OpenAI and Broadcom announce strategic collaboration (10 GW)","source_url":"https://openai.com/index/openai-and-broadcom-announce-strategic-collaboration/","quote":"10 GW of OpenAI-designed accelerators, deployed through end of 2029.","quote_kind":"paraphrase","estimate_note":"Amount undisclosed. ~$5B/yr early run-rate is our assumption.","verification":"unverified"},{"id":"S10","from":"nvda","to":"orcl","type":"supply","label":"GB200 chips for Stargate Abilene","amount_usd_b":40,"annual_usd_b":20,"amount_confidence":"ESTIMATED","period":"2025 - 2026","date":"2025-05-23","confidence":"REPORTED","source_id":"dcd-orcl-nvda","source_title":"DCD (citing FT): Oracle to spend $40B on Nvidia chips for OpenAI Texas site","source_url":"https://www.datacenterdynamics.com/en/news/oracle-to-spend-40bn-on-nvidia-chips-for-openai-texas-data-center/","quote":"About $40B of GB200 chips for the Abilene data center.","quote_kind":"paraphrase","estimate_note":"$40B over ~2 years = ~$20B/yr, our estimate.","verification":"unverified"},{"id":"S11","from":"nvda","to":"msft","type":"supply","label":"GPU sales","amount_usd_b":null,"annual_usd_b":30,"amount_confidence":"ESTIMATED","period":"FY2026","date":"2026-02-25","confidence":"ESTIMATED","source_id":"nvda-10k","source_title":"Nvidia FY2026 10-K, concentration of revenue","source_url":"https://www.sec.gov/Archives/edgar/data/1045810/000104581026000021/nvda-20260125.htm","quote":"Two direct customers made up 22% and 14% of revenue.","quote_kind":"paraphrase","estimate_note":"Nvidia names no customers. Split of the 22% + 14% across clouds is our assumption.","verification":"verified"},{"id":"S12","from":"nvda","to":"amzn","type":"supply","label":"GPU sales","amount_usd_b":null,"annual_usd_b":20,"amount_confidence":"ESTIMATED","period":"FY2026","date":"2026-02-25","confidence":"ESTIMATED","source_id":"nvda-10k","source_title":"Nvidia FY2026 10-K, concentration of revenue","source_url":"https://www.sec.gov/Archives/edgar/data/1045810/000104581026000021/nvda-20260125.htm","quote":"Two direct customers made up 22% and 14% of revenue.","quote_kind":"paraphrase","estimate_note":"Nvidia names no customers. $20B/yr is our assumption.","verification":"verified"},{"id":"S13","from":"nvda","to":"googl","type":"supply","label":"GPU sales","amount_usd_b":null,"annual_usd_b":20,"amount_confidence":"ESTIMATED","period":"FY2026","date":"2026-02-25","confidence":"ESTIMATED","source_id":"nvda-10k","source_title":"Nvidia FY2026 10-K, concentration of revenue","source_url":"https://www.sec.gov/Archives/edgar/data/1045810/000104581026000021/nvda-20260125.htm","quote":"Two direct customers made up 22% and 14% of revenue.","quote_kind":"paraphrase","estimate_note":"Nvidia names no customers. $20B/yr is our assumption.","verification":"verified"},{"id":"S14","from":"nvda","to":"crwv","type":"supply","label":"GPU sales","amount_usd_b":null,"annual_usd_b":10,"amount_confidence":"ESTIMATED","period":"FY2026","date":"2026-02-25","confidence":"ESTIMATED","source_id":"nvda-10k","source_title":"Nvidia FY2026 10-K, concentration of revenue","source_url":"https://www.sec.gov/Archives/edgar/data/1045810/000104581026000021/nvda-20260125.htm","quote":"Two direct customers made up 22% and 14% of revenue.","quote_kind":"paraphrase","estimate_note":"Nvidia names no customers. $10B/yr is our assumption, sized to CoreWeave's debt-funded GPU buildout.","verification":"verified"},{"id":"S15","from":"crwv","to":"nvda","type":"supply","label":"Unsold capacity, bought back","amount_usd_b":6.3,"annual_usd_b":1.05,"amount_confidence":"ESTIMATED","period":"through Apr 2032","date":"2025-09-15","confidence":"DISCLOSED","source_id":"dcd-nvda-crwv","source_title":"DCD: Nvidia invests another $2B in CoreWeave","source_url":"https://www.datacenterdynamics.com/en/news/nvidia-invests-another-2bn-in-coreweave/","quote":"Nvidia agreed to buy $6.3B of CoreWeave's unsold capacity.","quote_kind":"paraphrase","estimate_note":"$6.3B over ~6 years = ~$1.05B/yr, our estimate.","verification":"unverified"},{"id":"S16","from":"tsm","to":"nvda","type":"supply","label":"Chip manufacturing","amount_usd_b":23.2,"annual_usd_b":23.2,"amount_confidence":"DISCLOSED","period":"2025","date":"2026-03-10","confidence":"DISCLOSED","source_id":"tsm-ar","source_title":"Taiwan News: TSMC 2025 annual report, client A = 19% of revenue","source_url":"https://www.taiwannews.com.tw/news/6310676","quote":"Client A was 19% of revenue, NT$726.9B.","quote_kind":"paraphrase","estimate_note":"Client A is unnamed; Jensen Huang confirmed Nvidia is TSMC's top customer. NT$726.9B = ~US$23.2B.","verification":"verified"},{"id":"S17","from":"tsm","to":"amd","type":"supply","label":"Chip manufacturing","amount_usd_b":null,"annual_usd_b":7,"amount_confidence":"ESTIMATED","period":"2025","date":"2026-03-10","confidence":"ESTIMATED","source_id":"tsm-ar","source_title":"TSMC 2025 annual report (customer amounts not named)","source_url":"https://www.taiwannews.com.tw/news/6310676","quote":"TSMC manufactures AMD's leading-edge GPUs and CPUs.","quote_kind":"paraphrase","estimate_note":"Amount undisclosed. $7B/yr is our assumption (~20% of AMD revenue).","verification":"verified"},{"id":"S18","from":"tsm","to":"avgo","type":"supply","label":"Chip manufacturing","amount_usd_b":null,"annual_usd_b":8,"amount_confidence":"ESTIMATED","period":"2025","date":"2026-03-10","confidence":"ESTIMATED","source_id":"tsm-ar","source_title":"TSMC 2025 annual report (customer amounts not named)","source_url":"https://www.taiwannews.com.tw/news/6310676","quote":"TSMC manufactures Broadcom's custom accelerators.","quote_kind":"paraphrase","estimate_note":"Amount undisclosed. $8B/yr is our assumption.","verification":"verified"},{"id":"S19","from":"skh","to":"nvda","type":"supply","label":"HBM4 memory","amount_usd_b":null,"annual_usd_b":18,"amount_confidence":"ESTIMATED","period":"2026","date":"2026-01-20","confidence":"REPORTED","source_id":"yonhap-hbm","source_title":"Yonhap: SK Hynix to supply ~70% of Nvidia's 2026 HBM4","source_url":"https://en.yna.co.kr/search/index?query=SK%20hynix%20HBM4%20Nvidia","quote":"SK Hynix to supply about 70% of Nvidia's 2026 HBM4 needs.","quote_kind":"paraphrase","estimate_note":"Dollar amount undisclosed. $18B/yr is our assumption (~27% of SK Hynix revenue).","verification":"unverified"},{"id":"E01","from":"msft","to":"openai","type":"equity","label":"~27% stake","amount_usd_b":135,"stake_value_usd_b":135,"annual_usd_b":null,"amount_confidence":"DISCLOSED","period":"since 2019","date":"2025-10-28","confidence":"DISCLOSED","source_id":"msft-10q","source_title":"Microsoft 10-Q, quarter to Sep 30 2025, Note 17","source_url":"https://www.sec.gov/Archives/edgar/data/789019/000119312525256321/msft-20250930.htm","quote":"~27% stake valued ~$135B after the Oct 2025 recapitalisation.","quote_kind":"paraphrase","estimate_note":"Microsoft has put $13B of funding in total.","consideration":"cash","verification":"verified"},{"id":"E02","from":"amzn","to":"openai","type":"equity","label":"$50B, ~5% stake","amount_usd_b":50,"stake_value_usd_b":50,"annual_usd_b":null,"amount_confidence":"DISCLOSED","period":"completed Feb 2026","date":"2026-02-27","confidence":"DISCLOSED","source_id":"amzn-8k-openai","source_title":"Amazon 8-K: equity commitment letter with OpenAI Group PBC","source_url":"https://www.sec.gov/Archives/edgar/data/1018724/000110465926021050/tm267374d1_8k.htm","quote":"Amazon completed a $50B investment for about 5% of OpenAI.","quote_kind":"paraphrase","estimate_note":"8-K confirms the equity commitment; $50B and ~5% are from press coverage (GeekWire).","consideration":"cash","verification":"unverified"},{"id":"E03","from":"nvda","to":"openai","type":"equity","label":"$30B equity","amount_usd_b":30,"stake_value_usd_b":30,"annual_usd_b":null,"amount_confidence":"REPORTED","period":"Feb 2026 round","date":"2026-02-20","confidence":"REPORTED","source_id":"dcd-nvda-openai","source_title":"DCD (citing FT, CNBC): Nvidia plans $30B investment in OpenAI round","source_url":"https://www.datacenterdynamics.com/en/news/nvidia-plans-30bn-investment-in-upcoming-openai-funding-round/","quote":"$30B equity, replacing the Sep 2025 'up to $100B' letter of intent.","quote_kind":"paraphrase","estimate_note":null,"consideration":"cash","verification":"unverified"},{"id":"E04","from":"sb","to":"openai","type":"equity","label":"$30B equity","amount_usd_b":30,"stake_value_usd_b":30,"annual_usd_b":null,"amount_confidence":"REPORTED","period":"Feb 2026 round","date":"2026-02-20","confidence":"REPORTED","source_id":"sb-openai","source_title":"Reports: SoftBank puts $30B into OpenAI's $110B round","source_url":"https://www.reuters.com/site-search/?query=SoftBank+OpenAI+30+billion","quote":"$110B round at $730B pre-money, later raised to $122B.","quote_kind":"paraphrase","estimate_note":null,"consideration":"cash","verification":"unverified"},{"id":"E05","from":"nvda","to":"crwv","type":"equity","label":"~13% stake","amount_usd_b":2,"stake_value_usd_b":5.7,"annual_usd_b":null,"amount_confidence":"ESTIMATED","period":"extra $2B Jan 2026","date":"2026-01-26","confidence":"DISCLOSED","source_id":"dcd-nvda-crwv","source_title":"DCD: Nvidia invests another $2B in CoreWeave","source_url":"https://www.datacenterdynamics.com/en/news/nvidia-invests-another-2bn-in-coreweave/","quote":"Another $2B at $87.20 per share, taking the stake to ~13%.","quote_kind":"paraphrase","estimate_note":"Stake value ~$5.7B is our estimate: 13% x ~$44B market cap.","consideration":"cash","verification":"unverified"},{"id":"E06","from":"openai","to":"crwv","type":"equity","label":"$350M stake","amount_usd_b":0.35,"stake_value_usd_b":0.35,"annual_usd_b":null,"amount_confidence":"REPORTED","period":"Mar 2025","date":"2025-03-10","confidence":"REPORTED","source_id":"reuters-crwv","source_title":"Reuters: OpenAI takes $350M CoreWeave stake with $11.9B deal","source_url":"https://www.reuters.com/site-search/?query=OpenAI+CoreWeave+350+million+stake","quote":"CoreWeave issued $350M of stock to OpenAI alongside the contract.","quote_kind":"paraphrase","estimate_note":"Stock issued as part of the compute deal, so value flows CoreWeave to OpenAI.","consideration":"issued_in_deal","verification":"unverified"},{"id":"E07","from":"openai","to":"amd","type":"equity","label":"Warrant, up to ~10% of AMD","amount_usd_b":null,"stake_value_usd_b":null,"annual_usd_b":null,"amount_confidence":"DISCLOSED","period":"vests with GW milestones","date":"2025-10-06","confidence":"DISCLOSED","source_id":"amd-openai","source_title":"AMD and OpenAI announce strategic partnership (6 GW)","source_url":"https://newsroom.amd.com/news/amd-and-openai-announce-strategic-partnership-to-d/","quote":"Warrant for up to 160M AMD shares at $0.01, vesting by milestones.","quote_kind":"paraphrase","estimate_note":"AMD issues the shares, so value flows AMD to OpenAI. Dollar value depends on AMD's share price; not modelled.","consideration":"issued_in_deal","verification":"verified"}],"sources":[{"id":"msft-10q","title":"Microsoft Form 10-Q, quarter ended Sep 30 2025 (Note 17: OpenAI)","company":"msft","date":"2025-10-29","type":"10-Q","url":"https://www.sec.gov/Archives/edgar/data/789019/000119312525256321/msft-20250930.htm","used_for":"$250B incremental Azure commitment from OpenAI; ~27% stake valued ~$135B; $13B total funding.","verification":"verified","verified_note":"Confirmed in filing text: \"OpenAI has contracted to purchase an incremental $250 billion of Azure services\". Stake % and value not checked in quick pass."},{"id":"msft-fy26q4","title":"Microsoft FY26 Q4 earnings release (8-K, Exhibit 99.1)","company":"msft","date":"2026-07-29","type":"8-K","url":"https://www.sec.gov/Archives/edgar/data/789019/000119312526323632/msft-ex99_1.htm","used_for":"FY2026 revenue $331.8B; Azure passed $100B.","verification":"verified","verified_note":"Confirmed: \"Azure revenue surpassed $100 billion for the first time\". FY revenue $331.8B not checked in quick pass."},{"id":"nvda-10k","title":"Nvidia Form 10-K, fiscal year ended Jan 25 2026 (nvda-20260125)","company":"nvda","date":"2026-02-25","type":"10-K","url":"https://www.sec.gov/Archives/edgar/data/1045810/000104581026000021/nvda-20260125.htm","used_for":"FY2026 revenue $215.9B; direct customers at 22% and 14%; AI research company buying via cloud customers.","verification":"verified","verified_note":"Confirmed: direct customers at 22% and 14% of FY2026 revenue; \"one AI research and deployment company contributed to a meaningful amount of our revenue\"."},{"id":"orcl-q4fy26","title":"Oracle Q4 FY26 earnings release (8-K, Exhibit 99.1)","company":"orcl","date":"2026-06-10","type":"8-K","url":"https://www.sec.gov/Archives/edgar/data/1341439/000119312526265848/orcl-ex99_1.htm","used_for":"FY2026 revenue $67.4B; RPO $638B; $43B debt raised; FCF -$23.7B.","verification":"verified","verified_note":"Confirmed: FY2026 revenue $67.4B; RPO $638B. Debt and FCF not checked in quick pass."},{"id":"wsj-orcl","title":"WSJ: OpenAI signs ~$300B, five-year Oracle compute deal","company":"orcl","date":"2025-09-10","type":"news","url":"https://www.wsj.com/search?query=Oracle%20OpenAI%20300%20billion","used_for":"~$300B over 5 years from 2027 (REPORTED).","verification":"unverified","verified_note":"Not confirmed in the quick pass (site blocked automated fetch); value kept from the hand-verified brief."},{"id":"dcd-keybanc","title":"DCD: Oracle may need to borrow $100B for OpenAI efforts, says KeyBanc","company":"orcl","date":"2025-09-25","type":"news","url":"https://www.datacenterdynamics.com/en/news/oracle-may-need-to-borrow-100bn-for-openai-efforts-says-keybanc-capital-markets/","used_for":"OpenAI compute contract values incl. CoreWeave $11.9B + $4B + $6.5B; Oracle funding pressure.","verification":"unverified","verified_note":"Not confirmed in the quick pass (site blocked automated fetch); value kept from the hand-verified brief."},{"id":"crwv-10k","title":"CoreWeave Form 10-K, fiscal year 2025","company":"crwv","date":"2026-03-02","type":"10-K","url":"https://www.sec.gov/Archives/edgar/data/1769628/000176962826000104/crwv-20251231.htm","used_for":"FY2025 revenue $5.13B; Microsoft ~67% of revenue; debt-funded buildout.","verification":"unverified","verified_note":"Filing located; the 67% Microsoft figure was not confirmed in the quick pass."},{"id":"crwv-10q","title":"CoreWeave Form 10-Q, quarter ended Mar 31 2026","company":"crwv","date":"2026-05-12","type":"10-Q","url":"https://www.sec.gov/Archives/edgar/data/1769628/000176962826000222/crwv-20260331.htm","used_for":"Backlog $99.4B; largest customer 45% of Q1 2026 revenue.","verification":"unverified","verified_note":"Filing located; backlog and 45% figures not confirmed in the quick pass."},{"id":"amzn-q425","title":"Amazon Q4 2025 results (8-K, Exhibit 99.1)","company":"amzn","date":"2026-02-05","type":"8-K","url":"https://www.sec.gov/Archives/edgar/data/1018724/000101872426000002/amzn-20251231xex991.htm","used_for":"AWS revenue 2025 ~$128.7B (Q4 $35.6B); AWS backlog $244B.","verification":"verified","verified_note":"Confirmed: AWS segment sales $128.7B for 2025, $35.6B in Q4. Backlog not checked."},{"id":"geekwire-amzn","title":"GeekWire: Amazon invests $50B in OpenAI, expands AWS deal by $100B","company":"amzn","date":"2026-02-27","type":"news","url":"https://www.geekwire.com/2026/amazon-invests-50b-in-openai-deepens-aws-partnership-with-expanded-100b-cloud-deal/","used_for":"$50B equity (~5%); $38B + $100B AWS commitments; ~$17B/yr (William Blair).","verification":"unverified","verified_note":"Not confirmed in the quick pass (site blocked automated fetch); value kept from the hand-verified brief."},{"id":"googl-q425","title":"Alphabet Q4 2025 earnings (8-K)","company":"googl","date":"2026-02-04","type":"8-K","url":"https://www.sec.gov/Archives/edgar/data/1652044/000165204426000012/goog-20260204.htm","used_for":"2025 revenue $402.8B; Google Cloud $58.7B.","verification":"unverified","verified_note":"Filing located; figures not confirmed in the quick pass."},{"id":"reuters-googl","title":"Reuters: OpenAI taps Google Cloud for more computing capacity","company":"googl","date":"2025-06-10","type":"news","url":"https://www.reuters.com/site-search/?query=OpenAI+Google+cloud+deal","used_for":"Google sells cloud capacity to OpenAI; amount undisclosed.","verification":"unverified","verified_note":"Not confirmed in the quick pass (site blocked automated fetch); value kept from the hand-verified brief."},{"id":"dcd-crwv-googl","title":"DCD: CoreWeave to provide compute capacity for Google's OpenAI deal","company":"crwv","date":"2025-07-15","type":"news","url":"https://www.datacenterdynamics.com/en/news/coreweave-to-provide-compute-capacity-for-googles-openai-deal-report/","used_for":"CoreWeave capacity resold by Google to OpenAI (REPORTED).","verification":"unverified","verified_note":"Not confirmed in the quick pass (site blocked automated fetch); value kept from the hand-verified brief."},{"id":"amd-q425","title":"AMD Q4 2025 financial results (8-K)","company":"amd","date":"2026-02-03","type":"8-K","url":"https://www.sec.gov/Archives/edgar/data/2488/000000248826000014/amd-20260203.htm","used_for":"2025 revenue $34.6B.","verification":"unverified","verified_note":"Filing located; figures not confirmed in the quick pass."},{"id":"amd-openai","title":"AMD and OpenAI announce strategic partnership to deploy 6 GW of AMD GPUs","company":"amd","date":"2025-10-06","type":"press release","url":"https://newsroom.amd.com/news/amd-and-openai-announce-strategic-partnership-to-d/","used_for":"6 GW deal, first 1 GW 2H 2026; warrant up to 160M shares; CFO 'tens of billions'.","verification":"verified","verified_note":"Confirmed: 6 GW, 1 GW from 2H 2026, warrant up to 160M shares, CFO \"tens of billions of dollars in revenue\"."},{"id":"avgo-q4fy25","title":"Broadcom Q4 FY25 results (8-K, Exhibit 99.1)","company":"avgo","date":"2025-12-11","type":"8-K","url":"https://www.sec.gov/Archives/edgar/data/1730168/000173016825000116/avgo-11022025x8kxex99.htm","used_for":"FY2025 revenue ~$64B; AI revenue $20B.","verification":"unverified","verified_note":"Filing located (Q4 revenue $18,015M confirmed); FY total and AI revenue not confirmed."},{"id":"openai-avgo","title":"OpenAI and Broadcom announce strategic collaboration (10 GW)","company":"avgo","date":"2025-10-13","type":"press release","url":"https://openai.com/index/openai-and-broadcom-announce-strategic-collaboration/","used_for":"10 GW custom accelerators to end-2029; amount undisclosed.","verification":"unverified","verified_note":"Not confirmed in the quick pass (site blocked automated fetch); value kept from the hand-verified brief."},{"id":"dcd-orcl-nvda","title":"DCD: Oracle to spend $40B on Nvidia chips for OpenAI Texas data center","company":"nvda","date":"2025-05-23","type":"news","url":"https://www.datacenterdynamics.com/en/news/oracle-to-spend-40bn-on-nvidia-chips-for-openai-texas-data-center/","used_for":"~$40B of GB200 chips for Stargate Abilene (REPORTED, FT).","verification":"unverified","verified_note":"Not confirmed in the quick pass (site blocked automated fetch); value kept from the hand-verified brief."},{"id":"dcd-nvda-crwv","title":"DCD: Nvidia invests another $2B in CoreWeave","company":"crwv","date":"2026-01-26","type":"news","url":"https://www.datacenterdynamics.com/en/news/nvidia-invests-another-2bn-in-coreweave/","used_for":"$2B at $87.20/share; ~13% stake; $6.3B capacity backstop through Apr 2032.","verification":"unverified","verified_note":"Not confirmed in the quick pass (site blocked automated fetch); value kept from the hand-verified brief."},{"id":"dcd-nvda-openai","title":"DCD: Nvidia plans $30B investment in upcoming OpenAI funding round","company":"nvda","date":"2026-02-20","type":"news","url":"https://www.datacenterdynamics.com/en/news/nvidia-plans-30bn-investment-in-upcoming-openai-funding-round/","used_for":"$30B equity replacing the 'up to $100B' LOI (REPORTED, FT/CNBC).","verification":"unverified","verified_note":"Not confirmed in the quick pass (site blocked automated fetch); value kept from the hand-verified brief."},{"id":"tsm-ar","title":"Taiwan News: TSMC 2025 annual report, client A = 19% of revenue","company":"tsm","date":"2026-02-27","type":"news","url":"https://www.taiwannews.com.tw/news/6310676","used_for":"Nvidia NT$726.9B = 19% of revenue; TSMC revenue ~US$122B derived.","verification":"verified","verified_note":"Confirmed: client A NT$726.9B (US$23.2B), 19% of 2025 revenue; Nvidia identified via Jensen Huang comments."},{"id":"skh-fy25","title":"SK Hynix FY2025 earnings results","company":"skh","date":"2026-01-22","type":"press release","url":"https://www.skhynix.com/ir/","used_for":"2025 revenue KRW 97.15T (~$67.9B).","verification":"unverified","verified_note":"Not confirmed in the quick pass (site blocked automated fetch); value kept from the hand-verified brief."},{"id":"yonhap-hbm","title":"Yonhap: SK Hynix to supply ~70% of Nvidia's 2026 HBM4","company":"skh","date":"2026-01-20","type":"news","url":"https://en.yna.co.kr/search/index?query=SK%20hynix%20HBM4%20Nvidia","used_for":"~70% share of Nvidia HBM4 demand (REPORTED).","verification":"unverified","verified_note":"Not confirmed in the quick pass (site blocked automated fetch); value kept from the hand-verified brief."},{"id":"reuters-crwv","title":"Reuters: OpenAI signs $11.9B CoreWeave deal, takes $350M stake","company":"crwv","date":"2025-03-10","type":"news","url":"https://www.reuters.com/site-search/?query=OpenAI+CoreWeave+350+million+stake","used_for":"$350M of CoreWeave stock to OpenAI (REPORTED).","verification":"unverified","verified_note":"Not confirmed in the quick pass (site blocked automated fetch); value kept from the hand-verified brief."},{"id":"sb-openai","title":"Reports: SoftBank commits $30B to OpenAI's $110B round","company":"sb","date":"2026-02-20","type":"news","url":"https://www.reuters.com/site-search/?query=SoftBank+OpenAI+30+billion","used_for":"$30B; round $110B at $730B pre-money, later $122B (REPORTED).","verification":"unverified","verified_note":"Not confirmed in the quick pass (site blocked automated fetch); value kept from the hand-verified brief."},{"id":"fool-openai","title":"Motley Fool: OpenAI revenue and losses","company":"openai","date":"2026-06-15","type":"news","url":"https://www.fool.com/search/?q=OpenAI%20revenue","used_for":"Q1 2026 revenue $5.7B; 2025 net loss $38.5B.","verification":"unverified","verified_note":"Not confirmed in the quick pass (site blocked automated fetch); value kept from the hand-verified brief."},{"id":"amzn-8k-openai","title":"Amazon 8-K: equity commitment letter with OpenAI Group PBC","company":"amzn","date":"2026-02-27","type":"8-K","url":"https://www.sec.gov/Archives/edgar/data/1018724/000110465926021050/tm267374d1_8k.htm","used_for":"Amazon agreed to buy OpenAI Series C preferred stock (equity link E02).","verification":"verified","verified_note":"Confirmed: equity commitment letter to purchase OpenAI Series C Preferred Stock. Dollar amount per press coverage."}]};
-/*DATA:END*/
-</script>
-<script>
-'use strict';
-// ============================================================
-//  Lookups
-// ============================================================
-const C = Object.fromEntries(DATA.companies.map(c => [c.id, c]));
-const L = Object.fromEntries(DATA.links.map(l => [l.id, l]));
-const SRC = Object.fromEntries(DATA.sources.map(s => [s.id, s]));
-const SUP = DATA.links.filter(l => l.type === 'supply');
-const EQ = DATA.links.filter(l => l.type === 'equity');
-const IDS = DATA.companies.map(c => c.id);
-const CONF_RANK = { ESTIMATED: 0, REPORTED: 1, DISCLOSED: 2 };
-const CONF_TXT = {
-  DISCLOSED: 'Company filing or company press release with an amount.',
-  REPORTED: 'Credible media (WSJ, FT, Reuters, CNBC, Yonhap).',
-  ESTIMATED: 'Our assumption. See how it was estimated below.'
-};
-const $ = s => document.querySelector(s);
-const $$ = s => Array.from(document.querySelectorAll(s));
-const esc = s => String(s ?? '').replace(/[&<>"']/g, ch => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[ch]));
-const fB = v => v == null ? 'undisclosed' : '$' + (Math.abs(v) >= 100 ? v.toFixed(0) : Math.abs(v) >= 10 ? v.toFixed(1) : v.toFixed(2)) + 'B';
-const fP = (p, d = 1) => (p * 100).toFixed(d) + '%';
-const tick = id => C[id].listed ? C[id].ticker : C[id].name;
-const short = id => ({ openai: 'OpenAI', msft: 'Microsoft', nvda: 'Nvidia', orcl: 'Oracle', crwv: 'CoreWeave', amzn: 'Amazon', googl: 'Google', amd: 'AMD', avgo: 'Broadcom', tsm: 'TSMC', skh: 'SK Hynix', sb: 'SoftBank' }[id] || C[id].name);
-const sleep = ms => new Promise(r => setTimeout(r, ms));
-const isDotted = l => l.confidence === 'ESTIMATED' || l.amount_usd_b == null;
-const tagHTML = c => c ? `<span class="tag ${c}">${c}</span>` : '';
-const verTag = v => v === 'verified' ? '<span class="tag DISCLOSED" style="border-style:solid">CHECKED</span>' : '<span class="tag ESTIMATED">UNVERIFIED</span>';
-
-// ============================================================
-//  Exposure: share of each company's revenue that traces back to OpenAI
-//  tied(seller) = sum(annual(seller->buyer) * tied(buyer)) / revenue(seller); tied(OpenAI)=1
-// ============================================================
-function computeTied() {
-  const t = Object.fromEntries(IDS.map(id => [id, 0])); t.openai = 1;
-  for (let it = 0; it < 30; it++) {
-    for (const id of IDS) {
-      if (id === 'openai' || !C[id].revenue_usd_b) continue;
-      let s = 0;
-      for (const l of SUP) if (l.from === id) s += l.annual_usd_b * t[l.to];
-      t[id] = Math.min(1, s / C[id].revenue_usd_b);
-    }
-  }
-  return t;
-}
-const TIED = computeTied();
-const DEPEND_T = 0.05; // "depends on OpenAI" threshold: >=5% of revenue traces back to OpenAI
-
-// ============================================================
-//  Money loops: simple cycle search (DFS) over the money-flow graph
-//  supply: buyer pays seller; equity (cash): investor -> investee;
-//  equity issued in a deal (warrants / stock): issuer -> holder.
-// ============================================================
-function moneyEdges() {
-  const adj = {};
-  const add = (a, b, id) => { (adj[a] ||= {}); (adj[a][b] ||= []).push(id); };
-  for (const l of SUP) add(l.to, l.from, l.id);
-  for (const l of EQ) l.consideration === 'issued_in_deal' ? add(l.to, l.from, l.id) : add(l.from, l.to, l.id);
-  return adj;
-}
-const LOOP_META = {
-  E03: { n: 'L1', t: 'Nvidia funds its own customers', c: 'Nvidia puts $30B into OpenAI. OpenAI pays Oracle, Microsoft, Amazon, Google and CoreWeave for compute. They buy Nvidia GPUs.' },
-  E02: { n: 'L2', t: 'Amazon\'s $50B comes back as AWS revenue', c: 'Amazon invests $50B in OpenAI. OpenAI commits $138B to AWS.' },
-  E01: { n: 'L3', t: 'Microsoft owns the customer', c: 'Microsoft owns ~27% of OpenAI. OpenAI commits $250B to Azure.' },
-  E05: { n: 'L4', t: 'Nvidia backstops its own buyer', c: 'Nvidia owns ~13% of CoreWeave and buys $6.3B of its unused capacity. CoreWeave buys Nvidia GPUs.' },
-  E07: { n: 'L5', t: 'AMD pays in shares to win the order', c: 'AMD gives OpenAI warrants for up to ~10% of AMD. OpenAI buys 6 GW of AMD GPUs.' },
-  E06: { n: 'L6', t: 'CoreWeave\'s customer is also its shareholder', c: 'CoreWeave issued $350M of stock to OpenAI with the contract. OpenAI buys CoreWeave capacity.' }
-};
-const LOOP_PRIORITY = ['E07', 'E06', 'E02', 'E01', 'E05', 'E03', 'E04'];
-function findLoops() {
-  const adj = moneyEdges(), order = IDS, idx = Object.fromEntries(order.map((id, i) => [id, i]));
-  const cycles = [];
-  for (const s of order) {
-    const stack = [s], seen = new Set([s]);
-    const dfs = v => {
-      for (const w of Object.keys(adj[v] || {})) {
-        if (w === s && stack.length > 1) cycles.push([...stack]);
-        else if (idx[w] > idx[s] && !seen.has(w)) { seen.add(w); stack.push(w); dfs(w); stack.pop(); seen.delete(w); }
-      }
-    };
-    dfs(s);
-  }
-  // group each cycle by the investment / share-issue edge that closes it
-  const groups = {};
-  for (const cyc of cycles) {
-    const pairs = cyc.map((a, i) => [a, cyc[(i + 1) % cyc.length]]);
-    const ids = pairs.flatMap(([a, b]) => adj[a][b]);
-    const anchor = LOOP_PRIORITY.find(e => ids.includes(e)) || 'trade';
-    (groups[anchor] ||= []).push({ nodes: cyc, pairs, ids });
-  }
-  const list = Object.entries(groups).map(([anchor, cs]) => {
-    const minLen = Math.min(...cs.map(c => c.nodes.length));
-    const core = cs.filter(c => c.nodes.length === minLen);
-    // rotate each core cycle to start at the anchor's money source
-    const a = L[anchor]; const src = a ? (a.consideration === 'issued_in_deal' ? a.to : a.from) : null;
-    const pathStr = core.map(c => { const k = Math.max(0, c.nodes.indexOf(src)); const r = [...c.nodes.slice(k), ...c.nodes.slice(0, k)]; return [...r, r[0]].map(short).join(' > '); });
-    return { anchor, meta: LOOP_META[anchor] || { n: 'L?', t: 'Trade loop', c: '' }, cycles: cs, core, pathStr, links: new Set(core.flatMap(c => c.ids)) };
-  }).sort((x, y) => x.meta.n.localeCompare(y.meta.n));
-  return { loops: list, paths: cycles.length };
-}
-const LOOPS = findLoops();
-
-// ============================================================
-//  Scenario parsing. In the UI this is "AI interpretation".
-//  replace parseScenario() with Amazon Bedrock call in production
-// ============================================================
-const ALIASES = [
-  ['openai', /\b(openai|open ai|chatgpt|stargate)\b/], ['msft', /\b(microsoft|msft|azure)\b/], ['orcl', /\b(oracle|orcl|oci)\b/],
-  ['crwv', /\b(coreweave|core weave|crwv)\b/], ['amzn', /\b(amazon|aws|amzn)\b/], ['googl', /\b(google|alphabet|googl|goog)\b/],
-  ['nvda', /\b(nvidia|nvda)\b/], ['amd', /\b(amd|advanced micro)\b/], ['avgo', /\b(broadcom|avgo)\b/], ['tsm', /\b(tsmc|tsm|taiwan semi\w*)\b/],
-  ['skh', /\b(sk ?hynix|hynix|000660)\b/], ['sb', /\b(softbank|9984)\b/]
-];
-function parseScenario(text) {
-  const t = ' ' + text.toLowerCase() + ' ';
-  const hits = [];
-  for (const [id, re] of ALIASES) { const m = t.match(re); if (m) hits.push({ id, at: m.index }); }
-  hits.sort((a, b) => a.at - b.at);
-  const notes = [];
-  let origin = hits[0]?.id || 'openai';
-  if (!hits.length) notes.push('no company found, defaulted to OpenAI');
-  let target = hits.find(h => h.id !== origin)?.id || '';
-  const supplyWords = /(shortage|outage|can'?t deliver|cannot deliver|halts? (production|shipments)|supply (shock|cut|disruption)|fab|production (cut|halt)|delay(s|ed)? (shipments|deliveries))/;
-  let kind = supplyWords.test(t) ? 'supply' : 'demand';
-  let sev; const pm = t.match(/(\d+(?:\.\d+)?)\s*(%|percent|pc\b)/);
-  if (pm) sev = Math.min(100, parseFloat(pm[1]));
-  else if (/\b(halves|halve|half)\b/.test(t)) sev = 50;
-  else if (/\b(miss(es|ed)?|default(s|ed)?|stops? paying|fails? to pay|cancel(s|led)?|collapse(s|d)?|walks? away)\b/.test(t)) sev = 100;
-  else { sev = 40; notes.push('no size given, assumed 40%'); }
-  // validate: a demand shock needs the origin to buy from the target
-  if (kind === 'demand' && target && !SUP.some(l => l.to === origin && l.from === target)) {
-    if (SUP.some(l => l.to === target && l.from === origin)) { [origin, target] = [target, origin]; notes.push('read as ' + short(origin) + ' cutting purchases from ' + short(target)); }
-    else { notes.push(short(origin) + ' does not buy from ' + short(target) + ' in this map; applied to all its suppliers'); target = ''; }
-  }
-  if (kind === 'demand' && !SUP.some(l => l.to === origin)) { kind = 'supply'; notes.push(short(origin) + ' buys nothing in this map, read as a supply shock'); }
-  if (kind === 'supply' && !SUP.some(l => l.from === origin)) { kind = 'demand'; notes.push(short(origin) + ' sells nothing in this map, read as a demand shock'); }
-  if (kind === 'supply' && target && !SUP.some(l => l.from === origin && l.to === target)) target = '';
-  return { text, origin, target, kind, severity: sev / 100, notes };
-}
-
-// ============================================================
-//  Shock engine (deterministic, runs in the browser)
-// ============================================================
-// Live mode: when served by server.js with ANTHROPIC_API_KEY set, Claude parses the scenario.
-// Opened as a plain file (or without a key) it silently falls back to the keyword parser above.
-let LIVE = false;
-async function checkLive() {
-  if (location.protocol === 'file:') return;
-  try { const r = await fetch('api/health', { cache: 'no-store' }); if (r.ok) LIVE = !!(await r.json()).live; } catch (e) { LIVE = false; }
-  renderParser();
-}
-async function parseSmart(text) {
-  if (!LIVE) return parseScenario(text);
-  try {
-    const ctl = new AbortController(); const to = setTimeout(() => ctl.abort(), 12000);
-    const r = await fetch('api/parse-scenario', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ text }), signal: ctl.signal });
-    clearTimeout(to);
-    if (!r.ok) throw new Error('status ' + r.status);
-    const j = await r.json();
-    if (!C[j.origin] || !['demand', 'supply'].includes(j.kind) || !(j.severity >= 0 && j.severity <= 1)) throw new Error('bad parse');
-    let target = C[j.target] ? j.target : '';
-    const ok = j.kind === 'demand' ? SUP.some(l => l.to === j.origin && l.from === target) : SUP.some(l => l.from === j.origin && l.to === target);
-    if (target && !ok) target = '';
-    return { text, origin: j.origin, target, kind: j.kind, severity: j.severity, notes: ['parsed by Claude' + (j.reason ? ': ' + j.reason : '')] };
-  } catch (e) { const sc = parseScenario(text); sc.notes = [...sc.notes, 'live parse unavailable, used keyword parser']; return sc; }
-}
-
-function runShock(sc, eqMult = 1.5, damp = 0.6, maxHops = 4) {
-  const demand = sc.kind === 'demand';
-  // for a demand shock money stops flowing buyer -> seller, so the hit lands on the seller (upstream)
-  const src = l => demand ? l.to : l.from;   // who cuts
-  const dst = l => demand ? l.from : l.to;   // who is hit
-  const loss = {}, pct = {}, contrib = {}, hops = [];
-  let cut = { [sc.origin]: sc.severity };
-  for (let h = 1; h <= maxHops; h++) {
-    const fired = [], add = {};
-    for (const l of SUP) {
-      const d = cut[src(l)]; if (!d) continue;
-      if (h === 1 && sc.target && dst(l) !== sc.target) continue;
-      const v = dst(l); if (v === sc.origin) continue;
-      const usd = d * l.annual_usd_b; if (usd < 1e-6) continue;
-      add[v] = (add[v] || 0) + usd;
-      fired.push({ link: l.id, from: src(l), to: v, usd });
-      (contrib[v] ||= []).push({ from: src(l), link: l.id, usd, hop: h });
-    }
-    const next = {}; let maxChange = 0;
-    for (const [v, usd] of Object.entries(add)) {
-      const rev = C[v].revenue_usd_b; if (!rev) continue;
-      const before = pct[v] || 0;
-      loss[v] = (loss[v] || 0) + usd;
-      pct[v] = Math.min(1, loss[v] / rev);
-      const dlt = pct[v] - before;
-      next[v] = damp * dlt; maxChange = Math.max(maxChange, dlt);
-    }
-    hops.push({ fired, pct: { ...pct }, loss: { ...loss } });
-    cut = next;
-    if (maxChange < 0.001) break;
-  }
-  // origin distress: share of its purchases (or sales) the scenario removes
-  const own = SUP.filter(l => src(l) === sc.origin);
-  const tot = own.reduce((s, l) => s + l.annual_usd_b, 0);
-  const aff = own.filter(l => !sc.target || dst(l) === sc.target).reduce((s, l) => s + l.annual_usd_b, 0);
-  const distress = tot ? sc.severity * aff / tot : sc.severity;
-  // equity hit: stake value x valuation drop (separate from revenue)
-  const eq = {};
-  for (const l of EQ) {
-    const val = l.stake_value_usd_b; if (!val) continue;
-    const base = l.to === sc.origin ? distress : (pct[l.to] || 0);
-    const drop = Math.min(1, eqMult * base); if (drop <= 0) continue;
-    (eq[l.from] ||= []).push({ link: l.id, usd: val * drop, drop });
-  }
-  // strongest path back to the origin + weakest confidence along it
-  const parent = {};
-  for (const [v, cs] of Object.entries(contrib)) {
-    const by = {}; for (const c of cs) by[c.from] = (by[c.from] || 0) + c.usd;
-    parent[v] = Object.entries(by).sort((a, b) => b[1] - a[1])[0][0];
-  }
-  const pathOf = v => { const p = [v]; let cur = v; for (let i = 0; i < 8 && cur !== sc.origin && parent[cur]; i++) { cur = parent[cur]; if (p.includes(cur)) break; p.unshift(cur); } return p; };
-  const confOf = p => {
-    let r = 2;
-    for (let i = 0; i < p.length - 1; i++) {
-      const ls = SUP.filter(l => src(l) === p[i] && dst(l) === p[i + 1]);
-      for (const l of ls) r = Math.min(r, CONF_RANK[l.confidence]);
-    }
-    return Object.keys(CONF_RANK).find(k => CONF_RANK[k] === r);
-  };
-  const rows = IDS.filter(id => id !== sc.origin && ((loss[id] || 0) > 0 || eq[id])).map(id => {
-    const p = loss[id] ? pathOf(id) : [sc.origin, id];
-    const eqUsd = (eq[id] || []).reduce((s, e) => s + e.usd, 0);
-    const firstHop = (contrib[id] || []).reduce((m, c) => Math.min(m, c.hop), 9);
-    return { id, loss: loss[id] || 0, pct: pct[id] || 0, eq: eqUsd, path: p, conf: loss[id] ? confOf(p) : (eq[id] ? L[eq[id][0].link].confidence : null), hop: firstHop, viaEquity: !loss[id] };
-  }).sort((a, b) => b.pct - a.pct || b.eq - a.eq);
-  const total = rows.reduce((s, r) => s + r.loss, 0);
-  const eqTotal = rows.reduce((s, r) => s + r.eq, 0);
-  return { sc, eqMult, damp, hops, loss, pct, contrib, eq, rows, total, eqTotal, distress, parent };
-}
-
-// Choke points: fail each company completely, both ways (stops buying / stops delivering),
-// and rank by how far the damage spreads. score = revenue at risk x companies hit.
-function findChokes(n = 3) {
-  const out = [];
-  for (const id of IDS) {
-    const runs = ['demand', 'supply'].map(kind => { const r = runShock({ origin: id, severity: 1, kind, target: null, notes: [] }); return { kind, usd: r.total, reach: r.rows.filter(x => x.loss > 0).length }; });
-    const best = runs.sort((a, b) => b.usd * b.reach - a.usd * a.reach)[0];
-    if (best.usd > 0) out.push({ id, ...best, score: best.usd * best.reach });
-  }
-  return out.sort((a, b) => b.score - a.score).slice(0, n);
-}
-// simple paths in the shock direction (used by the agent trace)
-function allPaths(from, to, kind = 'demand', max = 5) {
-  const out = [];
-  const nxt = v => kind === 'demand' ? SUP.filter(l => l.to === v).map(l => l.from) : SUP.filter(l => l.from === v).map(l => l.to);
-  const go = (v, p) => { if (p.length > max) return; if (v === to) { out.push(p); return; } for (const w of new Set(nxt(v))) if (!p.includes(w)) go(w, [...p, w]); };
-  go(from, [from]);
-  return out;
-}
-
-function traceSteps() {
-  const res = S.res || runShock(parseScenario(PRESETS[0]));
-  const sc = res.sc, o = short(sc.origin);
-  const fs = DATA.sources.filter(s => [s.title, s.used_for].join(' ').toLowerCase().includes(o.toLowerCase()));
-  const rel = sc.kind === 'demand' ? 'customers_of' : 'suppliers_of';
-  const links = SUP.filter(l => sc.kind === 'demand' ? l.to === sc.origin : l.from === sc.origin);
-  const tgt = res.rows.find(r => r.id === 'nvda' && r.loss) ? 'nvda' : (res.rows.find(r => r.loss && r.hop > 1) || res.rows[0] || { id: 'nvda' }).id;
-  const paths = allPaths(sc.origin, tgt, sc.kind);
-  const pathVal = p => { // dollars that actually flowed along this path's last hop from its predecessor
-    const last = p[p.length - 2]; return (res.contrib[tgt] || []).filter(c => c.from === last).reduce((s, c) => s + c.usd, 0);
-  };
-  const top = res.rows.filter(r => r.loss).slice(0, 4);
-  const fmtRows = rows => rows.map(r => `  { company: "${C[r.id].ticker}", revenue_at_risk: ${r.loss.toFixed(2)}, pct: ${(r.pct * 100).toFixed(1)} }`).join(',\n');
-  return [
-    { fn: 'search_filings', args: `"${o}"`, ms: 184, out: `{ matches: ${fs.length}, top: [\n${fs.slice(0, 3).map(s => `  "${s.title}" (${s.type}, ${s.date})`).join(',\n')}\n] }` },
-    { fn: 'get_links', args: `"${o}", "${rel}"`, ms: 92, out: `[\n${links.map(l => `  { ${sc.kind === 'demand' ? 'seller' : 'buyer'}: "${short(sc.kind === 'demand' ? l.from : l.to)}", annual_usd_b: ${l.annual_usd_b}, confidence: "${l.confidence}" }`).join(',\n')}\n]` },
-    { fn: sc.kind === 'demand' ? 'demand_shock' : 'supply_shock', args: `"${o}", ${sc.severity.toFixed(2)}${sc.target ? `, only="${short(sc.target)}"` : ''}`, ms: 38, out: `{ hops: ${res.hops.length}, companies_hit: ${res.rows.filter(r => r.loss).length}, revenue_at_risk_usd_b: ${res.total.toFixed(2)}, equity_hit_usd_b: ${res.eqTotal.toFixed(2)},\n top: [\n${fmtRows(top)}\n ] }` },
-    { fn: 'find_loops', args: '', ms: 21, out: `{ loops: ${LOOPS.loops.length}, cycles: ${LOOPS.paths}, ids: [${LOOPS.loops.map(l => '"' + l.meta.n + '"').join(', ')}] }` },
-    { fn: 'paths', args: `"${o}", "${C[tgt].ticker}"`, ms: 15, out: `[\n${paths.map(p => `  "${p.map(short).join(' > ')}"  ${pathVal(p) ? '(last hop $' + pathVal(p).toFixed(2) + 'B)' : ''}`).join(',\n')}\n]  // ${paths.length} paths` },
-    { fn: 'explain', args: '', ms: 1260, out: '-> see summary' }
-  ];
-}
-function explainText() {
-  const res = S.res || runShock(parseScenario(PRESETS[0]));
-  const r = res.rows.filter(x => x.loss);
-  if (!r.length) return 'This scenario does not move revenue for any company in the map.';
-  const byPct = r[0], second = r[1];
-  const byUsd = [...r].sort((a, b) => b.loss - a.loss)[0];
-  const nv = r.find(x => x.id === 'nvda');
-  const nvPaths = nv ? new Set((res.contrib.nvda || []).map(c => c.from)).size : 0;
-  const late = r.filter(x => x.id === 'tsm' || x.id === 'skh');
-  const eqTop = Object.entries(res.eq).map(([id, es]) => [id, es.reduce((s, e) => s + e.usd, 0)]).sort((a, b) => b[1] - a[1])[0];
-  const lev = r.filter(x => C[x.id].leverage_flag);
-  let s = `If ${esc(describe(res.sc))}, about <b>${fB(res.total)}</b> a year of revenue is at risk across ${r.length} companies. `;
-  s += `${esc(short(byPct.id))} is hit hardest by share of revenue (<b>-${fP(byPct.pct)}</b>, ${fB(byPct.loss)}/yr)${second ? `, then ${esc(short(second.id))} (<b>-${fP(second.pct)}</b>)` : ''}. `;
-  if (byUsd.id !== byPct.id) s += `${esc(short(byUsd.id))} loses the most in dollars (${fB(byUsd.loss)}/yr) but only ${fP(byUsd.pct)} of revenue. `;
-  if (nv) s += `Nvidia is hit through ${nvPaths} customer${nvPaths > 1 ? 's' : ''} (<b>-${fP(nv.pct)}</b>), mostly via ${esc(short(res.parent.nvda))}. `;
-  if (late.length) s += `${late.map(x => esc(short(x.id))).join(' and ')} feel it last, from hop ${Math.min(...late.map(x => x.hop))}. `;
-  if (eqTop) s += `Separately, stakes lose about <b>${fB(res.eqTotal)}</b> in value, led by ${esc(short(eqTop[0]))} (${fB(eqTop[1])}). `;
-  if (lev.length) s += `${lev.map(x => esc(short(x.id))).join(' and ')} fund${lev.length === 1 ? 's' : ''} this buildout with debt, so the gap hurts more than the percentage suggests.`;
-  return s;
-}
-
-// ============================================================
-//  Interface
-// ============================================================
-const S = {
-  pf: new Set(['nvda', 'msft', 'orcl', 'crwv', 'amd']), focus: 'openai',
-  sel: null, srcSel: null, loops: false, loopIdx: 0,
-  sc: null, res: null, shown: null, hot: new Set(), hop: 0, animating: false, animToken: 0, live: {}, liveEq: {}, cap: '',
-  q: '', fType: 'All', srcOpen: false
-};
-const PRESETS = ['OpenAI cuts compute spending 40%', 'OpenAI misses its Oracle payments', 'Microsoft cuts CoreWeave contracts 50%'];
-const PF_IDS = ['msft', 'nvda', 'orcl', 'crwv', 'amzn', 'googl', 'amd', 'avgo', 'tsm', 'skh', 'sb'];
-const CHOKE = findChokes();
-const INK = '#16171B', RED = '#D92D4A', ORANGE = '#F7931E';
-const NS = 'http://www.w3.org/2000/svg', W = 1100, H = 740;
-const el = (tag, attrs = {}, parent) => { const e = document.createElementNS(NS, tag); for (const k in attrs) e.setAttribute(k, attrs[k]); if (parent) parent.appendChild(e); return e; };
-const R = Object.fromEntries(IDS.map(id => [id, C[id].revenue_usd_b ? 7 + 0.75 * Math.sqrt(C[id].revenue_usd_b) : 12]));
-const exposureColor = t => {
-  const lerp = (a, b, k) => a.map((x, i) => Math.round(x + (b[i] - x) * k));
-  const g = [168, 162, 152], o = [247, 147, 30], r = [217, 45, 74], k = Math.max(0, Math.min(1, t / 0.6));
-  return `rgb(${(k < 0.5 ? lerp(g, o, k / 0.5) : lerp(o, r, (k - 0.5) / 0.5)).join(',')})`;
-};
-function tiedTo(focus) {
-  const t = Object.fromEntries(IDS.map(id => [id, 0])); t[focus] = 1;
-  for (let it = 0; it < 30; it++) for (const id of IDS) {
-    if (id === focus || !C[id].revenue_usd_b) continue;
-    t[id] = Math.min(1, SUP.filter(l => l.from === id).reduce((a, l) => a + l.annual_usd_b * t[l.to], 0) / C[id].revenue_usd_b);
-  }
-  return t;
-}
-const describe = sc => sc.kind === 'demand'
-  ? `${short(sc.origin)} cuts ${sc.target ? 'purchases from ' + short(sc.target) : 'compute spending'} ${fP(sc.severity, 0)}`
-  : `${short(sc.origin)} can't deliver ${fP(sc.severity, 0)}${sc.target ? ' to ' + short(sc.target) : ''}`;
-function renderParser() { $('#parserBadge').textContent = LIVE ? 'Read by Claude (live)' : 'Keyword parser (offline)'; }
-
-// ---------- layout: suppliers | company | customers, like a supply chain screen ----------
-let P = {}, NODE = {}, EDGE = {}, gParticles, gPulse, gShock, gFloat;
-const COL_NAME = { '-3': 'Further upstream', '-2': "Suppliers' suppliers", '-1': 'Suppliers', '0': 'Company', '1': 'Customers', '2': "Customers' customers", '3': 'Further downstream' };
-function layout(focus) {
-  const bfs = next => { const d = { [focus]: 0 }; let fr = [focus]; for (let k = 1; fr.length; k++) { const nx = []; for (const v of fr) for (const w of next(v)) if (d[w] == null) { d[w] = k; nx.push(w); } fr = nx; } return d; };
-  const up = bfs(v => SUP.filter(l => l.to === v).map(l => l.from)), down = bfs(v => SUP.filter(l => l.from === v).map(l => l.to));
-  const flow = (a, b) => SUP.filter(l => l.from === a && l.to === b).reduce((s, l) => s + l.annual_usd_b, 0);
-  const col = {};
-  for (const id of IDS) {
-    if (id === focus) { col[id] = 0; continue; }
-    const u = up[id], d = down[id];
-    if (u != null && d != null && u === d) col[id] = flow(focus, id) > flow(id, focus) ? d : -u;
-    else if (u != null && (d == null || u < d)) col[id] = Math.max(-3, -u);
-    else if (d != null) col[id] = Math.min(3, d);
-  }
-  const used = [...new Set(Object.values(col))].sort((a, b) => a - b);
-  const inv = IDS.filter(id => col[id] == null && EQ.some(l => (l.from === id && col[l.to] != null)));
-  const cols = used.map(c => ({ name: COL_NAME[c], ids: IDS.filter(id => col[id] === c) }));
-  if (inv.length) cols.push({ name: 'Investors', ids: inv });
-  const pos = {}, lanes = [];
-  cols.forEach((c, i) => {
-    const x = cols.length === 1 ? W / 2 : 110 + i * (W - 220) / (cols.length - 1);
-    lanes.push([c.name, x]);
-    const n = c.ids.length, top = 56, span = H - 96;
-    c.ids.forEach((id, k) => { pos[id] = { x, y: top + span * (k + 0.5) / n }; });
-  });
-  return { pos, lanes };
-}
-function edgeD(l) {
-  const a = P[l.from], b = P[l.to]; if (!a || !b) return null;
-  const ra = R[l.from] + 3, rb = R[l.to] + 7, eq = l.type === 'equity', o = eq ? -9 : 0;
-  if (b.x - a.x > 40) { const dx = (b.x - a.x) * (eq ? 0.3 : 0.45); return `M${a.x + ra},${a.y + o} C${a.x + ra + dx},${a.y + o} ${b.x - rb - dx},${b.y + o} ${b.x - rb},${b.y + o}`; }
-  if (Math.abs(b.x - a.x) <= 40) { const s = eq ? -1 : 1, k = 46 + Math.abs(b.y - a.y) * 0.22; return `M${a.x + s * ra},${a.y} C${a.x + s * (ra + k)},${a.y} ${b.x + s * (rb + k)},${b.y} ${b.x + s * rb},${b.y}`; }
-  const up = eq ? -1 : 1, cy = up < 0 ? Math.min(a.y, b.y) - 120 : Math.max(a.y, b.y) + 120;
-  return `M${a.x},${a.y + up * ra} C${a.x},${cy} ${b.x},${cy} ${b.x},${b.y + up * rb}`;
-}
-const edgeW = l => l.type === 'supply' ? 1 + 0.8 * Math.sqrt(l.annual_usd_b || 0.5) : 1.7;
-const EDGE_BASE = l => l.type === 'supply' ? '#A9A398' : ORANGE;
-
-function buildMap() {
-  const svg = $('#map'); svg.innerHTML = ''; NODE = {}; EDGE = {}; svg.setAttribute('viewBox', `0 0 ${W} ${H}`);
-  const lay = layout(S.focus); P = lay.pos;
-  const defs = el('defs', {}, svg), gl = el('g', {}, svg);
-  lay.lanes.forEach(([t, x]) => {
-    el('line', { x1: x, x2: x, y1: 40, y2: H - 6, stroke: '#ECE8E0', 'stroke-width': 1 }, gl);
-    el('text', { x, y: 26, 'text-anchor': 'middle', class: 'lane-t', style: t === 'Company' ? 'fill:#16171B' : '' }, gl).textContent = t;
-  });
-  const gE = el('g', {}, svg); gShock = el('g', {}, svg); const gH = el('g', {}, svg); gParticles = el('g', {}, svg);
-  const gN = el('g', {}, svg); gPulse = el('g', {}, svg); gFloat = el('g', {}, svg);
-  [...DATA.links].sort((a, b) => edgeW(b) - edgeW(a)).forEach(l => {
-    const d = edgeD(l); if (!d) return;
-    const w = edgeW(l), ms = Math.max(8, Math.min(14, w * 1.9));
-    const mk = el('marker', { id: 'm-' + l.id, viewBox: '0 0 10 10', refX: 8.5, refY: 5, markerUnits: 'userSpaceOnUse', markerWidth: ms, markerHeight: ms, orient: 'auto-start-reverse' }, defs);
-    const mp = el('path', { d: 'M0,1 L10,5 L0,9 Z', fill: EDGE_BASE(l) }, mk);
-    const p = el('path', { d, class: 'edge', stroke: EDGE_BASE(l), 'stroke-width': w.toFixed(2), 'marker-end': `url(#m-${l.id})` }, gE);
-    const dash = l.type === 'equity' ? '6 4' : isDotted(l) ? '0.1 ' + Math.max(4, w * 1.6).toFixed(1) : null;
-    if (dash) { p.setAttribute('stroke-dasharray', dash); if (l.type !== 'equity') p.setAttribute('stroke-linecap', 'round'); }
-    const h = el('path', { d, class: 'ehit' }, gH);
-    h.addEventListener('click', e => { e.stopPropagation(); select('link', l.id); });
-    h.addEventListener('mousemove', e => showTip(e, linkTip(l))); h.addEventListener('mouseleave', hideTip);
-    EDGE[l.id] = { p, mp, w, dash };
-  });
-  for (const id of IDS) {
-    if (!P[id]) continue;
-    const { x, y } = P[id], r = R[id];
-    const g = el('g', { class: 'node', transform: `translate(${x},${y})`, tabindex: 0, role: 'button', 'aria-label': C[id].name }, gN);
-    el('circle', { r: r + 5, class: 'selring' }, g);
-    if (CHOKE.some(c => c.id === id)) { const q = r + 10; el('path', { d: `M0,${-q} L${q},0 L0,${q} L${-q},0Z`, class: 'choke' }, g); }
-    const core = el('circle', { r, class: 'core', fill: '#fff', 'stroke-width': id === S.focus ? 4 : 2.6 }, g);
-    const t1 = el('text', { class: 'tick', 'text-anchor': 'middle', y: r + (CHOKE.some(c => c.id === id) ? 26 : 17) }, g); t1.textContent = short(id);
-    const bg = el('g', { transform: `translate(0,${-r - 14})`, opacity: 0 }, g);
-    const br = el('rect', { class: 'badge-r', x: -28, y: -11, width: 56, height: 19 }, bg), bt = el('text', { class: 'badge-t', 'text-anchor': 'middle', y: 3.5 }, bg);
-    g.addEventListener('click', e => { e.stopPropagation(); select('node', id); });
-    g.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); select('node', id); } });
-    g.addEventListener('mousemove', e => showTip(e, nodeTip(id))); g.addEventListener('mouseleave', hideTip);
-    NODE[id] = { g, core, bg, br, bt };
-  }
-  paintMap();
-}
-function nodeTip(id) {
-  const c = C[id];
-  return `<b>${esc(c.name)}</b><div class="s">${c.revenue_usd_b ? 'Revenue ' + fB(c.revenue_usd_b) : 'Investor'}${id !== 'openai' && c.revenue_usd_b ? ' · ' + fP(TIED[id]) + ' tied to OpenAI' : ''}</div><div class="s">Click for details</div>`;
-}
-function linkTip(l) {
-  return `<b>${esc(short(l.from))} ${l.type === 'supply' ? 'sells to' : 'invests in'} ${esc(short(l.to))}</b><div class="s">${esc(l.label)}</div><div class="s">Click for the source</div>`;
-}
-function showTip(e, html) {
-  const t = $('#tip'); t.innerHTML = html; t.classList.remove('hide');
-  let x = e.clientX + 14, y = e.clientY + 14;
-  if (x + t.offsetWidth > innerWidth - 8) x = e.clientX - t.offsetWidth - 14;
-  if (y + t.offsetHeight > innerHeight - 8) y = e.clientY - t.offsetHeight - 14;
-  t.style.left = x + 'px'; t.style.top = y + 'px';
-}
-function hideTip() { $('#tip').classList.add('hide'); }
-
-function srcMatches() {
-  if (!S.srcOpen || (!S.q && S.fType === 'All')) return null;
-  const m = new Set();
-  for (const s of filteredSources()) { m.add(s.company); for (const l of DATA.links) if (l.source_id === s.id) { m.add(l.from); m.add(l.to); } }
-  return m;
-}
-function paintMap() {
-  const loop = S.loops ? LOOPS.loops[S.loopIdx] : null, loopNodes = loop ? new Set(loop.core.flatMap(c => c.nodes)) : null;
-  const scen = !!S.shown, m = srcMatches(), selL = new Set(), selN = new Set();
-  const addL = l => { selL.add(l.id); selN.add(l.from); selN.add(l.to); };
-  if (S.sel?.kind === 'node') { selN.add(S.sel.id); DATA.links.filter(l => l.from === S.sel.id || l.to === S.sel.id).forEach(addL); }
-  if (S.sel?.kind === 'link') addL(L[S.sel.id]);
-  if (S.srcSel) { selN.add(SRC[S.srcSel].company); DATA.links.filter(l => l.source_id === S.srcSel).forEach(addL); }
-  const focusing = !!(S.sel || S.srcSel);
-  for (const id in NODE) {
-    const n = NODE[id];
-    const dim = loop ? !loopNodes.has(id) : focusing ? !selN.has(id) : m ? !m.has(id) : false;
-    n.g.classList.toggle('dim', dim);
-    n.g.classList.toggle('sel', S.sel?.kind === 'node' && S.sel.id === id);
-    const p = scen ? (S.shown[id] || 0) : 0, origin = scen && S.res && S.res.sc.origin === id;
-    const badge = txt => { n.bg.setAttribute('opacity', 1); n.bt.textContent = txt; const w = Math.max(44, txt.length * 7.6 + 12); n.br.setAttribute('x', -w / 2); n.br.setAttribute('width', w); };
-    if (p > 0) {
-      n.core.setAttribute('fill', `rgba(217,45,74,${(0.14 + 0.62 * Math.min(1, 0.2 + p / 0.4 * 0.8)).toFixed(2)})`); n.core.setAttribute('stroke', RED);
-      badge('-' + fP(p, p < 0.01 ? 2 : 1));
-    } else {
-      n.core.setAttribute('fill', S.pf.has(id) ? '#FFE2B8' : '#fff');
-      n.core.setAttribute('stroke', origin ? RED : id === S.focus ? INK : exposureColor(TIED[id]));
-      if (origin) badge((S.res.sc.kind === 'demand' ? 'cuts ' : 'short ') + fP(S.res.sc.severity, 0)); else n.bg.setAttribute('opacity', 0);
-    }
-  }
-  for (const id in EDGE) {
-    const l = L[id], e = EDGE[id];
-    let color = EDGE_BASE(l), op = l.type === 'equity' ? 0.75 : 1, w = e.w, flow = false, dash = e.dash;
-    if (loop) { if (loop.links.has(id)) { color = ORANGE; w = Math.max(2.6, e.w); flow = true; dash = l.type === 'equity' ? '6 4' : '10 6'; op = 1; } else op = 0.07; }
-    else if (scen && S.hot.has(id)) { color = RED; op = 1; }
-    else if (focusing) { if (selL.has(id)) { color = l.type === 'supply' ? INK : ORANGE; op = 1; } else op = 0.08; }
-    else if (m) { if (!(m.has(l.from) && m.has(l.to))) op = 0.08; }
-    else if (scen) op = 0.28;
-    e.p.setAttribute('stroke', color); e.mp.setAttribute('fill', color); e.p.setAttribute('stroke-width', w.toFixed(2)); e.p.style.opacity = op;
-    if (dash) e.p.setAttribute('stroke-dasharray', dash); else e.p.removeAttribute('stroke-dasharray');
-    e.p.classList.toggle('flow', flow);
-  }
-}
-function setFocus(id) { if (!C[id] || id === S.focus) return; S.focus = id; buildMap(); renderCap(); renderPortfolio(); }
-
-// ---------- caption above the map ----------
-function renderCap() {
-  const c = $('#cap');
-  $$('.views button').forEach(b => b.setAttribute('aria-selected', String((b.dataset.mode === 'loops') === S.loops)));
-  if (S.loops) {
-    const lp = LOOPS.loops[S.loopIdx];
-    c.innerHTML = `<div class="tx"><span class="lbl" style="color:var(--accent-ink)">Money loop ${S.loopIdx + 1} of ${LOOPS.loops.length}</span><h1>${esc(lp.meta.t)}</h1><p>${esc(lp.meta.c)}</p></div>
-      <div class="acts"><button class="btn" id="lpPrev">Prev</button><button class="btn" id="lpNext">Next</button></div>`;
-    const step = d => { S.loopIdx = (S.loopIdx + LOOPS.loops.length + d) % LOOPS.loops.length; renderCap(); paintMap(); };
-    $('#lpPrev').onclick = () => step(-1); $('#lpNext').onclick = () => step(1);
-    return;
-  }
-  if (S.res) {
-    const n = S.res.hops.length, risk = Object.values(S.live).reduce((s, v) => s + v.loss, 0);
-    c.innerHTML = `<div class="tx"><span class="lbl" style="color:var(--danger)">${S.animating ? (S.hop ? `Hop ${S.hop} of ${n}` : 'Shock starts') : 'Scenario settled'}</span><h1>${esc(describe(S.res.sc))}</h1><p>${esc(S.cap)}</p><div class="pips">${S.res.hops.map((_, i) => `<i class="${i < S.hop ? 'on' : ''}"></i>`).join('')}</div></div>
-      <div class="kp"><span class="lbl">Revenue at risk</span><b class="neg">-${fB(risk)}/yr</b></div>`;
-    return;
-  }
-  c.innerHTML = `<div class="tx"><span class="lbl">Supply chain of</span><h1><select id="focusSel" aria-label="Company" style="font:inherit;border:0;border-bottom:2px solid var(--accent);background:transparent;color:var(--ink);padding:0 2px;cursor:pointer">${IDS.filter(id => SUP.some(l => l.from === id || l.to === id)).map(id => `<option value="${id}"${id === S.focus ? ' selected' : ''}>${esc(short(id))}</option>`).join('')}</select></h1>
-    <p>Suppliers on the left, customers on the right. Click a company or an arrow to see the deal and its source.</p></div>`;
-  $('#focusSel').onchange = e => { S.sel = null; renderDetail(); setFocus(e.target.value); };
-}
-
-// ---------- selection + detail ----------
-function select(kind, id) { S.sel = kind ? { kind, id } : null; renderDetail(); paintMap(); }
-const lkRow = l => `<button class="lk" data-link="${l.id}">${esc(short(l.from))} ${l.type === 'supply' ? 'sells to' : 'invests in'} ${esc(short(l.to))}<span>${l.type === 'supply' ? (l.annual_usd_b ? '~' + fB(l.annual_usd_b) + '/yr' : 'undisclosed') : (l.stake_value_usd_b ? fB(l.stake_value_usd_b) : 'stake')}</span></button>`;
-function renderDetail() {
-  const d = $('#detail');
-  if (!S.sel) { d.classList.add('hide'); d.innerHTML = ''; return; }
-  let h = '';
-  if (S.sel.kind === 'node') {
-    const id = S.sel.id, c = C[id], ck = CHOKE.find(x => x.id === id), row = S.res && !S.animating ? S.res.rows.find(r => r.id === id) : null;
-    const ls = DATA.links.filter(l => l.from === id || l.to === id);
-    h = `<div class="dh"><div><span class="lbl">${c.listed ? esc(c.ticker) : 'Private'}</span><h2>${esc(c.name)}</h2></div><button class="x" id="dX" aria-label="Close">&times;</button></div>
-      <dl class="kv"><dt>Revenue</dt><dd>${c.revenue_usd_b ? fB(c.revenue_usd_b) + ' <span class="note">' + esc(c.fiscal_year) + '</span>' : 'Investor only'}</dd>
-      <dt>Sells</dt><dd>${esc(c.sells || 'n/a')}</dd>
-      ${id !== 'openai' && c.revenue_usd_b ? `<dt>Tied to OpenAI</dt><dd>${fP(TIED[id])} of revenue</dd>` : ''}
-      ${row ? `<dt>In this scenario</dt><dd style="color:var(--danger)">${row.loss ? '-' + fB(row.loss) + '/yr (' + fP(row.pct) + ')' : ''}${row.eq ? ' -' + fB(row.eq) + ' stake value' : ''}</dd>` : ''}
-      ${ck ? `<dt>Choke point</dt><dd>If it ${ck.kind === 'demand' ? 'stops paying' : 'stops delivering'}, ${fB(ck.usd)}/yr is at risk across ${ck.reach} companies</dd>` : ''}
-      ${c.leverage_flag ? `<dt>Leverage</dt><dd>${esc(c.leverage_flag)}</dd>` : ''}</dl>
-      ${id !== S.focus && SUP.some(l => l.from === id || l.to === id) ? `<button class="btn" id="dFocus">Centre the map on ${esc(short(id))}</button>` : ''}
-      <div class="sub"><span class="lbl">Deals (${ls.length})</span></div>${ls.map(lkRow).join('')}
-      ${c.facts?.length ? `<div class="sub"><span class="lbl">From the filings</span></div><ul class="facts">${c.facts.map(f => `<li>${esc(f)}</li>`).join('')}</ul>` : ''}`;
-  } else {
-    const l = L[S.sel.id];
-    h = `<div class="dh"><div><span class="lbl">${l.type === 'supply' ? 'Sells to' : 'Invests in'}</span><h2>${esc(short(l.from))} &rarr; ${esc(short(l.to))}</h2></div><button class="x" id="dX" aria-label="Close">&times;</button></div>
-      <dl class="kv"><dt>Deal</dt><dd>${esc(l.label)}</dd>
-      <dt>Amount</dt><dd>${l.amount_usd_b != null ? fB(l.amount_usd_b) : 'undisclosed'}${l.period ? ' <span class="note">' + esc(l.period) + '</span>' : ''}</dd>
-      ${l.type === 'supply' ? `<dt>Per year in model</dt><dd>~${fB(l.annual_usd_b)}/yr</dd>` : ''}
-      <dt>Date</dt><dd>${esc(l.date)}</dd>
-      <dt>Confidence</dt><dd>${tagHTML(l.confidence)} <span class="note">${esc(CONF_TXT[l.confidence])}</span></dd></dl>
-      <div class="quote">${esc(l.quote)}<small>${l.quote_kind === 'paraphrase' ? 'Paraphrase of the source' : 'Quoted from the source'}</small></div>
-      ${l.estimate_note ? `<p class="note"><b>How we estimated:</b> ${esc(l.estimate_note)}</p>` : ''}
-      <div class="sub"><span class="lbl">Source</span>${verTag(l.verification)}</div>
-      <p style="margin:0 0 10px"><a href="${esc(l.source_url)}" target="_blank" rel="noopener">${esc(l.source_title)}</a></p>
-      <button class="btn" id="dSrc">Show in sources</button>`;
-  }
-  d.innerHTML = h; d.classList.remove('hide'); d.scrollTop = 0;
-  $('#dX').onclick = () => select(null);
-  d.querySelectorAll('.lk').forEach(b => b.onclick = () => select('link', b.dataset.link));
-  if ($('#dFocus')) $('#dFocus').onclick = () => { const id = S.sel.id; clearScenario(); if (S.loops) setLoops(false); setFocus(id); select('node', id); };
-  if ($('#dSrc')) $('#dSrc').onclick = () => { const sid = L[S.sel.id].source_id; openSources(sid); };
-}
-
-// ---------- portfolio ----------
-function renderPortfolio() {
-  const hold = [...S.pf];
-  const f = S.focus, t = tiedTo(f), down = new Set(); let fr = [f];
-  while (fr.length) { const nx = []; for (const v of fr) for (const l of SUP) if (l.from === v && !down.has(l.to) && l.to !== f) { down.add(l.to); nx.push(l.to); } fr = nx; }
-  const upDep = hold.filter(id => id === f || (C[id].revenue_usd_b && t[id] >= DEPEND_T) || EQ.some(l => l.from === id && l.to === f));
-  const dnDep = hold.filter(id => !upDep.includes(id) && down.has(id));
-  const dep = [...upDep, ...dnDep];
-  const how = !dnDep.length ? `${short(f)} paying its bills` : !upDep.length ? `${short(f)} delivering` : `${short(f)}, as its suppliers or customers`;
-  $('#pfBlk').innerHTML = `<div class="lbl"><span>Your portfolio</span><span>${hold.length} of ${PF_IDS.length} held</span></div>
-    <div class="chips" id="chips">${PF_IDS.map(id => `<button class="chip" data-id="${id}" aria-pressed="${S.pf.has(id)}" title="${esc(C[id].name)}">${esc(C[id].ticker)}</button>`).join('')}</div>
-    ${S.res ? '' : `<p class="headline">${hold.length ? `<em>${dep.length === hold.length && hold.length > 1 ? 'All ' + dep.length : dep.length + ' of your ' + hold.length}</em> ${dep.length === hold.length && hold.length > 1 ? 'of your holdings depend' : 'holding' + (hold.length === 1 ? '' : 's') + ' depend' + (dep.length === 1 ? 's' : '')} on ${esc(how)}.` : 'Pick the stocks you hold.'}</p>`}`;
-  $$('#chips .chip').forEach(b => b.onclick = () => { S.pf.has(b.dataset.id) ? S.pf.delete(b.dataset.id) : S.pf.add(b.dataset.id); renderPortfolio(); paintMap(); renderReport(); });
-}
-
-// ---------- scenario ----------
-function renderInterp() {
-  $('#presets').classList.toggle('hide', !!S.sc);
-  const b = $('#interp'); if (!S.sc) { b.classList.add('hide'); return; }
-  const sc = S.sc;
-  b.classList.remove('hide');
-  b.innerHTML = `<span class="lbl">AI interpretation. Edit to rerun.</span>
-    <div class="row"><select id="iOrigin" aria-label="Company">${IDS.filter(id => SUP.some(l => l.from === id || l.to === id)).map(id => `<option value="${id}"${id === sc.origin ? ' selected' : ''}>${esc(short(id))}</option>`).join('')}</select>
-    <select id="iKind" aria-label="Type"><option value="demand"${sc.kind === 'demand' ? ' selected' : ''}>buys less</option><option value="supply"${sc.kind === 'supply' ? ' selected' : ''}>can't deliver</option></select>
-    <input type="range" id="iSev" min="0" max="100" step="5" value="${Math.round(sc.severity * 100)}" aria-label="Severity"><output>${fP(sc.severity, 0)}</output></div>
-    ${sc.target ? `<div class="why">Only the deal with ${esc(short(sc.target))}.</div>` : ''}${sc.notes?.length ? `<div class="why">${esc(sc.notes.join('; '))}</div>` : ''}`;
-  const edit = () => {
-    const o = $('#iOrigin').value, k = $('#iKind').value, changed = o !== sc.origin || k !== sc.kind;
-    S.sc = { ...sc, origin: o, kind: k, severity: +$('#iSev').value / 100, target: changed ? '' : sc.target, notes: changed ? ['edited by you'] : sc.notes };
-    S.sc.text = describe(S.sc); $('#sText').value = S.sc.text; showInstant();
-  };
-  $('#iOrigin').onchange = edit; $('#iKind').onchange = edit; $('#iSev').onchange = edit;
-  $('#iSev').oninput = e => { e.target.nextElementSibling.textContent = e.target.value + '%'; };
-}
-async function runFromText(text) {
-  text = (text || '').trim(); if (!text) { $('#sText').focus(); return; }
-  $('#sText').value = text; $('#sText').blur();
-  S.sc = await parseSmart(text);
-  renderInterp(); await play();
-}
-function prepare() {
-  S.res = runShock(S.sc);
-  if (S.loops) setLoops(false, true);
-  S.sel = null; S.srcSel = null; renderDetail();
-  if (S.focus !== S.res.sc.origin) { S.focus = S.res.sc.origin; buildMap(); }
-}
-const HOP_CAP = (sc, i) => i === 0
-  ? (sc.kind === 'demand' ? `${short(sc.origin)} pays less, so its suppliers lose revenue.` : `${short(sc.origin)} cannot deliver, so its customers go short.`)
-  : (sc.kind === 'demand' ? 'Hit companies cut their own orders, so the shock moves to their suppliers.' : 'Short companies deliver less, so the shock moves to their customers.');
-async function play() {
-  prepare();
-  const res = S.res, my = ++S.animToken, dead = () => my !== S.animToken, rev = res.sc.kind === 'demand';
-  S.animating = true; S.shown = {}; S.hot = new Set(); S.hop = 0; S.live = {}; S.liveEq = {}; S.cap = 'The shock starts at ' + short(res.sc.origin) + '.';
-  [gParticles, gPulse, gShock, gFloat].forEach(g => g.innerHTML = '');
-  renderCap(); paintMap(); renderPortfolio(); renderReport();
-  $('#repBlk').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-  blast(res.sc.origin);
-  await sleep(900);
-  let prev = {};
-  for (let i = 0; i < res.hops.length; i++) {
-    if (dead()) return;
-    const h = res.hops[i]; S.hop = i + 1; S.cap = HOP_CAP(res.sc, i); renderCap();
-    for (const f of h.fired) { burn(f.link, rev, 700, RED); particle(f.link, rev, Math.min(1, 0.35 + Math.sqrt(f.usd) / 5), RED, 700); }
-    await sleep(720);
-    if (dead()) return;
-    for (const f of h.fired) S.hot.add(f.link);
-    S.shown = h.pct; paintMap();
-    const hit = Object.keys(h.loss).filter(id => h.loss[id] - (prev[id] || 0) > 1e-6).sort((x, y) => (h.loss[y] - (prev[y] || 0)) - (h.loss[x] - (prev[x] || 0)));
-    const delta = Object.fromEntries(hit.map(id => [id, h.loss[id] - (prev[id] || 0)]));
-    hit.forEach((id, k) => setTimeout(() => {
-      if (dead()) return;
-      impact(id, RED); floater(id, '-' + fB(delta[id]) + '/yr', RED); strike(id);
-      S.live[id] = { pct: h.pct[id], loss: h.loss[id] }; renderReport(); renderCap();
-    }, k * 80));
-    prev = h.loss;
-    await sleep(Math.max(600, hit.length * 80 + 420));
-  }
-  if (dead()) return;
-  const inv = Object.entries(res.eq).filter(([id]) => P[id]);
-  if (inv.length) {
-    S.cap = 'The loop closes: investors write down their stakes.'; renderCap();
-    for (const [, es] of inv) for (const e of es) if (EDGE[e.link]) { burn(e.link, true, 800, ORANGE); particle(e.link, true, 0.8, ORANGE, 800); }
-    await sleep(820);
-    if (dead()) return;
-    inv.forEach(([id, es], k) => setTimeout(() => {
-      if (dead()) return;
-      const usd = es.reduce((a, e) => a + e.usd, 0);
-      impact(id, ORANGE); floater(id, '-' + fB(usd) + ' stake', '#A85800', true); strike(id);
-      S.liveEq[id] = usd; renderReport();
-    }, k * 90));
-    await sleep(inv.length * 90 + 700);
-  }
-  if (dead()) return;
-  settle();
-}
-function settle() {
-  const res = S.res;
-  S.animating = false; S.shown = res.pct; S.hop = res.hops.length; S.hot = new Set(res.hops.flatMap(h => h.fired.map(f => f.link)));
-  S.live = Object.fromEntries(res.rows.filter(r => r.loss).map(r => [r.id, { pct: r.pct, loss: r.loss }]));
-  S.liveEq = Object.fromEntries(res.rows.filter(r => r.eq).map(r => [r.id, r.eq]));
-  S.cap = `${res.rows.filter(r => r.loss > 0).length} companies lose revenue. The full report is on the right.`;
-  renderCap(); paintMap(); renderPortfolio(); renderReport(); renderDetail();
-}
-function showInstant() { S.animToken++; prepare(); [gParticles, gPulse, gShock, gFloat].forEach(g => g.innerHTML = ''); renderInterp(); settle(); }
-function clearScenario() {
-  S.animToken++; S.animating = false; S.res = null; S.sc = null; S.shown = null; S.hot = new Set(); S.hop = 0; S.live = {}; S.liveEq = {};
-  [gParticles, gPulse, gShock, gFloat].forEach(g => g && (g.innerHTML = ''));
-  $('#sText').value = ''; renderInterp(); renderCap(); paintMap(); renderPortfolio(); renderReport(); renderDetail();
-}
-
-// ---------- report ----------
-function renderReport() {
-  const b = $('#repBlk'); if (!S.res) { b.classList.add('hide'); b.innerHTML = ''; return; }
-  const res = S.res, run = S.animating;
-  const rows = res.rows.filter(r => S.live[r.id]).map(r => ({ ...r, ...S.live[r.id] })).sort((a, b) => b.pct - a.pct);
-  const held = rows.filter(r => S.pf.has(r.id)), pfLoss = held.reduce((s, r) => s + r.loss, 0), all = rows.reduce((s, r) => s + r.loss, 0);
-  const eqRows = Object.entries(S.liveEq).sort((a, b) => b[1] - a[1]), pfEq = eqRows.filter(([id]) => S.pf.has(id)).reduce((s, [, v]) => s + v, 0);
-  const via = held.filter(r => (res.contrib[r.id] || []).some(c => c.from !== res.sc.origin && !S.pf.has(c.from)));
-  const n = S.pf.size;
-  b.classList.remove('hide');
-  b.innerHTML = `<div class="rep-h"><span class="lbl" style="color:var(--danger)">Report${run ? ' · running' : ''}</span><div style="display:flex;gap:6px"><button class="btn" id="rReplay">Replay</button><button class="btn ghost" id="rClear">Clear</button></div></div>
-    <div class="rep-t">${esc(describe(res.sc))}</div>
-    <div class="kpis"><div><span class="lbl">Your holdings</span><b>-${fB(pfLoss)}/yr</b></div><div><span class="lbl">All companies</span><b>-${fB(all)}/yr</b></div><div><span class="lbl">Your stakes</span><b>-${fB(pfEq)}</b></div></div>
-    ${run ? '' : `<p class="lead">Your ${n} holding${n === 1 ? '' : 's'} lose an estimated <b>${fB(pfLoss)}/yr</b> of revenue; ${via.length} of them through companies you don't own.</p>`}
-    <div class="sub"><span class="lbl">Revenue at risk, by company</span><span class="note">% of revenue</span></div>
-    <table class="rt"><tbody>${rows.map(r => `<tr data-node="${r.id}"><td class="nm"><b class="${S.pf.has(r.id) ? 'own' : ''}">${esc(tick(r.id))}</b>${C[r.id].leverage_flag ? ' <span class="tag lev" title="' + esc(C[r.id].leverage_flag) + '">LEVERAGE AMPLIFIES THIS</span>' : ''}<div>${r.path.map(short).map(esc).join(' &rsaquo; ')} ${tagHTML(r.conf)}</div></td>
-      <td class="bar"><i style="width:${Math.max(2, Math.min(100, r.pct / 0.4 * 100))}%"></i></td><td class="num p">-${fP(r.pct, r.pct < 0.01 ? 2 : 1)}</td><td class="num">${fB(r.loss)}</td></tr>`).join('') || '<tr><td class="note">Waiting for the first hit.</td></tr>'}</tbody></table>
-    ${eqRows.length ? `<div class="sub"><span class="lbl">Stake writedowns</span><span class="note">separate from revenue</span></div><table class="rt"><tbody>${eqRows.map(([id, v]) => `<tr data-node="${id}"><td class="nm"><b class="${S.pf.has(id) ? 'own' : ''}">${esc(tick(id))}</b><div>stake in ${esc([...new Set(res.eq[id].map(e => short(L[e.link].to)))].join(', '))}</div></td><td class="num p">-${fB(v)}</td></tr>`).join('')}</tbody></table>` : ''}
-    ${run ? '' : `<div class="sub"><span class="lbl">Summary</span></div><p class="summary">${explainText()}</p>
-    <details class="trace"><summary>How the AI got this<span class="tag REPORTED">RECORDED RUN</span></summary>${traceSteps().map(s => `<div class="call"><div class="f">${esc(s.fn)}(${esc(s.args)})<span>${s.ms} ms</span></div><pre>${esc(s.out)}</pre></div>`).join('')}</details>
-    <p class="note" style="margin:12px 0 0">The AI calls these tools and never invents a number. Assumptions: 0.6 damping per hop, stake drop 1.5 x shock. Not investment advice.</p>`}`;
-  $('#rReplay').onclick = () => play(); $('#rClear').onclick = () => clearScenario();
-  b.querySelectorAll('tr[data-node]').forEach(tr => tr.onclick = () => select('node', tr.dataset.node));
-}
-
-// ---------- animation helpers ----------
-function anim(dur, fn, done) { const t0 = performance.now(); const step = now => { const t = Math.min(1, (now - t0) / dur); fn(t); if (t < 1) requestAnimationFrame(step); else done && done(); }; requestAnimationFrame(step); }
-function strike(id) { const c = $(`#chips .chip[data-id="${id}"]`); if (c) { c.classList.remove('struck'); void c.offsetWidth; c.classList.add('struck'); } }
-function blast(id) {
-  if (!P[id]) return; const { x, y } = P[id];
-  for (let k = 0; k < 3; k++) { const c = el('circle', { cx: x, cy: y, r: R[id], fill: 'none', stroke: RED, 'stroke-width': 2, 'pointer-events': 'none', opacity: 0 }, gPulse); setTimeout(() => anim(1000, t => { c.setAttribute('r', R[id] + t * 90); c.setAttribute('opacity', (1 - t).toFixed(2)); }, () => c.remove()), k * 220); }
-}
-function burn(linkId, reverse, dur, color) {
-  const e = EDGE[linkId]; if (!e) return; const len = e.p.getTotalLength();
-  const b = el('path', { d: e.p.getAttribute('d'), class: 'burn', stroke: color, 'stroke-width': (e.w + 1.5).toFixed(2), 'stroke-dasharray': `${len} ${len}`, 'stroke-dashoffset': reverse ? -len : len }, gShock);
-  anim(dur, t => { const k = t < .5 ? 2 * t * t : 1 - Math.pow(-2 * t + 2, 2) / 2; b.setAttribute('stroke-dashoffset', ((reverse ? -len : len) * (1 - k)).toFixed(1)); }, () => anim(500, t => b.setAttribute('opacity', (1 - t).toFixed(2)), () => b.remove()));
-}
-function particle(linkId, reverse, size, color, dur) {
-  const e = EDGE[linkId]; if (!e) return; const len = e.p.getTotalLength();
-  const c = el('circle', { r: 3 + 4 * size, fill: color, stroke: '#fff', 'stroke-width': 1.5, 'pointer-events': 'none' }, gParticles);
-  anim(dur, t => { const k = t < .5 ? 2 * t * t : 1 - Math.pow(-2 * t + 2, 2) / 2; const pt = e.p.getPointAtLength(len * (reverse ? 1 - k : k)); c.setAttribute('cx', pt.x); c.setAttribute('cy', pt.y); }, () => c.remove());
-}
-function impact(id, color) {
-  if (!P[id]) return; const { x, y } = P[id], r0 = R[id], n = NODE[id];
-  const c = el('circle', { cx: x, cy: y, r: r0, fill: 'none', stroke: color, 'stroke-width': 3, 'pointer-events': 'none' }, gPulse);
-  anim(750, t => { c.setAttribute('r', r0 + t * 40); c.setAttribute('opacity', (1 - t).toFixed(2)); }, () => c.remove());
-  anim(420, t => n.core.setAttribute('r', (r0 * (1 + 0.25 * Math.sin(Math.PI * t))).toFixed(2)), () => n.core.setAttribute('r', r0));
-}
-function floater(id, text, color, below) {
-  if (!P[id]) return; const { x, y } = P[id], off = Math.max(R[id] + 10, 22);
-  const t = el('text', below ? { x, y: y + R[id] + 58, class: 'floater', fill: color, 'text-anchor': 'middle' } : { x: x + off, y: y + 5, class: 'floater', fill: color, 'text-anchor': 'start' }, gFloat); t.textContent = text;
-  anim(2000, k => { t.setAttribute('transform', `translate(0,${(-14 * (1 - Math.pow(1 - k, 3))).toFixed(1)})`); t.setAttribute('opacity', k < .75 ? 1 : ((1 - k) / .25).toFixed(2)); }, () => t.remove());
-}
-
-// ---------- money loops ----------
-function setLoops(on, quiet) {
-  S.loops = on;
-  if (on) { clearScenario(); S.sel = null; renderDetail(); if (S.focus !== 'openai') { S.focus = 'openai'; buildMap(); renderPortfolio(); } }
-  if (!quiet) { renderCap(); paintMap(); }
-}
-
-// ---------- sources ----------
-function filteredSources() {
-  const q = S.q.trim().toLowerCase();
-  return DATA.sources.filter(s => (S.fType === 'All' || s.type === S.fType) && (!q || [s.title, s.used_for, s.type, C[s.company]?.name, C[s.company]?.ticker].join(' ').toLowerCase().includes(q)));
-}
-function renderSources() {
-  const list = filteredSources().sort((a, b) => b.date.localeCompare(a.date));
-  $('#srcT').textContent = `${list.length} of ${DATA.sources.length} source documents`;
-  $('#types').innerHTML = ['All', ...new Set(DATA.sources.map(s => s.type))].map(t => `<button class="chip" data-t="${esc(t)}" aria-pressed="${S.fType === t}">${esc(t)}</button>`).join('');
-  $$('#types .chip').forEach(b => b.onclick = () => { S.fType = b.dataset.t; renderSources(); paintMap(); });
-  $('#srcList').innerHTML = list.map(s => `<button class="srow${S.srcSel === s.id ? ' on' : ''}" data-src="${s.id}"><div class="m"><span>${esc(s.date)}</span><span class="tag DISCLOSED">${esc(s.type.toUpperCase())}</span><span>${esc(C[s.company]?.name || '')}</span>${verTag(s.verification)}</div><div class="t">${esc(s.title)}</div><div class="u">Used for: ${esc(s.used_for)}</div>${S.srcSel === s.id ? `<div class="u" style="margin-top:4px"><a href="${esc(s.url)}" target="_blank" rel="noopener">Open the document</a></div>` : ''}</button>`).join('') || '<p class="note" style="padding:16px 20px">No document matches.</p>';
-  $$('#srcList .srow').forEach(b => b.onclick = e => { if (e.target.tagName === 'A') return; S.srcSel = S.srcSel === b.dataset.src ? null : b.dataset.src; renderSources(); paintMap(); });
-}
-function openSources(sid) {
-  S.srcOpen = true; S.srcSel = sid || null; S.sel = null; renderDetail();
-  $('#src').classList.remove('hide'); $('#scrim').classList.remove('hide'); renderSources(); paintMap();
-  const on = $('#srcList .srow.on'); if (on) on.scrollIntoView({ block: 'center' }); else $('#fq').focus();
-}
-function closeSources() { S.srcOpen = false; S.srcSel = null; $('#src').classList.add('hide'); $('#scrim').classList.add('hide'); paintMap(); }
-
-// ---------- init ----------
-function init() {
-  $('#nLoops').textContent = LOOPS.loops.length; $('#nSrc').textContent = DATA.sources.length;
-  $('#presets').innerHTML = PRESETS.map((t, i) => `<button class="preset" data-t="${esc(t)}">${esc(t)}<span>${i === 0 ? 'try this' : 'run'}</span></button>`).join('');
-  $$('.preset').forEach(b => b.onclick = () => runFromText(b.dataset.t));
-  $('#askForm').onsubmit = e => { e.preventDefault(); runFromText($('#sText').value || PRESETS[0]); };
-  $$('.views button').forEach(b => b.onclick = () => setLoops(b.dataset.mode === 'loops'));
-  $('#brand').onclick = () => { clearScenario(); S.sel = null; S.loops = false; S.focus = 'openai'; buildMap(); renderCap(); renderDetail(); renderPortfolio(); };
-  $('#srcBtn').onclick = () => openSources(); $('#srcX').onclick = closeSources; $('#scrim').onclick = closeSources;
-  $('#fq').oninput = e => { S.q = e.target.value; renderSources(); paintMap(); };
-  $('#howBtn').onclick = () => $('#how').classList.remove('hide');
-  $('#howX').onclick = () => $('#how').classList.add('hide');
-  $('#how').onclick = e => { if (e.target.id === 'how') $('#how').classList.add('hide'); };
-  $('#map').addEventListener('click', () => { if (S.sel) select(null); });
-  document.addEventListener('keydown', e => {
-    if (e.key !== 'Escape') return;
-    if (!$('#how').classList.contains('hide')) $('#how').classList.add('hide'); else if (S.srcOpen) closeSources(); else if (S.sel) select(null);
-  });
-  buildMap(); renderCap(); renderPortfolio(); renderInterp(); renderReport(); renderParser(); checkLive();
-}
-init();
-</script>
+<script src="data/graph.js"></script>
+<script src="data/layout.js"></script>
+<script src="vendor/three.min.js"></script>
+<script src="view3d.js"></script>
+<script src="app.js"></script>
 </body>
 </html>
