@@ -4,6 +4,20 @@ Type what could go wrong. See which of your stocks it hits.
 
 Investors think they own several different AI stocks, but many depend on the same customer (OpenAI) and on each other through circular deals. Upstream maps 12 companies and 26 sourced deals, then runs a shock through the network so you can see which holdings get hit and by how much.
 
+**Demo video:** https://www.youtube.com/watch?v=SKuJ9fjiGEE
+
+![Scenario report: OpenAI cuts compute spending 40%](docs/screenshots/scenario-report.png)
+
+## Screenshots
+
+**Supply chain of OpenAI.** Suppliers on the left, investors on the right. Line style shows the link type and confidence, diamonds mark choke points.
+
+![Supply chain map](docs/screenshots/supply-chain-map.png)
+
+**Every edge has a source.** Clicking CoreWeave → Microsoft shows the deal, the amount, how it was estimated and the 10-K it came from.
+
+![Edge detail with source](docs/screenshots/scenario-edge-source.png)
+
 ## How the demo works
 
 - Frontend only. `index.html` is self-contained; all data is hardcoded in a `DATA` object and mirrors `data/*.json`.
