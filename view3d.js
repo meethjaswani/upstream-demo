@@ -6,7 +6,7 @@
 // the shock flies along the links hop by hop, hit towers turn red and lose height, and the counters add up the damage.
 // Needs vendor/three.min.js (r147); vendor/three-post.js adds the glow and is optional.
 const G3 = (() => {
-  const RAD = 100, T0 = 1.6, HOP = 1.8, FLY = 1.05, SLATE = [0.085, 0.1, 0.15];
+  const RAD = 100, T0 = 1.6, HOP = 1.8, FLY = 1.05, SLATE = [0.085, 0.1, 0.15], CS = 0.052;
   let box, renderer, composer, scene, camera, globe, planet, planetMat, towers, lossMesh, glow, lineMat, hotGroup, comets, beam, rings, hud, labelBox, ro, raf = 0;
   let ids = [], ix = {}, P = {}, H = {}, WD = {}, baseCol = {}, cont = [], arcs = {}, labels = [];
   let res = null, tl = null, lookT = 0, lookNow = 0, dist = 430, distTo = 430, targetQ = null, drag = null, moved = false, shake = 0, shown = 0, shownMine = 0, hoverId = null, lastT = 0;
@@ -34,15 +34,28 @@ const G3 = (() => {
     let order = names.slice();
     const cost = o => { let c = 0; for (let i = 0; i < n; i++) for (let j = i + 1; j < n; j++) { const k = cross[key(o[i], o[j])]; if (k) c += k * pts[i].angleTo(pts[j]); } return c; };
     for (let best = cost(order), again = true; again;) { again = false; for (let i = 0; i < n; i++) for (let j = i + 1; j < n; j++) { const o = order.slice(); [o[i], o[j]] = [o[j], o[i]]; const c = cost(o); if (c < best - 1e-9) { best = c; order = o; again = true; } } }
-    const C = 0.0305;
+    const C = CS, groups = order.map(name => ids.filter(id => sec[id] === name).sort((a, b) => (N[b].cap || 0) - (N[a].cap || 0))), rad = groups.map(m => C * Math.sqrt(m.length));
+    // let the continents settle: big sectors take more room, none sit on top of each other, and the gaps between them even out
+    const cen = pts.map(p => p.clone()), away = (a, b, d) => { const t = a.clone().multiplyScalar(a.dot(b)).sub(b); if (t.length() < 1e-6) return; t.normalize(); a.multiplyScalar(Math.cos(d)).addScaledVector(t, Math.sin(d)).normalize(); };
+    for (let it = 0; it < 400; it++) for (let i = 0; i < n; i++) for (let j = i + 1; j < n; j++) {
+      const ang = cen[i].angleTo(cen[j]), want = (rad[i] + rad[j]) * 0.97, d = 0.0009 * (rad[i] + rad[j]) / (ang * ang) + (ang < want ? (want - ang) * 0.25 : 0);
+      const wi = rad[j] / (rad[i] + rad[j]), a0 = cen[i].clone(); away(cen[i], cen[j], d * wi); away(cen[j], a0, d * (1 - wi));
+    }
+    let sd = 4321; const rnd = () => { sd = (sd * 16807) % 2147483647; return sd / 2147483647; };
     order.forEach((name, i) => {
-      const c = pts[i], members = ids.filter(id => sec[id] === name).sort((a, b) => (N[b].cap || 0) - (N[a].cap || 0));
+      const c = cen[i], members = groups[i], ph = [rnd() * 6.283, rnd() * 6.283, rnd() * 6.283];
       const e1 = v3().crossVectors(c, Math.abs(c.y) > 0.9 ? v3(1, 0, 0) : v3(0, 1, 0)).normalize(), e2 = v3().crossVectors(c, e1).normalize();
-      members.forEach((id, k) => { const rho = C * Math.sqrt(k + 0.55), th = k * 2.39996; P[id] = c.clone().multiplyScalar(Math.cos(rho)).addScaledVector(e1, Math.cos(th) * Math.sin(rho)).addScaledVector(e2, Math.sin(th) * Math.sin(rho)).normalize(); });
-      const r = C * Math.sqrt(members.length) + 0.02, up = v3(0, 1, 0).addScaledVector(c, -c.y); if (up.length() < 0.2) up.set(0, 0, -1).addScaledVector(c, c.z); up.normalize();
-      cont.push({ name, c, r, col: rgb((FAM_OF[name] || FAMILY[5]).color), at: c.clone().multiplyScalar(Math.cos(r * 1.16)).addScaledVector(up, Math.sin(r * 1.16)).multiplyScalar(RAD * 1.012), cap: members.reduce((s, id) => s + (N[id].cap || 0), 0), n: members.filter(id => N[id].sp).length });
+      members.forEach((id, k) => {
+        // a loose spiral: tidy in the middle, ragged at the coast, with an uneven outline so no continent is a perfect circle
+        const frac = Math.sqrt((k + 0.55) / members.length), th = k * 2.39996 + (rnd() - 0.5) * 0.6 * frac;
+        const shape = 1 + frac * (0.2 * Math.sin(2 * th + ph[0]) + 0.13 * Math.sin(3 * th + ph[1]) + 0.07 * Math.sin(5 * th + ph[2]));
+        const rho = C * Math.sqrt(k + 0.55) * shape * (1 + (rnd() - 0.5) * 0.3 * (0.35 + frac));
+        P[id] = c.clone().multiplyScalar(Math.cos(rho)).addScaledVector(e1, Math.cos(th) * Math.sin(rho)).addScaledVector(e2, Math.sin(th) * Math.sin(rho)).normalize();
+      });
+      const r = rad[i] * 1.1, up = v3(0, 1, 0).addScaledVector(c, -c.y); if (up.length() < 0.2) up.set(0, 0, -1).addScaledVector(c, c.z); up.normalize();
+      cont.push({ name, c, r, col: rgb((FAM_OF[name] || FAMILY[5]).color), at: c.clone().multiplyScalar(Math.cos(r * 1.08)).addScaledVector(up, Math.sin(r * 1.08)).multiplyScalar(RAD * 1.012), cap: members.reduce((s, id) => s + (N[id].cap || 0), 0), n: members.filter(id => N[id].sp).length });
     });
-    for (const id of ids) { const cap = N[id].cap || 0; H[id] = 1.6 + 0.5 * Math.sqrt(cap); WD[id] = cap ? Math.min(2.5, 0.85 + 0.024 * Math.sqrt(cap)) : 0.8; baseCol[id] = rgb(famOf(id).color); }
+    for (const id of ids) { const cap = N[id].cap || 0; H[id] = 1.6 + 0.5 * Math.sqrt(cap); WD[id] = cap ? Math.min(2.9, 1.0 + 0.027 * Math.sqrt(cap)) : 0.9; baseCol[id] = rgb(famOf(id).color); }
     for (const l of OV_LINKS) arcs[l.id] = arc(P[l.from], P[l.to]);
   }
   function arc(a, b) {
@@ -65,21 +78,27 @@ const G3 = (() => {
     const sg = new THREE.BufferGeometry(); sg.setAttribute('position', new THREE.Float32BufferAttribute(sp, 3)); sg.setAttribute('color', new THREE.Float32BufferAttribute(sc, 3)); sg.setAttribute('size', new THREE.Float32BufferAttribute(ss, 1));
     const stars = new THREE.Points(sg, spriteMat()); stars.material.uniforms.scale.value = 4; scene.add(stars);
     // planet: dark ocean, grid, glowing sector continents, shock waves
-    const NC = cont.length;
+    // night-lights map: every company lights the ground around it, so each continent takes the shape of its companies
+    const TW = 2048, TH = 1024, cv = document.createElement('canvas'); cv.width = TW; cv.height = TH; const g2 = cv.getContext('2d');
+    g2.fillStyle = '#000'; g2.fillRect(0, 0, TW, TH); g2.globalCompositeOperation = 'lighter';
+    for (const id of ids) {
+      const p = P[id], lat = Math.asin(Math.max(-1, Math.min(1, p.y))), x = (Math.atan2(p.x, p.z) / (2 * Math.PI) + 0.5) * TW, y = (0.5 - lat / Math.PI) * TH, rr = CS * 3.2 / Math.PI * TH, sx = 1 / Math.max(0.22, Math.cos(lat)), c = baseCol[id].map(v => Math.round(v * 255));
+      for (const dx of [0, -TW, TW]) { g2.save(); g2.translate(x + dx, y); g2.scale(sx, 1); const gr = g2.createRadialGradient(0, 0, 0, 0, 0, rr); gr.addColorStop(0, `rgba(${c[0]},${c[1]},${c[2]},0.2)`); gr.addColorStop(0.5, `rgba(${c[0]},${c[1]},${c[2]},0.09)`); gr.addColorStop(1, `rgba(${c[0]},${c[1]},${c[2]},0)`); g2.fillStyle = gr; g2.beginPath(); g2.arc(0, 0, rr, 0, 6.2832); g2.fill(); g2.restore(); }
+    }
+    const lights = new THREE.CanvasTexture(cv); lights.minFilter = lights.magFilter = THREE.LinearFilter; lights.generateMipmaps = false; lights.wrapS = THREE.RepeatWrapping;
     planetMat = new THREE.ShaderMaterial({
-      uniforms: { uCen: { value: cont.map(c => c.c) }, uRad: { value: cont.map(c => c.r) }, uCol: { value: cont.map(c => v3(...c.col)) }, uLit: { value: 1 },
+      uniforms: { uMap: { value: lights }, uLit: { value: 1 },
         wDir: { value: Array.from({ length: 6 }, () => v3(0, 1, 0)) }, wAng: { value: [0, 0, 0, 0, 0, 0] }, wAmp: { value: [0, 0, 0, 0, 0, 0] }, wCol: { value: Array.from({ length: 6 }, () => v3(1, 0.2, 0.3)) } },
       vertexShader: `varying vec3 vN; varying vec3 vNv; varying vec3 vV; void main(){ vN = normalize(position); vNv = normalize(normalMatrix * normal); vec4 mv = modelViewMatrix * vec4(position, 1.0); vV = normalize(-mv.xyz); gl_Position = projectionMatrix * mv; }`,
-      fragmentShader: `varying vec3 vN; varying vec3 vNv; varying vec3 vV; uniform vec3 uCen[${NC}]; uniform float uRad[${NC}]; uniform vec3 uCol[${NC}]; uniform float uLit;
+      fragmentShader: `varying vec3 vN; varying vec3 vNv; varying vec3 vV; uniform sampler2D uMap; uniform float uLit;
         uniform vec3 wDir[6]; uniform float wAng[6]; uniform float wAmp[6]; uniform vec3 wCol[6];
         float gl(float x, float st){ float d = abs(fract(x / st + 0.5) - 0.5) * st; return smoothstep(0.0035, 0.0, d); }
         void main(){ vec3 col = vec3(0.012, 0.017, 0.034);
           float lat = asin(clamp(vN.y, -1.0, 1.0)), lon = atan(vN.x, vN.z);
           col += vec3(0.03, 0.055, 0.105) * max(gl(lat, 0.2618), gl(lon, 0.2618) * step(abs(lat), 1.35));
-          for (int i = 0; i < ${NC}; i++) { float a = acos(clamp(dot(vN, uCen[i]), -1.0, 1.0));
-            col += uCol[i] * (smoothstep(uRad[i] * 1.3, uRad[i] * 0.25, a) * 0.075 + smoothstep(0.011, 0.0, abs(a - uRad[i] * 1.12)) * 0.16) * uLit; }
+          col += texture2D(uMap, vec2(lon / 6.2831853 + 0.5, 0.5 + lat / 3.14159265)).rgb * 0.34 * uLit;
           for (int j = 0; j < 6; j++) { float a = acos(clamp(dot(vN, wDir[j]), -1.0, 1.0));
-            col += wCol[j] * wAmp[j] * (smoothstep(0.05, 0.0, abs(a - wAng[j])) + 0.16 * smoothstep(wAng[j], wAng[j] - 0.55, a) * step(a, wAng[j])); }
+            col += wCol[j] * wAmp[j] * (smoothstep(0.05, 0.0, abs(a - wAng[j])) + 0.06 * smoothstep(wAng[j], wAng[j] - 0.55, a) * step(a, wAng[j])); }
           col += vec3(0.07, 0.17, 0.42) * pow(1.0 - max(dot(vV, vNv), 0.0), 2.4);
           gl_FragColor = vec4(col, 1.0); }` });
     planet = new THREE.Mesh(new THREE.SphereGeometry(RAD, 128, 80), planetMat); globe.add(planet);
@@ -177,7 +196,7 @@ const G3 = (() => {
         if (!res.pass[l.id]) continue; const a = hopOf(l.from), b = hopOf(l.to); if (a > 90 || b > 90 || a === b) continue;
         const to = a < b ? l.to : l.from, k = Math.max(a, b), n = per[k] = (per[k] || 0) + 1, start = T0 + 0.25 + (k - 1) * HOP + Math.min(0.5, (n - 1) * 0.045);
         const pts = a < b ? arcs[l.id] : arcs[l.id].slice().reverse(), w = Math.sqrt(res.pass[l.id] / res.runs), seg = pts.length * 2;
-        const mesh = new THREE.Mesh(new THREE.TubeGeometry(new THREE.CatmullRomCurve3(pts), seg, 0.22 + 0.85 * w, 5, false), new THREE.MeshBasicMaterial({ color: new THREE.Color(linkCol(l.id)), transparent: true, opacity: 0.95, blending: THREE.AdditiveBlending, depthWrite: false }));
+        const mesh = new THREE.Mesh(new THREE.TubeGeometry(new THREE.CatmullRomCurve3(pts), seg, 0.16 + 0.58 * w, 5, false), new THREE.MeshBasicMaterial({ color: new THREE.Color(linkCol(l.id)), transparent: true, opacity: 0.95, blending: THREE.AdditiveBlending, depthWrite: false }));
         mesh.geometry.setDrawRange(0, 0); mesh.frustumCulled = false; hotGroup.add(mesh);
         hot.push({ mesh, pts, start, w, to, seg, col: rgb(linkCol(l.id)) });
         rev[to] = Math.min(rev[to] ?? 1e9, start + FLY);
@@ -220,18 +239,18 @@ const G3 = (() => {
       else {
         const row = res.byId[id], isO = tl.org.includes(id), at = tl.rev[id];
         r += (SLATE[0] + 0.1 * r - r) * dim; g += (SLATE[1] + 0.1 * g - g) * dim; bl += (SLATE[2] + 0.1 * bl - bl) * dim; k = k * (1 - dim) + 0.85 * dim; top = 0.75 * (1 - dim) + 0.1 * dim;
-        if (isO && !(row && row.hop === 0)) { const ch = Math.min(1, t / T0), pulse = 0.5 + 0.5 * Math.sin(tw * 7); r = 1; g = 0.86 - 0.3 * ch; bl = 0.8 - 0.45 * ch; k = 1.1 + 0.9 * ch + 0.35 * pulse; top = 1.5 + 0.6 * pulse; }
+        if (isO && !(row && row.hop === 0)) { const ch = Math.min(1, t / T0), pulse = 0.5 + 0.5 * Math.sin(tw * 7); r = 1; g = 0.86 - 0.3 * ch; bl = 0.8 - 0.45 * ch; k = 1.0 + 0.5 * ch + 0.2 * pulse; top = 1.1 + 0.3 * pulse; }
         else if (row && at != null && t >= at) {
-          const a = t - at, kk = ease(a / 0.5), fl = Math.max(0, 1 - a / 0.9), c = row.sgn > 0 ? [0.1, 0.92, 0.42] : [1, 0.16, 0.24], str = 0.5 + 0.8 * Math.sqrt(row.p);
-          r = c[0] + fl * (1 - c[0]); g = c[1] + fl * (1 - c[1]); bl = c[2] + fl * (1 - c[2]); k = str + 1.6 * fl; top = 1.1 + 1.3 * Math.sqrt(row.p) + 2.5 * fl;
+          const a = t - at, kk = ease(a / 0.5), fl = Math.max(0, 1 - a / 0.9), c = row.sgn > 0 ? [0.1, 0.92, 0.42] : [1, 0.16, 0.24], str = 0.45 + 0.65 * Math.sqrt(row.p);
+          r = c[0] + fl * (1 - c[0]); g = c[1] + fl * (1 - c[1]); bl = c[2] + fl * (1 - c[2]); k = str + 0.75 * fl; top = 0.9 + 0.95 * Math.sqrt(row.p) + 1.1 * fl;
           const d = Math.min(0.9, row.drop); h = H[id] * (1 - (row.sgn < 0 ? d : -d) * kk);
           if (row.sgn < 0) { const life = Math.max(0, 1 - a / 2.6); lh = Math.max(H[id] * d, 1.1) * (0.4 + 0.6 * life); lf = life; }
           risk += row.sgn * (row.mcar || 0); hit++; if (S.pf.has(id)) mine += row.sgn * (row.mcar || 0); hopNow = Math.max(hopNow, row.hop);
-          if (!tl.fired.has(id)) { tl.fired.add(id); const big = (row.mcar || 0) > 40; ringAt(P[id], row.sgn > 0 ? [0.3, 1, 0.55] : [1, 0.3, 0.38], big); if (big) { wave(P[id], row.sgn > 0 ? v3(0.1, 0.8, 0.35) : v3(1, 0.14, 0.22), 0.5, 0.5, 0.42); shake = Math.max(shake, 0.9); } }
+          if (!tl.fired.has(id)) { tl.fired.add(id); const big = (row.mcar || 0) > 40; ringAt(P[id], row.sgn > 0 ? [0.3, 1, 0.55] : [1, 0.3, 0.38], big); if (big) { wave(P[id], row.sgn > 0 ? v3(0.1, 0.8, 0.35) : v3(1, 0.14, 0.22), 0.28, 0.5, 0.42); shake = Math.max(shake, 0.28); } }
         }
       }
       setBox(towers, i, P[id], 0, h, WD[id]); setBox(lossMesh, i, P[id], h + (lf ? (1 - lf) * 3 : 0), lh, WD[id] * 1.04);
-      col[i * 3] = r * k; col[i * 3 + 1] = g * k; col[i * 3 + 2] = bl * k; lc[i * 3] = lf; lc[i * 3 + 1] = lf * 0.24; lc[i * 3 + 2] = lf * 0.2;
+      col[i * 3] = r * k; col[i * 3 + 1] = g * k; col[i * 3 + 2] = bl * k; lc[i * 3] = lf * 0.78; lc[i * 3 + 1] = lf * 0.19; lc[i * 3 + 2] = lf * 0.16;
       const tp = P[id]; gp[i * 3] = tp.x * (RAD + h + 0.4); gp[i * 3 + 1] = tp.y * (RAD + h + 0.4); gp[i * 3 + 2] = tp.z * (RAD + h + 0.4);
       gc[i * 3] = r * top; gc[i * 3 + 1] = g * top; gc[i * 3 + 2] = bl * top; gs[i] = (2.2 + WD[id] * 2.2) * (top > 1 ? 1 + 0.35 * (top - 1) : 1);
     }
@@ -244,13 +263,13 @@ const G3 = (() => {
       for (const hl of tl.hot) {
         const k = (t - hl.start) / FLY, kk = Math.max(0, Math.min(1, k)), e = kk * kk * (3 - 2 * kk);
         hl.mesh.geometry.setDrawRange(0, Math.floor(e * hl.seg) * 30);
-        hl.mesh.material.opacity = k < 1 ? 1 : 0.42 + 0.3 * hl.w + 0.14 * Math.sin(tw * 3 + hl.start * 5);
-        if (k > 0 && k < 1 && nc < 300) { const f = e * (hl.pts.length - 1), i = Math.min(hl.pts.length - 2, Math.floor(f)), p = _p.copy(hl.pts[i]).lerp(hl.pts[i + 1], f - i); cp[nc * 3] = p.x; cp[nc * 3 + 1] = p.y; cp[nc * 3 + 2] = p.z; cc[nc * 3] = 1 + hl.col[0]; cc[nc * 3 + 1] = 0.8 + hl.col[1]; cc[nc * 3 + 2] = 0.8 + hl.col[2]; cs[nc] = 9 + 12 * hl.w; nc++; }
+        hl.mesh.material.opacity = k < 1 ? 0.82 : 0.3 + 0.25 * hl.w + 0.09 * Math.sin(tw * 3 + hl.start * 5);
+        if (k > 0 && k < 1 && nc < 300) { const f = e * (hl.pts.length - 1), i = Math.min(hl.pts.length - 2, Math.floor(f)), p = _p.copy(hl.pts[i]).lerp(hl.pts[i + 1], f - i); cp[nc * 3] = p.x; cp[nc * 3 + 1] = p.y; cp[nc * 3 + 2] = p.z; cc[nc * 3] = 0.65 + hl.col[0]; cc[nc * 3 + 1] = 0.5 + hl.col[1]; cc[nc * 3 + 2] = 0.5 + hl.col[2]; cs[nc] = 6.5 + 8 * hl.w; nc++; }
       }
-      const o = tl.o, bh = t < T0 ? 14 + 70 * ease(t / T0) : 84, bo = t < T0 ? 0.55 * ease(t / 0.5) : Math.max(0, 0.9 - (t - T0) / 1.6);
-      beam.visible = bo > 0.01; beam.material.opacity = bo; _q.setFromUnitVectors(UP, o); beam.quaternion.copy(_q); beam.position.copy(o).multiplyScalar(RAD); beam.scale.set(1 + (t > T0 ? (t - T0) * 2.5 : 0), bh, 1 + (t > T0 ? (t - T0) * 2.5 : 0));
+      const o = tl.o, bh = t < T0 ? 12 + 46 * ease(t / T0) : 58, bo = t < T0 ? 0.28 * ease(t / 0.5) : Math.max(0, 0.45 - (t - T0) / 1.6);
+      beam.visible = bo > 0.01; beam.material.opacity = bo; _q.setFromUnitVectors(UP, o); beam.quaternion.copy(_q); beam.position.copy(o).multiplyScalar(RAD); beam.scale.set(1 + (t > T0 ? (t - T0) * 1.1 : 0), bh, 1 + (t > T0 ? (t - T0) * 1.1 : 0));
       const neg = res.sc.dir >= 0 && res.groups.every(g => g.dir > 0) ? v3(0.1, 0.85, 0.4) : v3(1, 0.13, 0.22);
-      if (!tl.blast && t >= T0) { tl.blast = true; wave(o, neg, 1, 0.95, 3.3); ringAt(o, [1, 0.7, 0.7], true); shake = 1.6; }
+      if (!tl.blast && t >= T0) { tl.blast = true; wave(o, neg, 0.5, 0.95, 3.3); ringAt(o, [1, 0.7, 0.7], true); shake = 0.55; }
       while (tl.frames.length && t >= tl.frames[0].at) { const f = tl.frames.shift(); if (!drag) lookAt([...tl.org.map(id => [id, 2]), ...f.set.map(x => [x.id, 0.3 + Math.sqrt(x.p)])], 270); }
       if (!tl.done && t >= tl.end) { tl.done = true; hud.classList.add('done'); }
     } else beam.visible = false;
@@ -258,7 +277,7 @@ const G3 = (() => {
     // surface waves and impact rings
     const U = planetMat.uniforms;
     for (let j = 0; j < 6; j++) { const w = waves[j]; if (!w) { U.wAmp.value[j] = 0; continue; } const a = (now - w.born) / 1000 * w.speed; U.wDir.value[j].copy(w.dir); U.wAng.value[j] = a; U.wCol.value[j].copy(w.col); U.wAmp.value[j] = a > w.reach ? 0 : w.amp * (1 - a / w.reach); }
-    for (let i = rings.children.length - 1; i >= 0; i--) { const m = rings.children[i], a = (now - m.userData.born) / 1000, life = m.userData.big ? 1.5 : 1; if (a > life) { rings.remove(m); m.geometry.dispose(); m.material.dispose(); continue; } const s = 2 + (m.userData.big ? 30 : 13) * ease(a / life); m.scale.set(s, s, s); m.material.opacity = 1 - a / life; }
+    for (let i = rings.children.length - 1; i >= 0; i--) { const m = rings.children[i], a = (now - m.userData.born) / 1000, life = m.userData.big ? 1.5 : 1; if (a > life) { rings.remove(m); m.geometry.dispose(); m.material.dispose(); continue; } const s = 2 + (m.userData.big ? 21 : 11) * ease(a / life); m.scale.set(s, s, s); m.material.opacity = 0.7 * (1 - a / life); }
     // motion
     if (!drag) {
       if (targetQ) { globe.quaternion.slerp(targetQ, 1 - Math.pow(0.03, dt)); if (globe.quaternion.angleTo(targetQ) < 0.004) targetQ = null; }
@@ -316,7 +335,7 @@ const G3 = (() => {
       box = container; renderer = new THREE.WebGLRenderer({ antialias: true }); box.appendChild(renderer.domElement);
       labelBox = document.createElement('div'); labelBox.className = 'l3box'; box.appendChild(labelBox);
       prep(); build(); buildHud();
-      if (THREE.EffectComposer && THREE.UnrealBloomPass) { composer = new THREE.EffectComposer(renderer); composer.addPass(new THREE.RenderPass(scene, camera)); composer.addPass(new THREE.UnrealBloomPass(new THREE.Vector2(512, 512), 0.95, 0.62, 0.16)); }
+      if (THREE.EffectComposer && THREE.UnrealBloomPass) { composer = new THREE.EffectComposer(renderer); composer.addPass(new THREE.RenderPass(scene, camera)); composer.addPass(new THREE.UnrealBloomPass(new THREE.Vector2(512, 512), 0.58, 0.5, 0.22)); }
       ro = new ResizeObserver(resize); ro.observe(box);
       const el = renderer.domElement;
       el.addEventListener('pointerdown', e => { drag = { x: e.clientX, y: e.clientY }; moved = false; el.setPointerCapture(e.pointerId); });
