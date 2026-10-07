@@ -30,7 +30,7 @@ const tagHTML = c => c ? `<span class="tag ${c}">${c}</span>` : '';
 //  confidence: disclosed 1.0, reported 0.7, estimated 0.4
 // ============================================================
 const CONF_W = { DISCLOSED: 1.0, REPORTED: 0.7, ESTIMATED: 0.4 };
-const CONF_TXT = { DISCLOSED: 'Read from a filing and checked by hand.', REPORTED: 'From credible media, not a filing.', ESTIMATED: 'Found by a text rule or inferred, not yet checked by hand.' };
+const CONF_TXT = { DISCLOSED: 'Read from a filing and checked by hand.', REPORTED: 'From credible media, or from a filing we have not yet checked by hand.', ESTIMATED: 'Found by a text rule or inferred, not yet checked by hand.' };
 const confOf = l => l.conf ? l.conf : l.exist === 'REPORTED' ? 'REPORTED' : l.review === 'reviewed' ? 'DISCLOSED' : 'ESTIMATED';
 const nBuyers = id => new Set((bySeller[id] || []).map(l => l.to)).size, nSellers = id => new Set((byBuyer[id] || []).map(l => l.from)).size;
 function weigh(l, kind) {
@@ -158,6 +158,7 @@ const S = {
 };
 const PRESETS = [
   { t: 'OpenAI cuts compute spending 40%', sc: { origins: ['openai'], kind: 'demand', severity: 0.4 } },
+  { t: 'Big three drug distributors cut orders 25%', sc: { title: 'Big three drug distributors cut orders 25%', origins: ['mck', 'cor', 'cah'], kind: 'demand', severity: 0.25 } },
   { t: 'AI compute buyers cut spending 30%', sc: { origins: ['msft', 'amzn', 'googl', 'meta', 'orcl', 'openai'], kind: 'demand', severity: 0.3 } },
   { t: 'TSMC output falls 50%', sc: { origins: ['tsmc'], kind: 'supply', severity: 0.5 } },
   { t: 'Walmart cuts purchases 20%', sc: { origins: ['wmt'], kind: 'demand', severity: 0.2 } },
@@ -374,7 +375,7 @@ function renderLegend() {
   const lg = $('#legend'); $('#zoom').classList.toggle('hide', !OV);
   if (G3.active) {
     lg.innerHTML = FAMILY.map(f => `<span><i style="width:11px;height:11px;border-radius:50%;display:inline-block;background:${f.color}"></i>${esc(f.name)}</span>`).join('') +
-      `<span><i style="width:11px;height:11px;border-radius:50%;display:inline-block;background:${NEG}"></i>hit</span><span><i style="width:11px;height:11px;border-radius:50%;display:inline-block;background:${POS}"></i>lifted</span><span>brighter and bigger = hit in more runs</span>`;
+      `<span><i style="width:11px;height:11px;border-radius:50%;display:inline-block;background:${NEG}"></i>hit</span><span><i style="width:11px;height:11px;border-radius:50%;display:inline-block;background:${POS}"></i>lifted</span><span>tower height = market value · brighter = hit in more runs</span>`;
     return;
   }
   if (!OV) { lg.innerHTML = CHAIN_LEGEND; return; }
@@ -546,8 +547,8 @@ function renderCap() {
     return;
   }
   if (S.view === '3d') {
-    c.innerHTML = `<div class="tx"><span class="lbl">3D view, for presenting</span><h1>${OV_IDS.length.toLocaleString()} companies, one connected market</h1>
-      <p>The same data as the map, wrapped on a globe. Drag to turn it, scroll to zoom. Run a scenario on the right to watch it spread. Use the other tabs to analyse.</p></div>`;
+    c.innerHTML = `<div class="tx"><span class="lbl">3D view, for presenting</span><h1>The market as a planet</h1>
+      <p>Each continent is a sector, each tower is a company and its height is its market value. Lines show who sells to whom. Run a scenario to watch it spread, or press F for full screen.</p></div>`;
     return;
   }
   if (S.view === 'all') {

@@ -1,5 +1,5 @@
 {
- "note": "Hand-added links outside the model bundle, from secondary sources found on 2026-10-07. Read the primary documents before quoting.",
+ "note": "Hand-added links outside the model bundle, found on 2026-10-07. Read the primary documents before quoting.",
  "nodes": [
   {
    "id": "zeiss",
@@ -282,6 +282,234 @@
    "conf": "ESTIMATED",
    "basis": "hand_added",
    "note": "Shortcut: the substrate makers in between are not in the data."
+  },
+  {
+   "id": "supply:amgn>mck",
+   "from": "amgn",
+   "to": "mck",
+   "type": "supply",
+   "label": "Drug distribution (McKesson = 33% of Amgen gross product sales, 2024)",
+   "status": "active",
+   "exist": "DISCLOSED",
+   "method": "hand_added",
+   "review": "unreviewed",
+   "role": "propagates",
+   "conf": "REPORTED",
+   "basis": "hand_added",
+   "note": "Share of gross product sales, FY2024. Retrieved from the filing by an automated reader on 2026-10-07. Not yet read in the original by a person.",
+   "share": 0.33
+  },
+  {
+   "id": "supply:amgn>cor",
+   "from": "amgn",
+   "to": "cor",
+   "type": "supply",
+   "label": "Drug distribution (Cencora = 27% of Amgen gross product sales, 2024)",
+   "status": "active",
+   "exist": "DISCLOSED",
+   "method": "hand_added",
+   "review": "unreviewed",
+   "role": "propagates",
+   "conf": "REPORTED",
+   "basis": "hand_added",
+   "note": "Share of gross product sales, FY2024. Retrieved from the filing by an automated reader on 2026-10-07. Not yet read in the original by a person.",
+   "share": 0.27
+  },
+  {
+   "id": "supply:amgn>cah",
+   "from": "amgn",
+   "to": "cah",
+   "type": "supply",
+   "label": "Drug distribution (Cardinal Health = 17% of Amgen gross product sales, 2024)",
+   "status": "active",
+   "exist": "DISCLOSED",
+   "method": "hand_added",
+   "review": "unreviewed",
+   "role": "propagates",
+   "conf": "REPORTED",
+   "basis": "hand_added",
+   "note": "Share of gross product sales, FY2024. Retrieved from the filing by an automated reader on 2026-10-07. Not yet read in the original by a person.",
+   "share": 0.17
+  },
+  {
+   "id": "supply:lly>mck",
+   "from": "lly",
+   "to": "mck",
+   "type": "supply",
+   "label": "Drug distribution (McKesson, share not stated)",
+   "status": "active",
+   "exist": "DISCLOSED",
+   "method": "hand_added",
+   "review": "unreviewed",
+   "role": "propagates",
+   "conf": "REPORTED",
+   "basis": "hand_added",
+   "note": "The filing names the three but gives no percentage, so the default 1 / 3 is used. Retrieved from the filing by an automated reader on 2026-10-07. Not yet read in the original by a person."
+  },
+  {
+   "id": "supply:abbv>mck",
+   "from": "abbv",
+   "to": "mck",
+   "type": "supply",
+   "label": "Drug distribution (McKesson, share not stated)",
+   "status": "active",
+   "exist": "DISCLOSED",
+   "method": "hand_added",
+   "review": "unreviewed",
+   "role": "propagates",
+   "conf": "REPORTED",
+   "basis": "hand_added",
+   "note": "The filing gives no percentage per distributor, so the default 1 / 3 is used. Retrieved from the filing by an automated reader on 2026-10-07. Not yet read in the original by a person."
+  },
+  {
+   "id": "supply:mrk>mck",
+   "from": "mrk",
+   "to": "mck",
+   "type": "supply",
+   "label": "Drug distribution (McKesson, share of sales not stated)",
+   "status": "active",
+   "exist": "DISCLOSED",
+   "method": "hand_added",
+   "review": "unreviewed",
+   "role": "propagates",
+   "conf": "REPORTED",
+   "basis": "hand_added",
+   "note": "The percentages are of receivables, not sales, so they are not used as the link strength. Retrieved from the filing by an automated reader on 2026-10-07. Not yet read in the original by a person."
+  },
+  {
+   "id": "supply:jnj>mck",
+   "from": "jnj",
+   "to": "mck",
+   "type": "supply",
+   "label": "Drug distribution (McKesson, identity inferred)",
+   "status": "active",
+   "exist": "DISCLOSED",
+   "method": "hand_added",
+   "review": "unreviewed",
+   "role": "propagates",
+   "conf": "ESTIMATED",
+   "basis": "hand_added",
+   "note": "The filing does not name the three wholesalers. We assume they are the three national distributors. Retrieved from the filing by an automated reader on 2026-10-07. Not yet read in the original by a person."
+  },
+  {
+   "id": "supply:lly>cor",
+   "from": "lly",
+   "to": "cor",
+   "type": "supply",
+   "label": "Drug distribution (Cencora, share not stated)",
+   "status": "active",
+   "exist": "DISCLOSED",
+   "method": "hand_added",
+   "review": "unreviewed",
+   "role": "propagates",
+   "conf": "REPORTED",
+   "basis": "hand_added",
+   "note": "The filing names the three but gives no percentage, so the default 1 / 3 is used. Retrieved from the filing by an automated reader on 2026-10-07. Not yet read in the original by a person."
+  },
+  {
+   "id": "supply:abbv>cor",
+   "from": "abbv",
+   "to": "cor",
+   "type": "supply",
+   "label": "Drug distribution (Cencora, share not stated)",
+   "status": "active",
+   "exist": "DISCLOSED",
+   "method": "hand_added",
+   "review": "unreviewed",
+   "role": "propagates",
+   "conf": "REPORTED",
+   "basis": "hand_added",
+   "note": "The filing gives no percentage per distributor, so the default 1 / 3 is used. Retrieved from the filing by an automated reader on 2026-10-07. Not yet read in the original by a person."
+  },
+  {
+   "id": "supply:mrk>cor",
+   "from": "mrk",
+   "to": "cor",
+   "type": "supply",
+   "label": "Drug distribution (Cencora, share of sales not stated)",
+   "status": "active",
+   "exist": "DISCLOSED",
+   "method": "hand_added",
+   "review": "unreviewed",
+   "role": "propagates",
+   "conf": "REPORTED",
+   "basis": "hand_added",
+   "note": "The percentages are of receivables, not sales, so they are not used as the link strength. Retrieved from the filing by an automated reader on 2026-10-07. Not yet read in the original by a person."
+  },
+  {
+   "id": "supply:jnj>cor",
+   "from": "jnj",
+   "to": "cor",
+   "type": "supply",
+   "label": "Drug distribution (Cencora, identity inferred)",
+   "status": "active",
+   "exist": "DISCLOSED",
+   "method": "hand_added",
+   "review": "unreviewed",
+   "role": "propagates",
+   "conf": "ESTIMATED",
+   "basis": "hand_added",
+   "note": "The filing does not name the three wholesalers. We assume they are the three national distributors. Retrieved from the filing by an automated reader on 2026-10-07. Not yet read in the original by a person."
+  },
+  {
+   "id": "supply:lly>cah",
+   "from": "lly",
+   "to": "cah",
+   "type": "supply",
+   "label": "Drug distribution (Cardinal Health, share not stated)",
+   "status": "active",
+   "exist": "DISCLOSED",
+   "method": "hand_added",
+   "review": "unreviewed",
+   "role": "propagates",
+   "conf": "REPORTED",
+   "basis": "hand_added",
+   "note": "The filing names the three but gives no percentage, so the default 1 / 3 is used. Retrieved from the filing by an automated reader on 2026-10-07. Not yet read in the original by a person."
+  },
+  {
+   "id": "supply:abbv>cah",
+   "from": "abbv",
+   "to": "cah",
+   "type": "supply",
+   "label": "Drug distribution (Cardinal Health, share not stated)",
+   "status": "active",
+   "exist": "DISCLOSED",
+   "method": "hand_added",
+   "review": "unreviewed",
+   "role": "propagates",
+   "conf": "REPORTED",
+   "basis": "hand_added",
+   "note": "The filing gives no percentage per distributor, so the default 1 / 3 is used. Retrieved from the filing by an automated reader on 2026-10-07. Not yet read in the original by a person."
+  },
+  {
+   "id": "supply:mrk>cah",
+   "from": "mrk",
+   "to": "cah",
+   "type": "supply",
+   "label": "Drug distribution (Cardinal Health, share of sales not stated)",
+   "status": "active",
+   "exist": "DISCLOSED",
+   "method": "hand_added",
+   "review": "unreviewed",
+   "role": "propagates",
+   "conf": "REPORTED",
+   "basis": "hand_added",
+   "note": "The percentages are of receivables, not sales, so they are not used as the link strength. Retrieved from the filing by an automated reader on 2026-10-07. Not yet read in the original by a person."
+  },
+  {
+   "id": "supply:jnj>cah",
+   "from": "jnj",
+   "to": "cah",
+   "type": "supply",
+   "label": "Drug distribution (Cardinal Health, identity inferred)",
+   "status": "active",
+   "exist": "DISCLOSED",
+   "method": "hand_added",
+   "review": "unreviewed",
+   "role": "propagates",
+   "conf": "ESTIMATED",
+   "basis": "hand_added",
+   "note": "The filing does not name the three wholesalers. We assume they are the three national distributors. Retrieved from the filing by an automated reader on 2026-10-07. Not yet read in the original by a person."
   }
  ],
  "evidence": {
@@ -393,6 +621,171 @@
     "url": "https://www.trendforce.com/news/2025/04/01/news-japanese-firm-ajinomoto-to-invest-jpy-25-billion-by-2030-to-expand-abf-production-for-advanced-packaging/",
     "by": null,
     "tier": 2
+   }
+  ],
+  "supply:amgn>mck": [
+   {
+    "q": "Amgen's FY2024 10-K lists three major customers: McKesson 33%, Cencora 27% and Cardinal Health 17% of gross product sales, 77% together.",
+    "kind": "paraphrase",
+    "doc": "10-K",
+    "filed": null,
+    "url": "https://www.sec.gov/Archives/edgar/data/318154/000031815425000010/R57.htm",
+    "by": "amgn",
+    "tier": 1
+   }
+  ],
+  "supply:amgn>cor": [
+   {
+    "q": "Amgen's FY2024 10-K lists three major customers: McKesson 33%, Cencora 27% and Cardinal Health 17% of gross product sales, 77% together.",
+    "kind": "paraphrase",
+    "doc": "10-K",
+    "filed": null,
+    "url": "https://www.sec.gov/Archives/edgar/data/318154/000031815425000010/R57.htm",
+    "by": "amgn",
+    "tier": 1
+   }
+  ],
+  "supply:amgn>cah": [
+   {
+    "q": "Amgen's FY2024 10-K lists three major customers: McKesson 33%, Cencora 27% and Cardinal Health 17% of gross product sales, 77% together.",
+    "kind": "paraphrase",
+    "doc": "10-K",
+    "filed": null,
+    "url": "https://www.sec.gov/Archives/edgar/data/318154/000031815425000010/R57.htm",
+    "by": "amgn",
+    "tier": 1
+   }
+  ],
+  "supply:lly>mck": [
+   {
+    "q": "In 2025, 2024, and 2023, three wholesale distributors in the U.S. (McKesson, Cencora and Cardinal Health) each accounted for a significant percentage of Lilly's consolidated revenue. No other customer was above 10 percent.",
+    "kind": "paraphrase",
+    "doc": "10-K",
+    "filed": null,
+    "url": "https://www.sec.gov/Archives/edgar/data/59478/000005947826000013/lly-20251231.htm",
+    "by": "lly",
+    "tier": 1
+   }
+  ],
+  "supply:abbv>mck": [
+   {
+    "q": "In 2025, three wholesale distributors (McKesson, Cardinal Health and Cencora) accounted for substantially all of AbbVie's pharmaceutical product sales in the United States.",
+    "kind": "paraphrase",
+    "doc": "10-K",
+    "filed": null,
+    "url": "https://www.sec.gov/Archives/edgar/data/1551152/000155115226000008/abbv-20251231.htm",
+    "by": "abbv",
+    "tier": 1
+   }
+  ],
+  "supply:mrk>mck": [
+   {
+    "q": "McKesson, Cencora and Cardinal Health represented approximately 22%, 21% and 13% of Merck's total accounts receivable at December 31, 2025.",
+    "kind": "paraphrase",
+    "doc": "10-K",
+    "filed": null,
+    "url": "https://www.sec.gov/Archives/edgar/data/310158/000031015826000063/mrk-20251231.htm",
+    "by": "mrk",
+    "tier": 1
+   }
+  ],
+  "supply:jnj>mck": [
+   {
+    "q": "Johnson & Johnson's FY2024 10-K says three wholesalers represented about 20.5%, 15.6% and 12.3% of total gross revenues. It does not name them.",
+    "kind": "paraphrase",
+    "doc": "10-K",
+    "filed": null,
+    "url": "https://www.sec.gov/Archives/edgar/data/200406/000020040626000016/jnj-20251228.htm",
+    "by": "jnj",
+    "tier": 1
+   }
+  ],
+  "supply:lly>cor": [
+   {
+    "q": "In 2025, 2024, and 2023, three wholesale distributors in the U.S. (McKesson, Cencora and Cardinal Health) each accounted for a significant percentage of Lilly's consolidated revenue. No other customer was above 10 percent.",
+    "kind": "paraphrase",
+    "doc": "10-K",
+    "filed": null,
+    "url": "https://www.sec.gov/Archives/edgar/data/59478/000005947826000013/lly-20251231.htm",
+    "by": "lly",
+    "tier": 1
+   }
+  ],
+  "supply:abbv>cor": [
+   {
+    "q": "In 2025, three wholesale distributors (McKesson, Cardinal Health and Cencora) accounted for substantially all of AbbVie's pharmaceutical product sales in the United States.",
+    "kind": "paraphrase",
+    "doc": "10-K",
+    "filed": null,
+    "url": "https://www.sec.gov/Archives/edgar/data/1551152/000155115226000008/abbv-20251231.htm",
+    "by": "abbv",
+    "tier": 1
+   }
+  ],
+  "supply:mrk>cor": [
+   {
+    "q": "McKesson, Cencora and Cardinal Health represented approximately 22%, 21% and 13% of Merck's total accounts receivable at December 31, 2025.",
+    "kind": "paraphrase",
+    "doc": "10-K",
+    "filed": null,
+    "url": "https://www.sec.gov/Archives/edgar/data/310158/000031015826000063/mrk-20251231.htm",
+    "by": "mrk",
+    "tier": 1
+   }
+  ],
+  "supply:jnj>cor": [
+   {
+    "q": "Johnson & Johnson's FY2024 10-K says three wholesalers represented about 20.5%, 15.6% and 12.3% of total gross revenues. It does not name them.",
+    "kind": "paraphrase",
+    "doc": "10-K",
+    "filed": null,
+    "url": "https://www.sec.gov/Archives/edgar/data/200406/000020040626000016/jnj-20251228.htm",
+    "by": "jnj",
+    "tier": 1
+   }
+  ],
+  "supply:lly>cah": [
+   {
+    "q": "In 2025, 2024, and 2023, three wholesale distributors in the U.S. (McKesson, Cencora and Cardinal Health) each accounted for a significant percentage of Lilly's consolidated revenue. No other customer was above 10 percent.",
+    "kind": "paraphrase",
+    "doc": "10-K",
+    "filed": null,
+    "url": "https://www.sec.gov/Archives/edgar/data/59478/000005947826000013/lly-20251231.htm",
+    "by": "lly",
+    "tier": 1
+   }
+  ],
+  "supply:abbv>cah": [
+   {
+    "q": "In 2025, three wholesale distributors (McKesson, Cardinal Health and Cencora) accounted for substantially all of AbbVie's pharmaceutical product sales in the United States.",
+    "kind": "paraphrase",
+    "doc": "10-K",
+    "filed": null,
+    "url": "https://www.sec.gov/Archives/edgar/data/1551152/000155115226000008/abbv-20251231.htm",
+    "by": "abbv",
+    "tier": 1
+   }
+  ],
+  "supply:mrk>cah": [
+   {
+    "q": "McKesson, Cencora and Cardinal Health represented approximately 22%, 21% and 13% of Merck's total accounts receivable at December 31, 2025.",
+    "kind": "paraphrase",
+    "doc": "10-K",
+    "filed": null,
+    "url": "https://www.sec.gov/Archives/edgar/data/310158/000031015826000063/mrk-20251231.htm",
+    "by": "mrk",
+    "tier": 1
+   }
+  ],
+  "supply:jnj>cah": [
+   {
+    "q": "Johnson & Johnson's FY2024 10-K says three wholesalers represented about 20.5%, 15.6% and 12.3% of total gross revenues. It does not name them.",
+    "kind": "paraphrase",
+    "doc": "10-K",
+    "filed": null,
+    "url": "https://www.sec.gov/Archives/edgar/data/200406/000020040626000016/jnj-20251228.htm",
+    "by": "jnj",
+    "tier": 1
    }
   ]
  }
