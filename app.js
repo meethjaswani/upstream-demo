@@ -157,16 +157,16 @@ const S = {
   q: '', fType: 'All', srcOpen: false
 };
 const PRESETS = [
-  { t: 'OpenAI cuts compute spending 40%', sc: { origins: ['openai'], kind: 'demand', severity: 0.4 } },
-  { t: 'Big three drug distributors cut orders 25%', sc: { title: 'Big three drug distributors cut orders 25%', origins: ['mck', 'cor', 'cah'], kind: 'demand', severity: 0.25 } },
-  { t: 'AI compute buyers cut spending 30%', sc: { origins: ['msft', 'amzn', 'googl', 'meta', 'orcl', 'openai'], kind: 'demand', severity: 0.3 } },
-  { t: 'TSMC output falls 50%', sc: { origins: ['tsmc'], kind: 'supply', severity: 0.5 } },
-  { t: 'Walmart cuts purchases 20%', sc: { origins: ['wmt'], kind: 'demand', severity: 0.2 } },
-  { t: 'Microsoft raises AI spending 30%', sc: { origins: ['msft'], kind: 'demand', dir: 1, severity: 0.3 } },
-  { t: 'Oil price falls 20%', sc: { title: 'Oil price falls 20%', dir: 0, origins: ['xom', 'cvx', 'cop', 'dal', 'ual', 'luv'], kind: 'demand', severity: 0.1, groups: [
+  { tag: 'AI', t: 'OpenAI cuts compute spending 40%', sc: { origins: ['openai'], kind: 'demand', severity: 0.4 } },
+  { tag: 'health care', t: 'Big three drug distributors cut orders 25%', sc: { title: 'Big three drug distributors cut orders 25%', origins: ['mck', 'cor', 'cah'], kind: 'demand', severity: 0.25 } },
+  { tag: 'AI', t: 'AI compute buyers cut spending 30%', sc: { origins: ['msft', 'amzn', 'googl', 'meta', 'orcl', 'openai'], kind: 'demand', severity: 0.3 } },
+  { tag: 'chips', t: 'TSMC output falls 50%', sc: { origins: ['tsmc'], kind: 'supply', severity: 0.5 } },
+  { tag: 'retail', t: 'Walmart cuts purchases 20%', sc: { origins: ['wmt'], kind: 'demand', severity: 0.2 } },
+  { tag: 'AI, upside', t: 'Microsoft raises AI spending 30%', sc: { origins: ['msft'], kind: 'demand', dir: 1, severity: 0.3 } },
+  { tag: 'energy, mixed', t: 'Oil price falls 20%', sc: { title: 'Oil price falls 20%', dir: 0, origins: ['xom', 'cvx', 'cop', 'dal', 'ual', 'luv'], kind: 'demand', severity: 0.1, groups: [
     { label: 'Oil producers', origins: ['xom', 'cvx', 'cop'], kind: 'demand', dir: -1, severity: 0.1, direct: true },
     { label: 'Airlines', origins: ['dal', 'ual', 'luv'], kind: 'demand', dir: 1, severity: 0.06, direct: true }] } },
-  { t: 'Zeiss optics output falls 50%', sc: { origins: ['zeiss'], kind: 'supply', severity: 0.5 } }
+  { tag: 'chips', t: 'Zeiss optics output falls 50%', sc: { origins: ['zeiss'], kind: 'supply', severity: 0.5 } }
 ].filter(p => p.sc.origins.every(id => N[id]));
 PRESETS.forEach(p => { if (p.sc.groups) p.note = 'illustrative assumption'; });
 const INK = '#16171B', NEG = '#D92D4A', POS = '#0B7A2E', ORANGE = '#F7931E';
@@ -758,7 +758,7 @@ function clearScenario(quiet) {
 function renderReport() {
   const b = $('#repBlk'); if (!S.res) { b.classList.add('hide'); b.innerHTML = ''; return; }
   const res = S.res, run = S.animating, mixed = res.sc.dir === 0, v = V(), rows = res.rows.filter(r => S.revealed.has(r.id));
-  const sum = (rs_, f = () => true) => rs_.filter(f).reduce((s, r) => s + r.sgn * (r.mcar || 0), 0), money = x => (x >= 0 ? '+' : '-') + fB(Math.abs(x));
+  const sum = (rs_, f = () => true) => rs_.filter(f).reduce((s, r) => s + r.sgn * (r.mcar || 0), 0), money = x => Math.abs(x) < 0.005 ? '$0' : (x >= 0 ? '+' : '-') + fB(Math.abs(x));
   const held = rows.filter(r => S.pf.has(r.id)), pfNet = sum(held), allNet = sum(rows), gain = sum(rows, r => r.sgn > 0), loss = sum(rows, r => r.sgn < 0);
   const likely = held.filter(r => r.p >= 0.5).length, n = S.pf.size, top = rows.slice(0, 25);
   const pfStake = res.stakes.filter(s => S.pf.has(s.id)).reduce((a, s) => a + s.sgn * s.usd, 0);
@@ -862,7 +862,7 @@ function init() {
   $('#snapT').textContent = `${G.nodes.length.toLocaleString()} companies · ${G.links.length.toLocaleString()} links from filings · prices ${G.meta.priced}`;
   $('#nSrc').textContent = G.links.length.toLocaleString();
   $('#covNote').textContent = `Coverage: all ${cov.sp500_nodes} S&P 500 companies are in the data, ${cov.sp500_in_model} have links that can pass a shock. ${rev} of ${G.links.length} links were checked by hand; the rest were found by text rules and count at 0.4 confidence. Results are a lower bound.`;
-  $('#presets').innerHTML = PRESETS.map((p, i) => `<button class="preset" data-i="${i}">${esc(p.t)}<span>${i === 0 ? 'try this' : 'run'}</span></button>`).join('');
+  $('#presets').innerHTML = PRESETS.map((p, i) => `<button class="preset" data-i="${i}">${esc(p.t)}<span>${esc(p.tag || 'run')}</span></button>`).join('');
   $$('.preset').forEach(b => b.onclick = () => { const p = PRESETS[+b.dataset.i]; runFromText(p.t, p.sc); });
   $('#askForm').onsubmit = e => { e.preventDefault(); const v = $('#sText').value.trim(); v ? runFromText(v) : runFromText(PRESETS[0].t, PRESETS[0].sc); };
   $$('.views button').forEach(b => b.onclick = () => { const m = b.dataset.mode; if (m === 'loops') { S.view = 'chain'; setLoops(true); renderPortfolio(); } else setView(m); });
