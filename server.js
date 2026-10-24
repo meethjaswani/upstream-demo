@@ -1,5 +1,5 @@
 // Upstream local server. No dependencies (Node 18+).
-// Serves index.html and exposes POST /api/parse-scenario, which asks Claude to turn a
+// Serves index.html and exposes POST /api/parse-scenario, which asks an LLM to turn a
 // free-text scenario into starting groups { origins, kind, direction, severity }. The API key stays on this
 // machine: it is read from the environment (or a local .env file) and never sent to the browser.
 //
@@ -70,7 +70,7 @@ const TOOL = {
   }
 };
 
-async function parseWithClaude(text) {
+async function parseWithLLM(text) {
   const r = await fetch('https://api.anthropic.com/v1/messages', {
     method: 'POST',
     headers: { 'x-api-key': KEY, 'anthropic-version': '2023-06-01', 'content-type': 'application/json' },
@@ -101,7 +101,7 @@ http.createServer(async (req, res) => {
     try {
       const { text } = JSON.parse(body || '{}');
       if (!text || typeof text !== 'string') return send(res, 400, { error: 'text required' });
-      const out = await parseWithClaude(text);
+      const out = await parseWithLLM(text);
       console.log(`[parse] "${text}" -> ${JSON.stringify(out)}`);
       return send(res, 200, out);
     } catch (e) {
