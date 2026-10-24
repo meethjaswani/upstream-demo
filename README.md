@@ -49,7 +49,7 @@ cp .env.example .env        # then put your key in .env: ANTHROPIC_API_KEY=sk-an
 npm start                   # open http://localhost:3000
 ```
 
-With a key, free-text scenarios are interpreted by Claude (`claude-sonnet-5`) through `POST /api/parse-scenario`. The key stays on your machine and is never sent to the browser.
+With a key, free-text scenarios are interpreted by an LLM through `POST /api/parse-scenario`. The key stays on your machine and is never sent to the browser.
 
 No key, or just want the static version? Open `index.html` directly. The keyword parser and recorded trace still work.
 

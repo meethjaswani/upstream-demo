@@ -283,7 +283,7 @@ details.trace>summary{padding:9px 12px;font-weight:600;cursor:pointer;display:fl
     <div class="dh"><h2 id="howT">How it works</h2><button class="x" id="howX" aria-label="Close">&times;</button></div>
     <ol>
       <li><b>The map.</b> 12 companies and 26 deals, taken from filings and press releases. Each arrow carries its amount, date, source and a confidence tag.</li>
-      <li><b>The scenario.</b> Your text becomes a company, a size and a type. With a local API key Claude reads it. Without one, a keyword parser does.</li>
+      <li><b>The scenario.</b> Your text becomes a company, a size and a type. With a local API key an LLM reads it. Without one, a keyword parser does.</li>
       <li><b>The shock.</b> If a buyer cuts spending, each seller loses that share of what the buyer pays it per year. The math runs in your browser.</li>
       <li><b>Next hops.</b> Each hit company cuts its own purchases in proportion to its revenue hit, damped by 0.6 per hop, for up to 4 hops. This damping is our assumption.</li>
       <li><b>Stakes.</b> Shown separately from revenue: stake value times valuation drop, where the drop is assumed to be 1.5 times the shock.</li>
@@ -442,7 +442,7 @@ function parseScenario(text) {
 // ============================================================
 //  Shock engine (deterministic, runs in the browser)
 // ============================================================
-// Live mode: when served by server.js with ANTHROPIC_API_KEY set, Claude parses the scenario.
+// Live mode: when served by server.js with ANTHROPIC_API_KEY set, an LLM parses the scenario.
 // Opened as a plain file (or without a key) it silently falls back to the keyword parser above.
 let LIVE = false;
 async function checkLive() {
@@ -462,7 +462,7 @@ async function parseSmart(text) {
     let target = C[j.target] ? j.target : '';
     const ok = j.kind === 'demand' ? SUP.some(l => l.to === j.origin && l.from === target) : SUP.some(l => l.from === j.origin && l.to === target);
     if (target && !ok) target = '';
-    return { text, origin: j.origin, target, kind: j.kind, severity: j.severity, notes: ['parsed by Claude' + (j.reason ? ': ' + j.reason : '')] };
+    return { text, origin: j.origin, target, kind: j.kind, severity: j.severity, notes: ['parsed by the LLM' + (j.reason ? ': ' + j.reason : '')] };
   } catch (e) { const sc = parseScenario(text); sc.notes = [...sc.notes, 'live parse unavailable, used keyword parser']; return sc; }
 }
 
@@ -631,7 +631,7 @@ function tiedTo(focus) {
 const describe = sc => sc.kind === 'demand'
   ? `${short(sc.origin)} cuts ${sc.target ? 'purchases from ' + short(sc.target) : 'compute spending'} ${fP(sc.severity, 0)}`
   : `${short(sc.origin)} can't deliver ${fP(sc.severity, 0)}${sc.target ? ' to ' + short(sc.target) : ''}`;
-function renderParser() { $('#parserBadge').textContent = LIVE ? 'Read by Claude (live)' : 'Keyword parser (offline)'; }
+function renderParser() { $('#parserBadge').textContent = LIVE ? 'Read by LLM (live)' : 'Keyword parser (offline)'; }
 
 // ---------- layout: suppliers | company | customers, like a supply chain screen ----------
 let P = {}, NODE = {}, EDGE = {}, gParticles, gPulse, gShock, gFloat;
