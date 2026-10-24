@@ -6,6 +6,22 @@ Investors think they own several different AI stocks, but many depend on the sam
 
 This is version 3 (whole S&P 500 market, Monte Carlo cascade, network and 3D views). The original 12-company demo, with its screenshots and demo video, is on the [`v1`](../../tree/v1) branch; version 2 is on [`v2`](../../tree/v2).
 
+![OpenAI cuts compute spending 40%, played on the 3D market view](docs/screenshots/3d-view.png)
+
+## Screenshots
+
+**All companies.** Every S&P 500 company and its counterparties, placed by sector. Lines are who sells to whom.
+
+![All companies network map](docs/screenshots/all-companies.png)
+
+**A scenario on the supply chain.** "OpenAI cuts compute spending 40%" run 20,000 times. Each supplier shows how often it gets hit, and the report on the right prices the damage to your portfolio.
+
+![Scenario on the supply chain view](docs/screenshots/scenario.png)
+
+**Money loops.** Circular deals where money flows out and comes back.
+
+![Money loops](docs/screenshots/money-loops.png)
+
 ## How it works
 
 - **Data:** `data/graph.json` holds all 500 S&P companies plus their counterparties, with links taken from filings, 13F forms, press releases and credible reports. `data/evidence.js` holds the quote and document behind every link. Rebuild everything with `npm run data` (or `python3 tools/build_data.py "<path to model bundle>"` then `node tools/layout.mjs`).
