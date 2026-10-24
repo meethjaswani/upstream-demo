@@ -6,7 +6,7 @@ Investors think they own several different AI stocks, but many depend on the sam
 
 This is version 3 (whole S&P 500 market, Monte Carlo cascade, network and 3D views). The original 12-company demo, with its screenshots and demo video, is on the [`v1`](../../tree/v1) branch; version 2 is on [`v2`](../../tree/v2).
 
-![OpenAI cuts compute spending 40%, played on the 3D market view](docs/screenshots/3d-view.png)
+![OpenAI cuts compute spending 40%, played on the 3D market view](docs/screenshots/3d-shock.gif)
 
 ## Screenshots
 
@@ -16,7 +16,15 @@ This is version 3 (whole S&P 500 market, Monte Carlo cascade, network and 3D vie
 
 **A scenario on the supply chain.** "OpenAI cuts compute spending 40%" run 20,000 times. Each supplier shows how often it gets hit, and the report on the right prices the damage to your portfolio.
 
-![Scenario on the supply chain view](docs/screenshots/scenario.png)
+![The shock moving through the supply chain hop by hop](docs/screenshots/supply-chain-shock.gif)
+
+The report after the run:
+
+![Scenario report on the supply chain view](docs/screenshots/scenario.png)
+
+**3D view, settled.** Towers are companies sized by market value, grouped into sector continents.
+
+![3D view after the shock](docs/screenshots/3d-view.png)
 
 **Money loops.** Circular deals where money flows out and comes back.
 
