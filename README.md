@@ -39,12 +39,15 @@ This is version 3 (whole S&P 500 market, Monte Carlo cascade, network and 3D vie
 Needs Node 18+. No npm install.
 
 ```bash
-git clone <this repo> && cd upstream-demo
-cp .env.example .env        # then put your key in .env: ANTHROPIC_API_KEY=sk-ant-...
+git clone https://github.com/meethjaswani/upstream-demo && cd upstream-demo
 npm start                   # open http://localhost:3000
 ```
 
-With a key, free-text scenarios are interpreted by an LLM through `POST /api/parse-scenario`. The key stays on your machine and is never sent to the browser.
+**Bring your own API key.** Free-text scenarios are read by an LLM. Click **Use your own API key** under the scenario box and paste an Anthropic (`sk-ant-...`) or OpenRouter (`sk-or-...`) key. OpenRouter has free models, so a free OpenRouter account is enough. The key stays in your browser's local storage and is only sent to your local server, which passes it to the provider with each request. **Remove** deletes it.
+
+To set a key once for everyone using your server, put it in `.env` instead (see `.env.example`).
+
+Without a key, the built-in keyword parser reads the scenario.
 
 No key, or just want the static version? Open `index.html` directly. The keyword parser and recorded trace still work.
 

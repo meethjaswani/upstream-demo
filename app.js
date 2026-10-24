@@ -108,7 +108,9 @@ const EXTRA = { google: 'googl', alphabet: 'googl', aws: 'amzn', azure: 'msft', 
 const MODEL_IDS = [...new Set(SUPL.flatMap(l => [l.from, l.to]))];
 const ALIASES = [...Object.entries(EXTRA), ...MODEL_IDS.map(id => [cleanName(N[id].name).toLowerCase(), id])].filter(([a, id]) => N[id] && a.length >= 4).sort((a, b) => b[0].length - a[0].length);
 const TICKERS = Object.fromEntries(MODEL_IDS.filter(id => N[id].sp && N[id].ticker).map(id => [N[id].ticker, id]));
-let LIVE = false;
+let LIVE = false, SERVER = false, SERVER_KEY = false;
+const KEY_STORE = 'upstream.apiKey';
+let USER_KEY = (() => { try { return localStorage.getItem(KEY_STORE) || ''; } catch (e) { return ''; } })();
 function parseLocal(text) {
   const t = ' ' + text.toLowerCase() + ' ', notes = [], found = new Map();
   for (const [re, ids] of GROUPS) { const m = t.match(re); if (m) ids.filter(id => N[id]).forEach(id => found.set(id, m.index)); }
@@ -126,16 +128,32 @@ function parseLocal(text) {
   return { text, origins, kind, dir, severity: sev / 100, notes };
 }
 async function checkLive() {
-  if (location.protocol === 'file:') return;
-  try { const r = await fetch('api/health', { cache: 'no-store' }); if (r.ok) LIVE = !!(await r.json()).live; } catch (e) { LIVE = false; }
+  if (location.protocol !== 'file:') {
+    try { const r = await fetch('api/health', { cache: 'no-store' }); if (r.ok) { SERVER = true; SERVER_KEY = !!(await r.json()).live; } } catch (e) { SERVER = false; }
+  }
   renderParser();
 }
-function renderParser() { $('#parserBadge').textContent = LIVE ? 'Read by the LLM (live)' : 'Keyword parser (offline)'; }
+function renderParser() {
+  LIVE = SERVER && (SERVER_KEY || !!USER_KEY);
+  $('#parserBadge').textContent = LIVE ? (USER_KEY ? 'Read by the LLM (your key)' : 'Read by the LLM (live)') : 'Keyword parser (offline)';
+  const btn = $('#keyBtn');
+  if (!SERVER) { btn.textContent = 'Run npm start to use your own API key'; btn.disabled = true; return; }
+  btn.disabled = false;
+  btn.textContent = USER_KEY ? 'Using your API key \u00b7 change' : 'Use your own API key';
+}
+function initKey() {
+  const form = $('#keyForm'), note = $('#keyNote'), input = $('#keyIn');
+  const toggle = show => { form.classList.toggle('hide', !show); note.classList.toggle('hide', !show); if (show) input.focus(); };
+  const save = key => { USER_KEY = key; try { key ? localStorage.setItem(KEY_STORE, key) : localStorage.removeItem(KEY_STORE); } catch (e) { /* storage blocked: keep it for this visit */ } renderParser(); };
+  $('#keyBtn').addEventListener('click', () => toggle(form.classList.contains('hide')));
+  form.addEventListener('submit', e => { e.preventDefault(); const key = input.value.trim(); if (key) { save(key); input.value = ''; toggle(false); } });
+  $('#keyDel').addEventListener('click', () => { save(''); input.value = ''; toggle(false); });
+}
 async function parseSmart(text) {
   if (!LIVE) return parseLocal(text);
   try {
     const ctl = new AbortController(), to = setTimeout(() => ctl.abort(), 15000);
-    const r = await fetch('api/parse-scenario', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ text }), signal: ctl.signal });
+    const r = await fetch('api/parse-scenario', { method: 'POST', headers: { 'content-type': 'application/json', ...(USER_KEY ? { 'x-user-api-key': USER_KEY } : {}) }, body: JSON.stringify({ text }), signal: ctl.signal });
     clearTimeout(to); if (!r.ok) throw new Error((await r.json().catch(() => ({}))).error || 'status ' + r.status);
     const j = await r.json();
     const groups = (j.groups || []).map(g => ({ label: g.label || '', origins: (g.origins || []).filter(id => N[id]).slice(0, 8), kind: g.kind, dir: g.direction === 'positive' ? 1 : -1, severity: +g.severity, direct: !!g.hits_them_directly }))
@@ -879,6 +897,6 @@ function init() {
     if (!$('#how').classList.contains('hide')) $('#how').classList.add('hide'); else if (S.srcOpen) closeSources(); else if (S.sel) select(null);
   });
   S.loopList = findLoops(S.focus);
-  buildMap(); renderCap(); renderPortfolio(); renderInterp(); renderReport(); renderParser(); checkLive();
+  buildMap(); renderCap(); renderPortfolio(); renderInterp(); renderReport(); renderParser(); initKey(); checkLive();
 }
 init();
