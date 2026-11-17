@@ -3,3 +3,8 @@
 node_modules/
 *.zip
 .DS_Store
+
+pipeline/cache/
+pipeline/db/
+backtest/cache/
+__pycache__/
