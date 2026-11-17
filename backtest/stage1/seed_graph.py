@@ -37,7 +37,8 @@ CUE = re.compile(r"accounted for|account for|represent(?:ed|s|ing)?\b|comprised|
 SUPPLY = re.compile(r"\b(purchases? from|purchased from|suppliers?|vendors?|sourced from|raw materials?)\b", re.I)
 BEFORE_SKIP = re.compile(r"(increase[ds]?|decrease[ds]?|grew|grow|growth|declined?|declines|rose|fell|up|down|"
                          r"higher|lower|margins?|rates?|interest|tax|discount|ownership|owns?|owned|stake|equity|"
-                         r"shares|voting|approximately half|change|changed|by)\W+(?:[\w$.,]+\W+){0,2}$", re.I)
+                         r"shares|voting|approximately half|change|changed|by|less than|fewer than|below)"
+                         r"\W+(?:[\w$.,]+\W+){0,2}$", re.I)
 ANON = re.compile(r"\b(customer [A-Z]\b|customer (?:one|two|three|four|1|2|3|4)\b|one customer|a single customer|"
                   r"(?:our )?(?:largest|second[- ]largest|third[- ]largest) (?:customer|client|tenant)|"
                   r"another customer|one of our customers|one client|a single client|one tenant|"
@@ -47,11 +48,21 @@ NONE_CUE = re.compile(r"\bno (?:single |one |individual |other )?(?:customer|cli
 SENT = re.compile(r"(?<=[.;])\s+(?=[A-Z(\"“])")
 YEAR = re.compile(r"\b(?:fiscal\s+)?((?:19|20)\d\d)\b")
 
-ANON_MEMBER = re.compile(r"^(customer|client|tenant|lessee)\s?([a-z]|\d+|one|two|three|four|five)$|"
-                         r"^(one|two|three|single|largest|major|significant|another|second|third|first)\b", re.I)
+ANON_MEMBER = re.compile(r"^(customer|client|tenant|lessee|company|partner|distributor|oem|licensee|wholesaler|"
+                         r"reseller|worldwide distributor|collaboration partner|licensing partner)"
+                         r"(\s?([a-z]|\d+|one|two|three|four|five|six|seven))?(\s+concentration risk)?$|"
+                         r"\blargest customer\b|"
+                         r"^(one|two|three|single|largest|major|significant|another|second|third|first|next|"
+                         r"principal|key)\b", re.I)
+AGG_TEXT = re.compile(r"\b(two|three|four|five|six|seven|eight|nine|ten|\d+)\s+(?:largest\s+|major\s+|significant\s+)?"
+                      r"(customers|clients|tenants)\b|\bcustomers,? (?:including|such as)\b|\b(collectively|combined)\b",
+                      re.I)
 AGG_MEMBER = re.compile(r"\b(customers|clients|tenants|distributors|wholesalers|others?|all|top|ten|five|"
-                        r"commercial|international|domestic|retail|group)\b", re.I)
-GOV_MEMBER = re.compile(r"\b(government|federal|defense|navy|army|air force|dod)\b", re.I)
+                        r"commercial|international|domestic|retail|group|contracts?|providers|hospitals|"
+                        r"healthcare|merchant|site|sales|subsidies|channel|segment|products?|services|programs?|"
+                        r"gas)\b", re.I)
+GOV_MEMBER = re.compile(r"\b(government|federal|defense|navy|army|air force|dod|do d|intelligence|"
+                        r"procurement office)\b", re.I)
 REV_BENCH = re.compile(r"revenue|sales", re.I)
 NOT_REV = re.compile(r"receivable|purchase|cost|supplier|vendor|inventory|expense|payable|backlog|asset", re.I)
 CONC_AXES = re.compile(r"ConcentrationRiskByBenchmarkAxis|ConcentrationRiskByTypeAxis", re.I)
@@ -79,9 +90,10 @@ def xbrl_links(facts, seller, idx):
             continue
         dims = f.get("dims", {})
         cust = [d for d in dims if re.search(r"customer", d.split(":")[-1], re.I)]
-        if len(cust) != 1:
+        if not cust:
             continue
-        other = [d for d in dims if d != cust[0] and not CONC_AXES.search(d)]
+        cust = sorted(cust, key=lambda d: 0 if re.search(r"MajorCustomersAxis$", d) else 1)
+        other = [d for d in dims if d not in cust and not CONC_AXES.search(d)]
         if other:
             continue      # segment, product or geography share: not a share of total revenue
         bench = [m for d, m in dims.items() if re.search(r"BenchmarkAxis", d)]
@@ -103,10 +115,10 @@ def xbrl_links(facts, seller, idx):
         words = camel_words(member)
         nm = norm(words)
         hits = idx.find(words)
-        whole = [h for h in hits if norm(words[h[0]:h[1]]) == nm]
+        whole = [h for h in hits if norm(words[h[0]:h[1]]) == nm] if nm else []
         if whole:
             buyer, kind = whole[0][2], "named"
-        elif ANON_MEMBER.search(nm):
+        elif ANON_MEMBER.search(words.lower()) or len(nm) <= 2:
             buyer, kind = None, "anonymous"
         elif GOV_MEMBER.search(words):
             buyer, kind = "gov:us", "named"
@@ -144,7 +156,16 @@ def _ascending_years(s):
     return len(ys) >= 2 and ys == sorted(ys) and ys[0] != ys[-1]
 
 
-def text_links(text, seller, idx, seller_names=()):
+def min_year(report_date):
+    """Earliest fiscal-year label a sentence may refer to and still describe the year of this
+    10-K. Fiscal years ending Jan-Mar are often labelled by the previous calendar year."""
+    if report_date is None or pd.isna(report_date):
+        return None
+    d = pd.Timestamp(report_date)
+    return d.year - 1 if d.month <= 3 else d.year
+
+
+def text_links(text, seller, idx, seller_names=(), first_year=None):
     rows = []
     for para in text.split("\n"):
         if len(para) < 30 or not PCT.search(para) or not REV.search(para):
@@ -162,6 +183,9 @@ def text_links(text, seller, idx, seller_names=()):
             pcts = _percents(s)
             if not pcts:
                 continue
+            ys = [int(y) for y in YEAR.findall(s)]
+            if first_year and ys and max(ys) < first_year:
+                continue          # describes an earlier fiscal year only
             asc = _ascending_years(s)
             pick = (lambda g: g[-1]) if asc else (lambda g: g[0])
             names = [h for h in idx.find(s) if h[2] != seller and norm(s[h[0]:h[1]]) not in seller_names]
@@ -173,11 +197,13 @@ def text_links(text, seller, idx, seller_names=()):
             names = uniq
             assigned = {}
             if names:
-                if re.search(r"respectively", s, re.I) and all(h[1] <= pcts[0][0] for h in names):
+                if all(h[1] <= pcts[0][0] for h in names):
+                    # all names come before the first percentage
                     if len(names) == 1:
                         assigned = {names[0][2]: pick(pcts)[1]}
-                    elif len(pcts) == len(names):
+                    elif len(pcts) == len(names) and not (AGG_TEXT.search(s) and not re.search(r"respectively", s, re.I)):
                         assigned = {h[2]: p[1] for h, p in zip(names, pcts)}
+                    # otherwise an aggregate or ambiguous share: names kept without a share
                 else:
                     for k, h in enumerate(names):
                         nxt = names[k + 1][0] if k + 1 < len(names) else len(s)
@@ -205,6 +231,63 @@ def text_links(text, seller, idx, seller_names=()):
     return rows
 
 
+TABLE_PCT = re.compile(r"(\d{1,3}(?:\.\d+)?)\s*(?:\|\s*)?%")
+CAPTION_CUE = re.compile(r"customer|wholesaler|distributor|client|tenant|percentage of|% of|accounted for|"
+                         r"represented", re.I)
+ANON_CELL = re.compile(r"^(customer|client|tenant)\s+([A-Z]|\d+|one|two|three|four)$", re.I)
+
+
+def table_links(text, seller, idx, seller_names=(), first_year=None):
+    """Customer tables: a row whose first cell is a company (or 'Customer A'), percentages in
+    the same row or the next line, under a caption that talks about revenue and customers."""
+    rows = []
+    lines = text.split("\n")
+    for i, line in enumerate(lines):
+        if "|" not in line and i + 1 < len(lines) and "|" not in lines[i + 1]:
+            continue
+        cell0 = line.split("|")[0].strip()
+        if not cell0 or len(cell0) > 80:
+            continue
+        vals_line = line[len(line.split("|")[0]):]
+        vals = [float(m.group(1)) for m in TABLE_PCT.finditer(vals_line)]
+        if not vals and i + 1 < len(lines) and not re.search(r"[A-Za-z]", lines[i + 1]):
+            vals = [float(m.group(1)) for m in TABLE_PCT.finditer(lines[i + 1])]
+        vals = [v for v in vals if 0 < v <= 100]
+        if not vals:
+            continue
+        hits = idx.find(cell0)
+        n0 = norm(cell0)
+        buyer = None
+        if hits and norm(cell0[hits[0][0]:hits[0][1]]) == n0 and hits[0][2] != seller and n0 not in seller_names:
+            buyer, label, kind = hits[0][2], cell0, "named"
+        elif ANON_CELL.match(cell0):
+            label, kind = cell0.lower(), "anonymous"
+        else:
+            continue
+        # caption: nearest earlier prose line (at most two '|', 40+ chars, mostly letters) within 15 lines
+        cap, header = None, []
+        for k in range(i - 1, max(-1, i - 16), -1):
+            l = lines[k]
+            prose = l.replace("|", " ").strip()
+            if l.count("|") <= 2 and len(prose) >= 40 and len(re.findall(r"[A-Za-z]", prose)) > 30:
+                cap = prose
+                break
+            header.append(l)
+        if cap is None or not REV.search(cap) or not CAPTION_CUE.search(cap) or SUPPLY.search(cap):
+            continue
+        if re.search(r"receivable", cap, re.I) and not REV.search(cap.split("eceivable")[0]):
+            continue
+        ys = [int(y) for y in YEAR.findall(" ".join(header + [cap]))]
+        if first_year and ys and max(ys) < first_year:
+            continue
+        asc = len(ys) >= 2 and ys == sorted(ys) and ys[0] != ys[-1]
+        share = (vals[-1] if asc else vals[0]) / 100.0
+        rows.append({"buyer": buyer, "buyer_label": label, "kind": kind, "revenue_share": share,
+                     "source": "text_table", "period_end": None,
+                     "quote": (cap.strip()[:300] + " … " + line.strip()[:200])})
+    return rows
+
+
 def merge_filing(xb, tx):
     """One link per buyer per 10-K. XBRL wins; text adds buyers XBRL did not tag.
     Anonymous edges come from XBRL if it has any, else from text (largest share per label)."""
@@ -222,7 +305,10 @@ def merge_filing(xb, tx):
                  and r["revenue_share"] > cur["revenue_share"]):
             named_text[r["buyer"]] = r
     out += list(named_text.values())
-    anon_x = [r for r in xb if r["buyer"] is None]
+    named_shares = [r["revenue_share"] for r in out if r["revenue_share"] is not None]
+    # an anonymous XBRL member with the same share as a named customer is that customer
+    anon_x = [r for r in xb if r["buyer"] is None
+              and not any(abs(r["revenue_share"] - v) < 0.0051 for v in named_shares)]
     if anon_x:
         best = {}
         for r in anon_x:
@@ -242,13 +328,29 @@ def merge_filing(xb, tx):
     return out
 
 
+def remap_parents(df, t2c):
+    """A customer bought by a universe company (Express Scripts -> Cigna from Dec 2018, ...)
+    becomes the parent for 10-Ks accepted after the deal closed; then one link per buyer."""
+    from .names import PARENT
+    acc = pd.to_datetime(df["accepted_at"])
+    for alias, tick, d in PARENT:
+        if tick in t2c:
+            m = (df["buyer"] == alias) & (acc >= pd.Timestamp(d))
+            df.loc[m, "buyer"] = f"cik:{t2c[tick]}"
+    df = df[df["buyer"] != df["seller"]]
+    named = df[df["buyer"].notna()].copy()
+    named["_s"] = named["revenue_share"].fillna(-1)
+    named = named.sort_values("_s", ascending=False).drop_duplicates(["accession", "buyer"]).drop(columns="_s")
+    return pd.concat([named, df[df["buyer"].isna()]], ignore_index=True)
+
+
 def build(ciks=None):
     idx, t2c = build_index()
     tenk = fetch_10k.todo(ciks)
     meta = {m["cik"]: m for m in json.loads((CACHE / "sec" / "entity_meta.json").read_text())}
     rows, index_rows = [], []
     for r in tenk.itertuples():
-        d = fetch_10k.OUT / str(int(r.cik))
+        d = fetch_10k.OUT / str(int(getattr(r, "orig_cik", r.cik)))
         xf, tf = d / f"{r.accession}.xbrl.json", d / f"{r.accession}.txt.gz"
         if not xf.exists() or not tf.exists():
             index_rows.append({"cik": int(r.cik), "accession": r.accession, "accepted": r.accepted, "fetched": False,
@@ -257,8 +359,16 @@ def build(ciks=None):
         seller = f"cik:{int(r.cik)}"
         m = meta.get(int(r.cik), {})
         snames = {norm(n) for n in [m.get("name")] + list(m.get("former_names") or []) if n}
-        xb = xbrl_links(json.loads(xf.read_text()).get("facts", []), seller, idx)
-        tx = text_links(gzip.decompress(tf.read_bytes()).decode("utf-8", "replace"), seller, idx, snames)
+        try:
+            facts = json.loads(xf.read_text()).get("facts", [])
+            text = gzip.decompress(tf.read_bytes()).decode("utf-8", "replace")
+        except (OSError, EOFError, ValueError):
+            index_rows.append({"cik": int(r.cik), "accession": r.accession, "accepted": r.accepted,
+                               "fetched": False, "n_links": 0})
+            continue
+        xb = xbrl_links(facts, seller, idx)
+        fy = min_year(r.report_date)
+        tx = text_links(text, seller, idx, snames, first_year=fy) + table_links(text, seller, idx, snames, fy)
         links = merge_filing(xb, tx)
         for l in links:
             l.update({"seller": seller, "seller_cik": int(r.cik), "accession": r.accession, "accepted_at": r.accepted,
@@ -267,6 +377,7 @@ def build(ciks=None):
         index_rows.append({"cik": int(r.cik), "accession": r.accession, "accepted": r.accepted, "fetched": True,
                            "n_links": len(links)})
     df = pd.DataFrame(rows)
+    df = remap_parents(df, t2c)
     pit.check_frame(df, ["accepted_at"], what="seed links")
     df.to_parquet(OUT, index=False)
     ti = pd.DataFrame(index_rows)

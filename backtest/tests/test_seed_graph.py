@@ -27,7 +27,30 @@ def test_norm_and_camel():
     assert norm("Wal-Mart Stores, Inc.") == "walmart"
     assert norm("The Home Depot, Inc.") == "home depot"
     assert norm("AT&T Inc.") == "at and t"
+    assert norm("Walmart Stores Inc And Affiliates") == "walmart"
     assert camel_words("wmt:WalMartStoresIncMember") == "Wal Mart Stores Inc"
+    assert camel_words("x:McKessonCorporationMember") == "McKesson Corporation"
+    assert camel_words("x:WalmartInc.Member") == "Walmart Inc"
+    assert camel_words("x:CompanyCMemberDomain") == "Company C"
+
+
+def test_generic_other_is_not_a_customer():
+    ix = NameIndex().build([], {}, [{"id": "ext:other", "name": "Other", "ticker": None}])
+    assert ix.find("Other | 51 | 39 | 31%") == []
+
+
+def test_parent_remap_after_deal_date():
+    from stage1.seed_graph import remap_parents
+    df = pd.DataFrame([
+        {"seller": "cik:1", "buyer": "name:express_scripts", "revenue_share": 0.2, "accession": "a",
+         "accepted_at": pd.Timestamp("2018-02-01")},
+        {"seller": "cik:1", "buyer": "name:express_scripts", "revenue_share": 0.2, "accession": "b",
+         "accepted_at": pd.Timestamp("2019-02-01")},
+        {"seller": "cik:1", "buyer": "cik:77", "revenue_share": 0.1, "accession": "b",
+         "accepted_at": pd.Timestamp("2019-02-01")}])
+    out = remap_parents(df, {"CI": 77})
+    assert set(zip(out["accession"], out["buyer"], out["revenue_share"])) == {
+        ("a", "name:express_scripts", 0.2), ("b", "cik:77", 0.2)}
 
 
 def test_single_customer_most_recent_year_first(idx):
@@ -137,3 +160,72 @@ def test_seed_graph_point_in_time_and_supersede():
     assert len(SeedGraph(links, ti2).at("2018-06-01")) == 0  # stale after 456 days
     with pytest.raises(pit.ClosedPeriodError):
         g.at("2024-01-05")
+
+
+def test_aggregate_share_not_given_to_one_name(idx):
+    t = ("In addition, five customers, including Walmart, Target and Apple, accounted for approximately 90% "
+         "of the net revenue in 2015.")
+    rows = text_links(t, "cik:999", idx)
+    assert rows and all(r["revenue_share"] is None for r in rows)
+
+
+def test_two_names_two_percents_without_respectively(idx):
+    t = "Walmart and Target accounted for 20% and 12% of our net sales in 2019."
+    assert shares(text_links(t, "cik:999", idx)) == {"cik:104169": 0.20, "cik:27419": 0.12}
+
+
+def test_min_year_for_fiscal_labels():
+    from stage1.seed_graph import min_year
+    assert min_year(pd.Timestamp("2018-09-28")) == 2018
+    assert min_year(pd.Timestamp("2018-02-03")) == 2017
+
+
+def test_prior_year_sentence_dropped_in_text(idx):
+    t = "In fiscal 2017, Walmart and Target accounted for 12% and 10% of net revenue, respectively."
+    assert text_links(t, "cik:999", idx, first_year=2018) == []
+    assert len(text_links(t, "cik:999", idx, first_year=2017)) == 2
+
+
+def test_lowercase_phrase_is_not_a_company():
+    ix = NameIndex().build([{"cik": 5, "name": "Vantage Limited", "former_names": []}], {}, [])
+    assert ix.find("the range at the vantage the portion of revenue") == []
+    assert [h[2] for h in ix.find("Sales to Vantage Limited were 10%")] == ["cik:5"]
+
+
+def test_xbrl_two_customer_axes_and_domain_suffix_anonymous(idx):
+    f = {"concept": "us-gaap:ConcentrationRiskPercentage1", "value": 0.10, "start": "2016-10-01", "end": "2017-09-29",
+         "dims": {"swks:MajorCustomerByPercentageAxis": "swks:CustomerThreeMemberDomain",
+                  "us-gaap:MajorCustomersAxis": "swks:CompanyCMemberDomain"}}
+    rows = xbrl_links([f], "cik:999", idx)
+    assert len(rows) == 1 and rows[0]["buyer"] is None and rows[0]["revenue_share"] == 0.10
+
+
+def test_table_same_row(idx):
+    from stage1.seed_graph import table_links
+    t = ("Gross revenue to the three largest pharmaceutical wholesalers in the U.S. as a percentage of U.S. "
+         "gross revenues was as follows:\n | Year Ended December 31, | \n | 2022 | | 2021 | | 2020 | \n"
+         " McKesson Corporation | 32 | % | | 32 | % | | 31 | % | \n"
+         " AmerisourceBergen Corporation | 25 | % | | 25 | % | | 25 | % | \n"
+         " Cardinal Health, Inc. | 21 | % | | 20 | % | | 19 | % |\n Wholesalers are invoiced at list prices.")
+    assert shares(table_links(t, "cik:999", idx, first_year=2022)) == {
+        "cik:927653": 0.32, "cik:1140859": 0.25, "cik:721371": 0.21}
+
+
+def test_table_values_on_next_line_and_receivable_caption_skipped(idx):
+    from stage1.seed_graph import table_links
+    t = ("The following summarizes revenue, as a percentage of total revenues, for our three largest U.S. "
+         "wholesaler customers: | \n | | Year Ended December 31, | \n | | 2022 | | 2021 | | 2020 | \n"
+         "McKesson, Inc. \n | | 8 | % | | 9 | % | | 16 | % | \n")
+    assert shares(table_links(t, "cik:999", idx)) == {"cik:927653": 0.08}
+    bad = ("Accounts receivable from our largest customers as a percentage of total trade receivables: \n"
+           " | 2022 | | 2021 | \n McKesson Corporation | 40 | % | | 38 | % |")
+    assert table_links(bad, "cik:999", idx) == []
+
+
+def test_anonymous_xbrl_duplicate_of_named_text_dropped():
+    xb = [{"buyer": None, "buyer_label": "Company", "kind": "anonymous", "revenue_share": 0.51, "source": "xbrl",
+           "period_end": "2019-09-27", "quote": "x"}]
+    tx = [{"buyer": "cik:320193", "buyer_label": "Apple", "kind": "named", "revenue_share": 0.51, "source": "text",
+           "period_end": None, "quote": "t"}]
+    m = merge_filing(xb, tx)
+    assert [(r["buyer"], r["revenue_share"]) for r in m] == [("cik:320193", 0.51)]

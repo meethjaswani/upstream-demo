@@ -161,15 +161,36 @@ def run(workers=8):
 
 
 def consolidate():
+    """Merge per-CIK files. Predecessor CIKs (predecessors.py) are folded into the successor:
+    `cik` is the company, `orig_cik` the registrant that filed (used for archive URLs)."""
+    from .predecessors import canonical
     subs = [pd.read_parquet(p) for p in sorted(SUB_DIR.glob("*.parquet"))]
     subs = pd.concat([s for s in subs if not s.empty], ignore_index=True)
+    subs["orig_cik"] = subs["cik"].astype(int)
+    subs["cik"] = subs["orig_cik"].map(canonical)
+    subs = subs.sort_values(["accession", "orig_cik"]).drop_duplicates("accession", keep="first")
     pit.check_frame(subs, ["filing_date", "accepted"], what="filings")
     subs.to_parquet(SEC_DIR / "filings.parquet", index=False)
     sh = pd.concat([pd.read_parquet(p) for p in sorted(SH_DIR.glob("*.parquet"))], ignore_index=True)
+    sh["orig_cik"] = sh["cik"].astype(int)
+    sh["cik"] = sh["orig_cik"].map(canonical)
     pit.check_frame(sh, ["filed"], what="shares")
     sh.to_parquet(SEC_DIR / "shares.parquet", index=False)
-    metas = [json.loads(p.read_text()) for p in sorted(SUB_DIR.glob("*.meta.json"))]
-    pd.DataFrame(metas).to_json(SEC_DIR / "entity_meta.json", orient="records")
+    metas = {}
+    for p in sorted(SUB_DIR.glob("*.meta.json")):
+        m = json.loads(p.read_text())
+        c = canonical(m["cik"])
+        names = [m.get("name")] + list(m.get("former_names") or [])
+        if c in metas:
+            metas[c]["former_names"] = list(dict.fromkeys(metas[c]["former_names"] + [n for n in names if n]))
+        else:
+            if c != m["cik"]:
+                m = {**m, "cik": c, "name": None, "former_names": [n for n in names if n]}
+            metas[c] = m
+    for c, m in metas.items():
+        if m.get("name") is None and m["former_names"]:
+            m["name"] = m["former_names"][0]
+    pd.DataFrame(list(metas.values())).to_json(SEC_DIR / "entity_meta.json", orient="records")
     print("filings", len(subs), subs["form"].value_counts().to_dict())
     print("share facts", len(sh), "ciks", sh["cik"].nunique())
 

@@ -120,7 +120,7 @@ def _instance_url(cik, acc_nd):
 
 
 def fetch_one(row):
-    cik, acc = int(row.cik), row.accession
+    cik, acc = int(getattr(row, "orig_cik", row.cik)), row.accession     # archive path uses the filer
     d = OUT / str(cik)
     d.mkdir(parents=True, exist_ok=True)
     tx, xb = d / f"{acc}.txt.gz", d / f"{acc}.xbrl.json"
@@ -142,9 +142,15 @@ def fetch_one(row):
             ri = sec.get(u)
             if ri is not None:
                 facts, src = concentration_facts(_decode(ri), inline=False), u.rsplit("/", 1)[-1]
-    xb.write_text(json.dumps({"source": src, "facts": facts}))
-    tx.write_bytes(gzip.compress(to_text(raw).encode("utf-8")))
+    _atomic(tx, gzip.compress(to_text(raw).encode("utf-8")))
+    _atomic(xb, json.dumps({"source": src, "facts": facts}).encode("utf-8"))   # written last: marks done
     return "ok"
+
+
+def _atomic(path, data):
+    tmp = path.with_suffix(path.suffix + ".tmp")
+    tmp.write_bytes(data)
+    tmp.replace(path)
 
 
 def todo(ciks=None):
@@ -183,4 +189,4 @@ def universe_ciks():
 
 
 if __name__ == "__main__":
-    run(ciks=universe_ciks())
+    run(workers=24, ciks=universe_ciks())   # latency-bound; the shared limiter keeps it under 8 req/s

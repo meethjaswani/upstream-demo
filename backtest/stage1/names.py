@@ -41,8 +41,21 @@ MANUAL = {
     "u s navy": "gov:us", "us navy": "gov:us", "u s army": "gov:us", "us army": "gov:us",
     "u s air force": "gov:us", "us air force": "gov:us", "us dod": "gov:us", "u s dod": "gov:us",
     "medicare": "gov:medicare", "medicaid": "gov:medicaid",
-    "centers for medicare and medicaid services": "gov:medicare",
+    "centers for medicare and medicaid services": "gov:medicare", "cms": "gov:medicare",
+    "cms subsidies": "gov:medicare",
+    # spellings produced by splitting XBRL member names and by filers
+    "t mobile": "TMUS", "tmobile us": "TMUS", "at t": "T", "atandt": "T", "atandt mobility": "T",
+    "at t mobility": "T", "at and t mobility": "T", "at and t wireless": "T", "att mobility": "T",
+    "mc kesson": "MCK", "mckesson specialty": "MCK", "mc donalds": "MCD", "mcdonalds": "MCD",
+    "amerisource bergen": "COR", "amerisorce bergen": "COR", "mclane": "BRK-B", "mc lane": "BRK-B",
+    "us do d": "gov:us", "u s do d": "gov:us", "do d": "gov:us", "maryland procurement office": "gov:us",
+    "optumrx": "UNH", "optum rx": "UNH", "sprint nextel": "name:sprint", "medco": "name:express_scripts",
+    "celgene": "name:celgene", "allergan": "name:allergan", "home depot usa": "HD",
 }
+# customers later bought by a universe company: (alias node, parent ticker, from date)
+PARENT = [("name:express_scripts", "CI", "2018-12-20"), ("name:aetna", "CVS", "2018-11-28"),
+          ("name:sprint", "TMUS", "2020-04-01"), ("name:celgene", "BMY", "2019-11-20"),
+          ("name:allergan", "ABBV", "2020-05-08")]
 # single words too common to use as a name on their own
 COMMON = {"general", "united", "american", "international", "national", "first", "southern", "public",
           "global", "health", "energy", "capital", "financial", "services", "systems", "technologies",
@@ -51,7 +64,8 @@ COMMON = {"general", "united", "american", "international", "national", "first",
           "visa", "ball", "gap", "fox", "west", "central", "eastern", "western", "pacific",
           "atlantic", "north", "south", "east", "realty", "trust", "bank", "insurance", "foods", "chemical",
           "resources", "industries", "brands", "partners", "solutions", "communications", "media", "data",
-          "us", "u", "s"}
+          "us", "u", "s", "other", "others", "all", "remaining", "rest", "unallocated", "eliminations",
+          "domestic", "foreign", "americas", "europe", "asia", "corporate", "excludes", "tennessee"}
 
 
 def norm(s):
@@ -60,6 +74,8 @@ def norm(s):
     s = re.sub(r"(?<=\w)-(?=\w)", "", s)
     s = re.sub(r"[^a-z0-9 ]", " ", s)
     toks = [t for t in s.split() if t not in STOP]
+    while toks and toks[-1] == "and":      # 'Walmart Stores Inc And Affiliates'
+        toks.pop()
     return " ".join(toks)
 
 
@@ -118,8 +134,13 @@ class NameIndex:
                     continue
                 a = " ".join(parts)
                 if a in self.alias:
-                    if L == 1 and not toks[k][2][:1].isupper():
-                        continue
+                    gov = self.alias[a].startswith("gov:")
+                    if not gov and not toks[k][2][:1].isupper():
+                        continue          # company names must start with a capital
+                    if not normed[k]:
+                        continue          # do not start a match on a stop word
+                    if len(a.split()) == 1 and not normed[k + L - 1]:
+                        continue          # 'Excludes the' is not 'Excludes Limited'
                     hit = (toks[k][0], toks[k + L - 1][1], self.alias[a], a, L)
                     break
             if hit:
@@ -133,8 +154,10 @@ class NameIndex:
 def camel_words(member):
     """'wmt:WalMartStoresIncMember' -> 'Wal Mart Stores Inc'."""
     local = member.split(":")[-1]
-    local = re.sub(r"Member$", "", local)
-    return re.sub(r"(?<=[a-z0-9])(?=[A-Z])|(?<=[A-Z])(?=[A-Z][a-z])", " ", local).strip()
+    local = re.sub(r"[.\s]*(Member)?(Domain)?\s*$", "", local)
+    s = re.sub(r"(?<=[a-z0-9])(?=[A-Z])|(?<=[A-Z])(?=[A-Z][a-z])", " ", local).strip()
+    s = re.sub(r"\bMa?c (?=[A-Z])", lambda m: m.group(0)[:-1], s)      # 'Mc Kesson' -> 'McKesson'
+    return s
 
 
 def load_entity_meta(path):

@@ -33,7 +33,10 @@ class Universe:
 
     # -------------------------------------------------------------- symbols
     def _membership_days(self):
-        m = self.mem.sort_values("date")
+        from .predecessors import DATED_TICKERS
+        m = self.mem.sort_values("date").copy()
+        for tk, until, meant in DATED_TICKERS:
+            m.loc[(m["ticker"] == tk) & (m["date"] < pd.Timestamp(until)), "ticker"] = meant
         dates = m["date"].drop_duplicates().sort_values().reset_index(drop=True)
         # each change row is in force until the next one
         nxt = dict(zip(dates, list(dates[1:]) + [pit.CUTOFF]))

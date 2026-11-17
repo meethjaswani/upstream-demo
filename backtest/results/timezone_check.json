@@ -1,0 +1,62 @@
+{
+ "apple_8k": [
+  {
+   "accession": "0000320193-19-000002",
+   "items": "2.02,9.01",
+   "raw_api_utc": "2019-01-02 21:30:03",
+   "accepted_new_york": "2019-01-02 16:30:03",
+   "index_page_accepted": "2019-01-02 16:30:03",
+   "event_day": "2019-01-03"
+  }
+ ],
+ "share_next_day_filing_date_by_raw_hour": {
+  "[0.0, 9.0)": {
+   "mean": 0.0,
+   "size": 24086
+  },
+  "[9.0, 12.0)": {
+   "mean": 0.0,
+   "size": 10432
+  },
+  "[12.0, 16.0)": {
+   "mean": 0.0,
+   "size": 11611
+  },
+  "[16.0, 17.0)": {
+   "mean": 0.0,
+   "size": 38109
+  },
+  "[17.0, 17.5)": {
+   "mean": 0.0,
+   "size": 11022
+  },
+  "[17.5, 18.0)": {
+   "mean": 0.829,
+   "size": 1826
+  },
+  "[18.0, 19.0)": {
+   "mean": 0.968,
+   "size": 2028
+  },
+  "[19.0, 21.0)": {
+   "mean": 0.973,
+   "size": 2235
+  },
+  "[21.0, 21.5)": {
+   "mean": 0.993,
+   "size": 409
+  },
+  "[21.5, 22.0)": {
+   "mean": 0.998,
+   "size": 461
+  },
+  "[22.0, 22.5)": {
+   "mean": 1.0,
+   "size": 8
+  }
+ },
+ "next_day_share_17_00_to_17_30": 0.0,
+ "next_day_share_17_30_to_18_00": 0.8291347207009858,
+ "api_minus_index_page_hours": 5.0,
+ "conclusion": "acceptanceDateTime is true UTC; converted to New York time on load"
+}
