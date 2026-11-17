@@ -1,0 +1,40 @@
+# old membership ticker -> Yahoo symbol that now holds the same company's history.
+# Blank yahoo = the company was acquired or delisted and Yahoo has no history (survivorship gap).
+old,yahoo,note
+ABC,COR,AmerisourceBergen renamed Cencora 2023
+ADS,BFH,Alliance Data renamed Bread Financial 2022
+ANTM,ELV,Anthem renamed Elevance 2022
+ARNC,HWM,Arconic Inc renamed Howmet Aerospace 2020 (same CIK)
+BHGE,BKR,Baker Hughes a GE company renamed Baker Hughes 2019
+BLL,BALL,Ball ticker change 2022
+CBS,PSKY,CBS -> ViacomCBS (VIAC) -> Paramount (PARA) -> Paramount Skydance (PSKY)
+VIAC,PSKY,ViacomCBS -> Paramount -> Paramount Skydance
+PARA,PSKY,Paramount -> Paramount Skydance 2025
+CDAY,DAY,Ceridian renamed Dayforce 2024
+CHK,EXE,Chesapeake -> Expand Energy 2024 (post-2021 equity only)
+COG,CTRA,Cabot Oil & Gas renamed Coterra 2021
+CTL,LUMN,CenturyLink renamed Lumen 2020
+DISCA,WBD,Discovery -> Warner Bros. Discovery 2022
+DISCK,,Discovery class C (duplicate share class)
+DWDP,DD,DowDuPont renamed DuPont 2019
+FB,META,Facebook renamed Meta 2022
+FBHS,FBIN,Fortune Brands Home & Security renamed 2022
+FI,FISV,Fiserv ticker FISV -> FI 2023 -> FISV again
+FLT,CPAY,FleetCor renamed Corpay 2024
+GPS,GAP,Gap ticker change 2024
+HCP,DOC,HCP -> Healthpeak (PEAK) -> DOC 2024
+PEAK,DOC,Healthpeak ticker change 2024
+HFC,DINO,HollyFrontier -> HF Sinclair 2022
+HRS,LHX,Harris -> L3Harris 2019 (same CIK)
+JEC,J,Jacobs ticker change 2019
+KORS,CPRI,Michael Kors -> Capri 2019
+LB,BBWI,L Brands -> Bath & Body Works 2021
+NLOK,GEN,NortonLifeLock -> Gen Digital 2022
+SYMC,GEN,Symantec -> NortonLifeLock -> Gen Digital
+PKI,RVTY,PerkinElmer -> Revvity 2023
+RE,EG,Everest Re -> Everest Group 2023
+TMK,GL,Torchmark -> Globe Life 2019
+UTX,RTX,United Technologies -> Raytheon Technologies -> RTX 2020 (same CIK)
+WLTW,WTW,Willis Towers Watson ticker change 2022
+WYND,TNL,Wyndham Destinations -> Travel + Leisure 2021 (same CIK)
+CMCSK,,Comcast special class K (duplicate share class)
