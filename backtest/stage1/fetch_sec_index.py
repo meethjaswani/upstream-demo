@@ -61,8 +61,25 @@ def build_entities():
 
 
 def _acc_time(s):
-    # EDGAR stamps acceptance in US Eastern time even though the string ends in 'Z'
-    return pd.to_datetime(s.str.replace("Z", "", regex=False).str.replace(".000", "", regex=False), errors="coerce")
+    """acceptanceDateTime is true UTC (checked in timezone_check.py: Apple's 8-K of 2 Jan 2019
+    is 21:30:03Z in the API and 16:30:03 on the EDGAR index page). Stored as naive New York time."""
+    t = pd.to_datetime(s, utc=True, errors="coerce")
+    return t.dt.tz_convert("America/New_York").dt.tz_localize(None)
+
+
+def fix_cached_tz():
+    """One-off: per-CIK files written before the UTC fix hold the UTC clock time; convert them."""
+    n = 0
+    for p in sorted(SUB_DIR.glob("*.parquet")):
+        df = pd.read_parquet(p)
+        if df.empty or "accepted_tz" in df.columns:
+            continue
+        df["accepted"] = (df["accepted"].dt.tz_localize("UTC").dt.tz_convert("America/New_York")
+                          .dt.tz_localize(None))
+        df["accepted_tz"] = "America/New_York"
+        df.to_parquet(p, index=False)
+        n += 1
+    return n
 
 
 def _frame(block):
@@ -95,6 +112,7 @@ def fetch_submissions(cik):
         "accessionNumber": "accession", "filingDate": "filing_date", "reportDate": "report_date",
         "primaryDocument": "primary_doc", "isXBRL": "is_xbrl", "isInlineXBRL": "is_ixbrl"})
     df["cik"] = cik
+    df["accepted_tz"] = "America/New_York"
     pit.check_frame(df, ["filing_date", "accepted"], what=f"submissions {cik}")
     df.to_parquet(out, index=False)
     former = [x for x in j.get("formerNames", []) if pd.Timestamp(x["from"][:10]) < pit.CUTOFF]
@@ -112,7 +130,9 @@ def fetch_shares(cik):
     for tax, concept in SHARE_CONCEPTS + [("dei", "EntityPublicFloat")]:
         units = ((j or {}).get("facts", {}).get(tax, {}).get(concept, {}) or {}).get("units", {})
         for v in units.get("shares", []) + units.get("USD", []):
-            rows.append({"concept": concept, "end": v.get("end"), "val": v.get("val"), "accn": v.get("accn"),
+            val = v.get("val")
+            rows.append({"concept": concept, "end": v.get("end"), "val": float(val) if val is not None else None,
+                         "accn": v.get("accn"),
                          "form": v.get("form"), "filed": v.get("filed")})
     df = pd.DataFrame(rows, columns=["concept", "end", "val", "accn", "form", "filed"])
     df["filed"] = pd.to_datetime(df["filed"])

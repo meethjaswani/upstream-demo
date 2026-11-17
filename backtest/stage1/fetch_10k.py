@@ -174,5 +174,13 @@ def run(workers=8, ciks=None):
     print("done", stat, flush=True)
 
 
+def universe_ciks():
+    """CIKs with a priced primary symbol and at least one validated index span."""
+    from .universe import Universe
+    U = Universe()
+    cols = {c for _, _, _, c in U.span_rows if c is not None}
+    return sorted(U.cik_of_sym[U.symbols[c]] for c in cols)
+
+
 if __name__ == "__main__":
-    run()
+    run(ciks=universe_ciks())

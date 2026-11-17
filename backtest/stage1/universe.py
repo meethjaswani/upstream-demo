@@ -57,38 +57,63 @@ class Universe:
         self.col = {s: k for k, s in enumerate(self.symbols)}
         self.ticker_cik = dict(zip(ent["member_ticker"], ent["cik"]))
 
+    def _span_ok(self, cik, a, b):
+        """The CIK filed a 10-K or 10-Q while the ticker was in the index (guards against SEC's
+        current ticker list pointing an old symbol at a new company)."""
+        d = self._periodic.get(cik)
+        if d is None or len(d) == 0:
+            return False
+        lo, hi = a - pd.Timedelta(days=200), b + pd.Timedelta(days=120)
+        i, j = d.searchsorted(lo), d.searchsorted(hi)
+        return j - i >= 1
+
     def _member_matrix(self):
         T, S = len(self.calendar), len(self.symbols)
         M = np.zeros((T, S), dtype=bool)
         cal = self.calendar
+        f = pd.read_parquet(CACHE / "sec" / "filings.parquet", columns=["cik", "form", "filing_date"])
+        f = f[f["form"].isin(["10-K", "10-Q", "10-K405", "10-KT"])]
+        self._periodic = {c: pd.DatetimeIndex(sorted(g["filing_date"])) for c, g in f.groupby("cik")}
+        self.rejected_spans = []
+        self.span_rows = []           # (ticker, first idx, end idx, column or None)
         for r in self.mem_spans.itertuples():
-            c = self.ticker_cik.get(r.ticker)
-            if c is None or c not in self.sym_of_cik:
-                continue
             a, b = cal.searchsorted(r.date), cal.searchsorted(r.until)
-            M[a:b, self.col[self.sym_of_cik[c]]] = True
+            c = self.ticker_cik.get(r.ticker)
+            col = None
+            if c is not None and c in self.sym_of_cik:
+                if self._span_ok(c, max(r.date, pit.DATA_START), min(r.until, pit.CUTOFF)):
+                    col = self.col[self.sym_of_cik[c]]
+                    M[a:b, col] = True
+                else:
+                    self.rejected_spans.append((r.ticker, c, r.date))
+            self.span_rows.append((r.ticker, a, b, col))
         self.member = M
 
-    def survivorship(self):
-        """Share of index member-days (2016-2023) whose company has no Yahoo prices."""
-        sp = self.mem_spans
-        rows = []
-        for r in sp.itertuples():
-            a = max(r.date, pd.Timestamp("2016-01-01"))
-            b = min(r.until, pit.CUTOFF)
+    def survivorship(self, start="2016-01-01"):
+        """Index member-days from `start` to 2023-12 without a usable Yahoo price on that day
+        (no Yahoo history, no SEC match, or a ticker that now belongs to another company)."""
+        px = self.prices.pivot(index="date", columns="ticker", values="adj_close")
+        has = px.reindex(index=self.calendar, columns=self.symbols).notna().values
+        t0 = self.calendar.searchsorted(pd.Timestamp(start))
+        dup = {"DISCK", "CMCSK"}           # second share classes of companies already counted
+        days, priced = {}, {}
+        for tk, a, b, col in self.span_rows:
+            if tk in dup:
+                continue
+            a = max(a, t0)
             if b <= a:
                 continue
-            ok = r.ticker in self.ticker_cik and self.ticker_cik[r.ticker] in self.sym_of_cik
-            dup = r.ticker in ("DISCK", "CMCSK")
-            rows.append({"ticker": r.ticker, "days": (b - a).days, "priced": ok, "dup_class": dup})
-        d = pd.DataFrame(rows)
-        d = d[~d["dup_class"]]
-        tick = d.groupby("ticker").agg(days=("days", "sum"), priced=("priced", "max"))
-        return {"member_tickers_2016_2023": int(len(tick)),
-                "tickers_without_prices": int((~tick["priced"]).sum()),
-                "share_tickers_without_prices": float((~tick["priced"]).mean()),
-                "share_member_days_without_prices": float(d.loc[~d["priced"], "days"].sum() / d["days"].sum()),
-                "missing": sorted(tick.index[~tick["priced"]])}
+            n = b - a
+            ok = int(has[a:b, col].sum()) if col is not None else 0
+            days[tk] = days.get(tk, 0) + n
+            priced[tk] = priced.get(tk, 0) + ok
+        d = pd.DataFrame({"days": days, "priced": priced})
+        none = d["priced"] == 0
+        return {"member_tickers": int(len(d)), "tickers_without_any_prices": int(none.sum()),
+                "share_tickers_without_prices": round(float(none.mean()), 4),
+                "share_member_days_without_prices": round(float(1 - d["priced"].sum() / d["days"].sum()), 4),
+                "rejected_ticker_cik_spans": len({(t, c) for t, c, _ in self.rejected_spans}),
+                "missing": sorted(d.index[none])}
 
     # -------------------------------------------------------------- returns
     def excess_returns(self):
