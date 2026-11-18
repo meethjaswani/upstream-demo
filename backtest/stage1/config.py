@@ -12,6 +12,12 @@ GRAPH_JSON = REPO / "data" / "graph.json"
 
 SEED = 4801                                        # global RNG seed
 
+# Licensed WRDS export (CRSP / Compustat). Never committed; read in place.
+_wrds_default = CACHE / "wrds"
+if not _wrds_default.exists():
+    _wrds_default = Path.home() / "upstream-v3" / "backtest" / "cache" / "wrds"
+WRDS = Path(os.environ.get("BACKTEST_WRDS", _wrds_default))
+
 for p in (CACHE, RESULTS, FIGURES):
     p.mkdir(parents=True, exist_ok=True)
 

@@ -42,15 +42,17 @@ def test_generic_other_is_not_a_customer():
 def test_parent_remap_after_deal_date():
     from stage1.seed_graph import remap_parents
     df = pd.DataFrame([
-        {"seller": "cik:1", "buyer": "name:express_scripts", "revenue_share": 0.2, "accession": "a",
+        {"seller": "cik:1", "buyer": "cik:55", "revenue_share": 0.2, "accession": "a",
          "accepted_at": pd.Timestamp("2018-02-01")},
-        {"seller": "cik:1", "buyer": "name:express_scripts", "revenue_share": 0.2, "accession": "b",
+        {"seller": "cik:1", "buyer": "cik:55", "revenue_share": 0.2, "accession": "b",
          "accepted_at": pd.Timestamp("2019-02-01")},
         {"seller": "cik:1", "buyer": "cik:77", "revenue_share": 0.1, "accession": "b",
+         "accepted_at": pd.Timestamp("2019-02-01")},
+        {"seller": "cik:1", "buyer": "name:esrx", "revenue_share": 0.3, "accession": "c",
          "accepted_at": pd.Timestamp("2019-02-01")}])
-    out = remap_parents(df, {"CI": 77})
+    out = remap_parents(df, {"CI": 77, "ESRX": 55})
     assert set(zip(out["accession"], out["buyer"], out["revenue_share"])) == {
-        ("a", "name:express_scripts", 0.2), ("b", "cik:77", 0.2)}
+        ("a", "cik:55", 0.2), ("b", "cik:77", 0.2), ("c", "cik:77", 0.3)}
 
 
 def test_single_customer_most_recent_year_first(idx):

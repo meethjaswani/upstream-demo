@@ -1,0 +1,53 @@
+{
+ "arm": "crsp",
+ "seed_links_total": 3544,
+ "seed_links_named": 2381,
+ "seed_links_both_ends_in_universe": 1279,
+ "seed_pairs_both_ends_in_universe": 337,
+ "universe_companies": 704,
+ "events_total": 7636,
+ "events_by_period": {
+  "fit": 5823,
+  "choose": 1813
+ },
+ "events_negative": 3904,
+ "events_positive": 3732,
+ "events_earnings": 5570,
+ "event_funnel": {
+  "stock_days_in_index_with_fit": 979203,
+  "abs_z_ge_3": 18658,
+  "and_filing_within_1d": 9031,
+  "and_spx_within_2pct": 7636
+ },
+ "events_with_linked_h1": 743,
+ "event_firm_pairs_h1": 1652,
+ "event_firm_pairs_h1_by_period": {
+  "choose": 397,
+  "fit": 1255
+ },
+ "event_firm_pairs_h4": 2050,
+ "median_linked_h1_given_any": 1.0,
+ "events_with_5plus_linked_h1": 70,
+ "survivorship": {
+  "member_permnos": 719,
+  "companies": 704,
+  "share_member_days_without_returns": 0.0044,
+  "member_days_without_cik": 1580
+ },
+ "clean_pairs_drop_any_car_0_5": {
+  "choose": 229,
+  "fit": 683
+ },
+ "clean_pairs_drop_earn_car_0_5": {
+  "choose": 290,
+  "fit": 952
+ },
+ "clean_pairs_drop_any_car_1_20": {
+  "choose": 103,
+  "fit": 307
+ },
+ "clean_pairs_drop_earn_car_1_20": {
+  "choose": 222,
+  "fit": 779
+ }
+}

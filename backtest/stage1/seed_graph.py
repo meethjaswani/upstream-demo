@@ -72,10 +72,16 @@ def build_index():
     ent = pd.read_csv(CACHE / "entities.csv")
     meta = json.loads((CACHE / "sec" / "entity_meta.json").read_text())
     t2c = {}
+    try:                                   # CRSP historical tickers (point in time within the window) first
+        from . import crsp
+        t2c.update(crsp.ticker_cik())
+    except (FileNotFoundError, OSError):
+        pass
+    from .predecessors import canonical
     for r in ent.dropna(subset=["cik"]).itertuples():
         for t in (r.member_ticker, r.yahoo):
             if isinstance(t, str):
-                t2c.setdefault(t.upper(), int(r.cik))
+                t2c.setdefault(t.upper(), canonical(int(r.cik)))
     g = json.load(open(GRAPH_JSON))
     idx = NameIndex().build(meta, t2c, g["nodes"])
     return idx, t2c
@@ -333,10 +339,18 @@ def remap_parents(df, t2c):
     becomes the parent for 10-Ks accepted after the deal closed; then one link per buyer."""
     from .names import PARENT
     acc = pd.to_datetime(df["accepted_at"])
-    for alias, tick, d in PARENT:
-        if tick in t2c:
-            m = (df["buyer"] == alias) & (acc >= pd.Timestamp(d))
-            df.loc[m, "buyer"] = f"cik:{t2c[tick]}"
+
+    def node(x):
+        if x.startswith("name:"):
+            return x
+        return f"cik:{t2c[x]}" if x in t2c else "name:" + x.lower()
+
+    for acquired, parent, d in PARENT:
+        src, dst = node(acquired), node(parent)
+        if dst.startswith("name:") and not parent.startswith("name:"):
+            continue
+        m = df["buyer"].isin({src, "name:" + acquired.lower()}) & (acc >= pd.Timestamp(d))
+        df.loc[m, "buyer"] = dst
     df = df[df["buyer"] != df["seller"]]
     named = df[df["buyer"].notna()].copy()
     named["_s"] = named["revenue_share"].fillna(-1)

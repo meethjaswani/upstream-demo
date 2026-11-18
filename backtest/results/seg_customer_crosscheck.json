@@ -1,0 +1,29 @@
+{
+ "seg_customer_fiscal_period_range": [
+  "2020-06-30",
+  "2023-12-31"
+ ],
+ "company_rows_all_sellers": 32003,
+ "distinct_customer_names": 5974,
+ "names_resolved_to_a_node": 1065,
+ "universe_seller_years_in_both_sources": 757,
+ "named_customers_compustat": 2836,
+ "named_customers_ours": 767,
+ "named_in_both": 507,
+ "universe_customers_compustat": 939,
+ "universe_customers_ours": 446,
+ "universe_customers_in_both": 407,
+ "recall_of_compustat_universe_customers": 0.433,
+ "share_of_our_universe_customers_confirmed_by_compustat": 0.913,
+ "cik_customers_in_both": 407,
+ "anonymous_rows_compustat": 0,
+ "anonymous_links_ours": 444,
+ "outside_sellers_naming_a_universe_customer": 848,
+ "outside_links_to_universe_customers": 5035,
+ "outside_links_by_fiscal_year": {
+  "2020": 1299,
+  "2021": 1307,
+  "2022": 1231,
+  "2023": 1198
+ }
+}

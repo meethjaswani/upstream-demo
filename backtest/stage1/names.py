@@ -16,7 +16,9 @@ MANUAL = {
     "target": "TGT", "home depot": "HD", "lowes": "LOW", "costco": "COST", "costco wholesale": "COST",
     "kroger": "KR", "amazon": "AMZN", "amazoncom": "AMZN", "apple": "AAPL", "mckesson": "MCK",
     "amerisourcebergen": "COR", "cencora": "COR", "cardinal health": "CAH", "cardinal": "CAH",
-    "cvs": "CVS", "cvs caremark": "CVS", "cvs health": "CVS", "caremark": "CVS", "aetna": "name:aetna",
+    "cvs": "CVS", "cvs caremark": "CVS", "cvs health": "CVS", "caremark": "CVS", "aetna": "AET",
+    "whole foods": "WFM", "whole foods market": "WFM", "time warner cable": "TWC", "directv": "DTV",
+    "kraft foods": "KRFT", "rockwell collins": "COL", "caesars": "CZR", "mgm": "MGM", "penn": "PENN",
     "walgreens": "WBA", "walgreen": "WBA", "walgreens boots alliance": "WBA", "best buy": "BBY",
     "dollar general": "DG", "dollar tree": "DLTR", "general motors": "GM", "gm": "GM", "ford": "F",
     "ford motor": "F", "boeing": "BA", "at and t": "T", "att": "T", "verizon": "VZ", "verizon wireless": "VZ",
@@ -27,7 +29,7 @@ MANUAL = {
     "procter and gamble": "PG", "p and g": "PG", "unitedhealth": "UNH", "unitedhealthcare": "UNH",
     "optum": "UNH", "cigna": "CI", "humana": "HUM", "anthem": "ELV", "elevance": "ELV",
     "lockheed martin": "LMT", "raytheon": "name:raytheon", "general dynamics": "GD", "northrop grumman": "NOC",
-    "dish network": "name:dish", "express scripts": "name:express_scripts", "sprint": "name:sprint",
+    "dish network": "DISH", "express scripts": "ESRX", "sprint": "name:sprint",
     "rite aid": "name:rite_aid", "dell": "name:dell", "dell technologies": "name:dell",
     "samsung": "name:samsung", "samsung electronics": "name:samsung", "huawei": "name:huawei",
     "foxconn": "name:hon_hai", "hon hai": "name:hon_hai", "hon hai precision": "name:hon_hai",
@@ -49,13 +51,17 @@ MANUAL = {
     "mc kesson": "MCK", "mckesson specialty": "MCK", "mc donalds": "MCD", "mcdonalds": "MCD",
     "amerisource bergen": "COR", "amerisorce bergen": "COR", "mclane": "BRK-B", "mc lane": "BRK-B",
     "us do d": "gov:us", "u s do d": "gov:us", "do d": "gov:us", "maryland procurement office": "gov:us",
-    "optumrx": "UNH", "optum rx": "UNH", "sprint nextel": "name:sprint", "medco": "name:express_scripts",
-    "celgene": "name:celgene", "allergan": "name:allergan", "home depot usa": "HD",
+    "optumrx": "UNH", "optum rx": "UNH", "sprint nextel": "name:sprint", "medco": "ESRX",
+    "celgene": "CELG", "allergan": "AGN", "home depot usa": "HD",
 }
-# customers later bought by a universe company: (alias node, parent ticker, from date)
-PARENT = [("name:express_scripts", "CI", "2018-12-20"), ("name:aetna", "CVS", "2018-11-28"),
-          ("name:sprint", "TMUS", "2020-04-01"), ("name:celgene", "BMY", "2019-11-20"),
-          ("name:allergan", "ABBV", "2020-05-08")]
+# customers later bought by a universe company: (acquired ticker or name node, parent ticker, from date).
+# A ticker that cannot be resolved falls back to the 'name:' node of the same customer.
+PARENT = [("ESRX", "CI", "2018-12-20"), ("AET", "CVS", "2018-11-28"), ("name:sprint", "TMUS", "2020-04-01"),
+          ("CELG", "BMY", "2019-11-20"), ("AGN", "ABBV", "2020-05-08"), ("TWC", "CHTR", "2016-05-18"),
+          ("DTV", "T", "2015-07-24"), ("WFM", "AMZN", "2017-08-28"), ("KRFT", "KHC", "2015-07-02"),
+          ("COL", "UTX", "2018-11-26"), ("TWX", "T", "2018-06-14"), ("RTN", "UTX", "2020-04-03"),
+          ("RHT", "IBM", "2019-07-09"), ("XLNX", "AMD", "2022-02-14"), ("LVLT", "CTL", "2017-11-01"),
+          ("FDO", "DLTR", "2015-07-06"), ("DISH", "name:echostar", "2023-12-31")]
 # single words too common to use as a name on their own
 COMMON = {"general", "united", "american", "international", "national", "first", "southern", "public",
           "global", "health", "energy", "capital", "financial", "services", "systems", "technologies",
