@@ -109,6 +109,73 @@ def resolve(idx, name):
     return "cs:" + re.sub(r"[^a-z0-9]+", "_", n).strip("_"), "unresolved"
 
 
+LEGAL_FORM = {"inc", "incorporated", "corp", "corporation", "co", "company", "ltd", "limited", "plc", "llc", "lp",
+              "llp", "nv", "sa", "ag", "se", "bv", "spa", "ab", "asa", "oyj", "kk", "adr", "the", "de", "new", "del",
+              "cl", "a", "b"}
+
+
+def legal_core(name):
+    """Name with only the legal form, punctuation and 'the' removed (words like Stores, Holdings,
+    Group are kept). Returns (core variants, had_legal_form)."""
+    out, had = set(), False
+    for v in {name, name.replace("-", " "), name.replace("-", "")}:
+        s = v.lower().replace("&", " and ")
+        s = re.sub(r"[’'`]", "", s)
+        s = re.sub(r"[^a-z0-9 ]", " ", s)
+        toks = s.split()
+        had = had or any(t in LEGAL_FORM - {"the", "a", "b", "new", "de", "del", "cl"} for t in toks)
+        core = [t for t in toks if t not in LEGAL_FORM]
+        while core and core[-1] == "and":
+            core.pop()
+        if core:
+            out.add(" ".join(core))
+    return out, had
+
+
+def strict_index():
+    """Exact legal names -> company node: SEC current and former names, Compustat names, CRSP
+    historical names. Names that point to more than one company are dropped."""
+    seen = {}
+
+    def add(nm, node):
+        if isinstance(nm, str) and nm.strip():
+            for c in legal_core(nm)[0]:
+                seen.setdefault(c, set()).add(node)
+
+    for m in json.loads((CACHE / "sec" / "entity_meta.json").read_text()):
+        node = f"cik:{canonical(int(m['cik']))}"
+        for nm in [m.get("name")] + list(m.get("former_names") or []):
+            add(nm, node)
+    for r in wrds2.company_all().itertuples():
+        node = f"cik:{int(r.cik_c)}" if pd.notna(r.cik_c) else f"gv:{r.gvkey}"
+        add(r.conm, node)
+        add(r.conml, node)
+    pm = pd.concat([crsp.permno_map()[["permno", "cik"]], _seller_ciks()], ignore_index=True).dropna()
+    p2c = dict(zip(pm["permno"].astype(int), pm["cik"].astype(int)))
+    for n in (crsp.names(), wrds2.names()):
+        for p, nm in zip(n["permno"], n["comnam"]):
+            if int(p) in p2c:
+                add(nm, f"cik:{p2c[int(p)]}")
+    return {c: next(iter(v)) for c, v in seen.items() if len(v) == 1}
+
+
+def resolve_strict(index, name):
+    if not isinstance(name, str) or not name.strip():
+        return None, "empty"
+    s = name.strip()
+    if ANON_MEMBER.search(s.lower()) or re.match(r"^(customer|client)\b", s, re.I) \
+            or re.match(r"^\d+\s+customers?$", s, re.I) or NOT_NAMED.match(s):
+        return None, "anonymous"
+    cores, had_form = legal_core(s)
+    for c in cores:
+        if c in index and (len(c.split()) >= 2 or had_form):
+            return index[c], "named"
+    if AGG_NAME.search(s):
+        return None, "aggregate"
+    n = norm(s)
+    return ("cs:" + re.sub(r"[^a-z0-9]+", "_", n).strip("_"), "unresolved") if n else (None, "anonymous")
+
+
 def _seller_ciks():
     from .universe_crsp import CrspUniverse
     m = CrspUniverse._seller_map(set(wrds2.ccm()["permno"]))
@@ -130,8 +197,15 @@ def availability(filings, cik, datadate):
     return None, datadate + pd.Timedelta(days=90)
 
 
-def build():
+MATCHING = "strict"     # 'strict': exact legal names (after the round-1 audit); 'loose': the first version
+
+
+def build(matching=None, no_fallback=False):
+    """matching: 'strict' (default) or 'loose'. no_fallback: drop rows dated by datadate + 90 days
+    (robustness arm); written to *_nofallback files."""
+    matching = matching or MATCHING
     idx, t2c, added = name_index()
+    sidx = strict_index() if matching == "strict" else None
     seg = wrds2.seg_customer()
     co = wrds2.company_all().set_index("gvkey")
     fa = wrds2.funda()
@@ -145,7 +219,11 @@ def build():
                                     np.minimum(share, 1.0), np.nan)
     seg["seller_cik"] = seg["gvkey"].map(co["cik_c"])
     seg["seller"] = [f"cik:{int(c)}" if pd.notna(c) else f"gv:{g}" for c, g in zip(seg["seller_cik"], seg["gvkey"])]
-    rmap = {n: resolve(idx, n) for n in seg["cnms"].drop_duplicates()}
+    if matching == "strict":
+        rmap = {n: resolve_strict(sidx, n) for n in seg["cnms"].drop_duplicates()}
+        added = len(sidx)
+    else:
+        rmap = {n: resolve(idx, n) for n in seg["cnms"].drop_duplicates()}
     seg["buyer"] = seg["cnms"].map(lambda n: rmap[n][0])
     seg["kind"] = seg["cnms"].map(lambda n: rmap[n][1])
     seg = seg[seg["kind"] != "aggregate"]
@@ -167,6 +245,9 @@ def build():
                         for a, g, d in zip(seg["accession"], seg["gvkey"], seg["datadate"])]
     seg = seg[seg["available_at"] < pit.CUTOFF]
     seg["pit_source"] = np.where(seg["accession"].str.startswith("cs:"), "datadate+90", "edgar_10k")
+    n_fallback = int((seg["pit_source"] == "datadate+90").sum())
+    if no_fallback:
+        seg = seg[seg["pit_source"] == "edgar_10k"]
     seg = remap(seg, t2c)
 
     # merge with the 10-K graph
@@ -222,8 +303,9 @@ def build():
     cnt = W.groupby("accession").size()
     TI["n_links"] = TI["accession"].map(cnt).fillna(0).astype(int)
     pit.check_frame(TI, ["accepted"], what="wide 10-K index")
-    W.to_parquet(OUT_LINKS, index=False)
-    TI.to_parquet(OUT_TI, index=False)
+    sfx = "_nofallback" if no_fallback else ""
+    W.to_parquet(CACHE / f"seed_links_wide{sfx}.parquet", index=False)
+    TI.to_parquet(CACHE / f"tenk_index_wide{sfx}.parquet", index=False)
 
     stats = {"compustat_aliases_added": added,
              "compseg_company_rows": int(len(seg)),
@@ -234,7 +316,8 @@ def build():
              "named_links_both": int(len(both)),
              "anonymous_links_tenk": int(len(anon_t)), "anonymous_links_compseg": int(len(anon_c)),
              "links_total_wide": int(len(W))}
-    (RESULTS / "wide_graph_build.json").write_text(json.dumps(stats, indent=1))
+    stats.update({"matching": matching, "no_fallback": no_fallback, "fallback_rows_dropped": n_fallback if no_fallback else 0})
+    (RESULTS / f"wide_graph_build{sfx}.json").write_text(json.dumps(stats, indent=1))
     print(json.dumps(stats, indent=1))
     return W, TI
 
@@ -253,13 +336,15 @@ def remap(seg, t2c):
     return seg[~(named.values & seg["buyer"].isna().values)]
 
 
-def load():
-    W = pd.read_parquet(OUT_LINKS)
-    TI = pd.read_parquet(OUT_TI)
+def load(no_fallback=False):
+    sfx = "_nofallback" if no_fallback else ""
+    W = pd.read_parquet(CACHE / f"seed_links_wide{sfx}.parquet")
+    TI = pd.read_parquet(CACHE / f"tenk_index_wide{sfx}.parquet")
     pit.check_frame(W, ["accepted_at"], what="wide links")
     pit.check_frame(TI, ["accepted"], what="wide 10-K index")
     return W, TI
 
 
 if __name__ == "__main__":
-    build()
+    import sys
+    build(matching=(sys.argv[1] if len(sys.argv) > 1 else None), no_fallback="nofallback" in sys.argv)

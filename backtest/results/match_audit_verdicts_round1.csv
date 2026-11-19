@@ -1,0 +1,61 @@
+match_id,verdict,reason
+1,correct,same firm
+2,correct,same firm
+3,correct,same firm (later renamed)
+4,correct,same firm
+5,correct,same firm
+6,correct,same firm
+7,correct,"same firm, later acquired"
+8,correct,same firm
+9,correct,same firm (formerly United Stationers)
+10,correct,same firm
+11,correct,same firm
+12,correct,same firm
+13,correct,same firm
+14,correct,same firm
+15,correct,same firm
+16,correct,same firm (later renamed)
+17,correct,successor company of the same group
+18,correct,subsidiary or parent of the matched firm
+19,correct,subsidiary of the matched firm
+20,correct,same firm
+21,wrong,customer is a different firm (seller 10-K names Royal Philips; Compustat string points to a defunct firm)
+22,wrong,prefix match to a one-word alias
+23,correct,same firm
+24,correct,subsidiary of the matched firm
+25,wrong,prefix match to a one-word alias
+26,correct,subsidiary of the matched firm
+27,correct,subsidiary of the matched firm
+28,correct,same firm
+29,correct,same firm
+30,correct,subsidiary of the matched firm
+31,wrong,"prefix match to a one-word alias (cooperative, not the listed firm)"
+32,correct,same firm
+33,correct,same firm (later renamed)
+34,correct,same firm
+35,correct,subsidiary of the matched firm
+36,wrong,prefix match to a one-word former-name alias
+37,correct,same firm
+38,wrong,prefix match to a one-word former-name alias
+39,correct,same firm
+40,correct,same firm
+41,correct,same firm
+42,correct,same firm
+43,correct,operating division of the matched firm
+44,correct,same firm
+45,correct,same firm
+46,correct,subsidiary of the matched firm
+47,correct,same firm
+48,correct,same firm
+49,correct,same firm
+50,correct,same firm
+51,correct,same firm
+52,correct,same firm
+53,wrong,listed namesake in another country; the seller's customer is a private US firm
+54,correct,same firm (later renamed)
+55,correct,part of the matched group
+56,wrong,prefix match to a different firm with a similar name
+57,wrong,prefix match to a generic one-word alias
+58,correct,same firm
+59,correct,subsidiary of the matched firm
+60,correct,same firm

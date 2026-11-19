@@ -1,0 +1,61 @@
+match_id,verdict,reason
+1,correct,same firm
+2,correct,same firm
+3,correct,same firm
+4,correct,same firm
+5,correct,same firm
+6,correct,same firm
+7,correct,same firm
+8,correct,same firm
+9,correct,same firm
+10,correct,same firm
+11,correct,same firm
+12,correct,same firm (renamed)
+13,correct,same firm
+14,correct,same firm
+15,correct,same firm
+16,correct,same firm
+17,correct,same firm
+18,correct,same firm (renamed)
+19,correct,same firm
+20,correct,same firm
+21,correct,same firm
+22,correct,same firm
+23,correct,same firm
+24,correct,same firm
+25,correct,same firm
+26,correct,same firm
+27,correct,same firm
+28,wrong,customer is a different firm (seller 10-K names a DuPont subsidiary in Denmark; Compustat string points to a defunct Canadian affiliate)
+29,correct,same firm (renamed)
+30,correct,same firm
+31,correct,same firm
+32,correct,same firm
+33,correct,same firm
+34,correct,same firm
+35,correct,same firm
+36,correct,same firm
+37,correct,same firm (row names two customers; the share may combine both)
+38,correct,same firm
+39,correct,same firm
+40,correct,same firm
+41,correct,same firm (later holding company)
+42,correct,same firm (renamed)
+43,correct,same firm
+44,wrong,two firms share the legal name; the tenant is a different (later) retailer
+45,correct,same firm
+46,correct,same firm
+47,correct,same firm
+48,correct,same firm
+49,correct,same firm
+50,correct,same firm (renamed)
+51,correct,same firm
+52,correct,same firm
+53,correct,same firm
+54,correct,same firm
+55,correct,same firm
+56,correct,same firm (post-bankruptcy name)
+57,correct,same firm
+58,correct,same firm
+59,correct,same firm
+60,correct,same firm

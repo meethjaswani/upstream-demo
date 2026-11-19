@@ -94,19 +94,23 @@ def arm_counts(arm):
     return res
 
 
-def main():
+def main(arms=("crsp", "wide"), name="checkpoint_wide"):
     out = {"links_per_year": links_per_year().reset_index().rename(columns={"index": "year"}).to_dict(orient="records"),
            "compseg_vs_10k_text": compseg_additions(),
            "build": json.loads((RESULTS / "wide_graph_build.json").read_text())}
-    for arm in ("crsp", "wide"):
+    for arm in arms:
         out[arm] = arm_counts(arm)
-    (RESULTS / "checkpoint_wide.json").write_text(json.dumps(out, indent=1, default=str))
-    trial_log.log("checkpoint_wide", {"overlap_exposure": "M1 delta 0.7", "contamination": "any"}, "fit+choose",
+    (RESULTS / f"{name}.json").write_text(json.dumps(out, indent=1, default=str))
+    trial_log.log(name, {"overlap_exposure": "M1 delta 0.7", "contamination": "any"}, "fit+choose",
                   {a: {k: out[a][k] for k in ("events", "events_with_seed_in_graph", "H1", "H2", "H3")}
-                   for a in ("crsp", "wide")}, "data checkpoint before the widened search")
+                   for a in arms}, "data checkpoint (counts only)")
     print(json.dumps(out, indent=1, default=str)[:12000])
     return out
 
 
 if __name__ == "__main__":
-    main()
+    import sys
+    if len(sys.argv) > 1:
+        main(tuple(sys.argv[2:]) or ("crsp", "wide", "wide_nf"), sys.argv[1])
+    else:
+        main()

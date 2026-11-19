@@ -1,0 +1,12 @@
+{
+ "sample": 60,
+ "correct": 51,
+ "precision_sample": 0.85,
+ "precision_short": 1.0,
+ "precision_other": 0.775,
+ "population_matches": 4877,
+ "population_short": 1319,
+ "population_rows": 35132,
+ "population_rows_short": 13975,
+ "precision_weighted_by_matches": 0.836
+}

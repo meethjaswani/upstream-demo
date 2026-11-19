@@ -28,9 +28,10 @@ MAX_H = 6
 class Panel:
     def __init__(self, arm, graph=None):
         self.arm = arm
-        if arm in ("crsp", "wide"):
+        wide = arm in ("wide", "wide_nf")
+        if arm in ("crsp", "wide", "wide_nf"):
             from .universe_crsp import CrspUniverse
-            U = CrspUniverse(widen=(arm == "wide"))
+            U = CrspUniverse(widen=wide)
         else:
             from .universe import Universe
             U = Universe()
@@ -38,17 +39,17 @@ class Panel:
         self.y, self.X = U.excess_returns()
         self.Y = self.y.values
         self.B, self.sig, _ = events.rolling_ff3(self.y, self.X)
-        self.ev = pd.read_parquet(CACHE / f"events_{arm}.parquet")
+        self.ev = pd.read_parquet(CACHE / f"events_{'wide' if wide else arm}.parquet")
         filings = fetch_sec_index.load_filings()
         self.own_any, self.own_earn = own_day_flags(U, filings, U.earnings_days() if arm != "yahoo" else None)
         self.mcap = U.market_caps()
         self.logsize = np.log(self.mcap.shift(1).values)                 # day t-1
-        self.eligible = U.member if arm != "wide" else ~np.isnan(self.Y)
+        self.eligible = ~np.isnan(self.Y) if wide else U.member
         self._industry()
-        self.graph = graph or ("wide" if arm == "wide" else "universe")
-        if self.graph == "wide":
+        self.graph = graph or {"wide": "wide", "wide_nf": "wide_nf"}.get(arm, "universe")
+        if self.graph in ("wide", "wide_nf"):
             from . import compseg
-            links, ti = compseg.load()
+            links, ti = compseg.load(no_fallback=(self.graph == "wide_nf"))
         else:
             links = pd.read_parquet(CACHE / "seed_links_universe.parquet")
             ti = pd.read_parquet(CACHE / "tenk_index_universe.parquet")
@@ -90,7 +91,8 @@ class Panel:
                     for r in g.itertuples()]
             w = engine.weights(recs, {}, beta=0.0)
             nodes = sorted({n for k in w for n in k})
-            s = {"nodes": nodes, "idx": {n: i for i, n in enumerate(nodes)}, "W": engine.matrix(w, nodes), "links": g}
+            s = {"nodes": nodes, "idx": {n: i for i, n in enumerate(nodes)}, "W": engine.matrix(w, nodes), "links": g,
+                 "wdict": w, "recs": recs}
         self._snap[date] = s
         return s
 
@@ -131,10 +133,21 @@ class Panel:
 
     # ------------------------------------------------------------------ CARs on demand
     def car_vec(self, k):
-        t = int(self.ev.iloc[k]["t"])
-        return {w: events.car(self.Y, self.X, self.B, t, k0, k1) for w, (k0, k1) in WINDOWS.items()}
+        c = self._car_cache.get(k) if hasattr(self, "_car_cache") else None
+        if c is None:
+            t = int(self.ev.iloc[k]["t"])
+            c = {w: events.car(self.Y, self.X, self.B, t, k0, k1).astype(np.float32) for w, (k0, k1) in WINDOWS.items()}
+            self.__dict__.setdefault("_car_cache", {})[k] = c
+        return c
 
     def adj_vec(self, k, car=None):
+        a = self._adj_cache.get(k) if hasattr(self, "_adj_cache") else None
+        if a is None:
+            a = {w: v.astype(np.float32) for w, v in self._adj_vec(k, car).items()}
+            self.__dict__.setdefault("_adj_cache", {})[k] = a
+        return a
+
+    def _adj_vec(self, k, car=None):
         """Industry-adjusted CARs (all firms) for event k."""
         r = self.ev.iloc[k]
         t = int(r["t"])
@@ -146,7 +159,7 @@ class Panel:
         excl[self.U.col[r["symbol"]]] = True
         out = {}
         for w in WINDOWS:
-            c = car[w]
+            c = car[w].astype(float)
             ok = self.eligible[t] & ~excl & ~np.isnan(c) & has_g
             sums = np.bincount(codes[ok], weights=c[ok], minlength=G)
             cnt = np.bincount(codes[ok], minlength=G).astype(float)

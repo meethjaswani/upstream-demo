@@ -1,0 +1,22 @@
+{
+ "compustat_aliases_added": 86669,
+ "compseg_company_rows": 74629,
+ "compseg_rows_by_kind": {
+  "named": 26331,
+  "unresolved": 24702,
+  "anonymous": 23596
+ },
+ "compseg_rows_with_share": 53688,
+ "compseg_pit_source": {
+  "edgar_10k": 74629
+ },
+ "named_links_tenk_only": 1487,
+ "named_links_compseg_only": 50123,
+ "named_links_both": 910,
+ "anonymous_links_tenk": 1163,
+ "anonymous_links_compseg": 22710,
+ "links_total_wide": 76393,
+ "matching": "strict",
+ "no_fallback": true,
+ "fallback_rows_dropped": 24040
+}

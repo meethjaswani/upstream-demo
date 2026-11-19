@@ -1,20 +1,23 @@
 {
- "compustat_aliases_added": 81492,
- "compseg_company_rows": 98617,
+ "compustat_aliases_added": 86669,
+ "compseg_company_rows": 98669,
  "compseg_rows_by_kind": {
-  "named": 40251,
+  "unresolved": 33909,
   "anonymous": 33440,
-  "unresolved": 24926
+  "named": 31320
  },
- "compseg_rows_with_share": 70796,
+ "compseg_rows_with_share": 70844,
  "compseg_pit_source": {
-  "edgar_10k": 74586,
-  "datadate+90": 24031
+  "edgar_10k": 74629,
+  "datadate+90": 24040
  },
- "named_links_tenk_only": 1148,
- "named_links_compseg_only": 63926,
- "named_links_both": 1251,
+ "named_links_tenk_only": 1487,
+ "named_links_compseg_only": 64319,
+ "named_links_both": 910,
  "anonymous_links_tenk": 1163,
  "anonymous_links_compseg": 32554,
- "links_total_wide": 100042
+ "links_total_wide": 100433,
+ "matching": "strict",
+ "no_fallback": false,
+ "fallback_rows_dropped": 0
 }
