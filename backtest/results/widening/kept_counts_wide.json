@@ -1,0 +1,16 @@
+{
+ "car_0_5": {
+  "pairs_raw": 14468,
+  "pairs_with_car": 14106,
+  "dropped_contaminated": 5799,
+  "dropped_overlap": 1399,
+  "pairs_used": 6908
+ },
+ "car_1_20": {
+  "pairs_raw": 14468,
+  "pairs_with_car": 14063,
+  "dropped_contaminated": 10437,
+  "dropped_overlap": 829,
+  "pairs_used": 2797
+ }
+}

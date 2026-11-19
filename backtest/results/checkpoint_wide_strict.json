@@ -1,0 +1,615 @@
+{
+ "links_per_year": [
+  {
+   "year": 2015,
+   "universe_only": 344,
+   "widened": 9616,
+   "both": 82,
+   "compseg": 9270,
+   "tenk": 264
+  },
+  {
+   "year": 2016,
+   "universe_only": 336,
+   "widened": 9488,
+   "both": 83,
+   "compseg": 9150,
+   "tenk": 255
+  },
+  {
+   "year": 2017,
+   "universe_only": 357,
+   "widened": 9182,
+   "both": 89,
+   "compseg": 8823,
+   "tenk": 270
+  },
+  {
+   "year": 2018,
+   "universe_only": 363,
+   "widened": 8941,
+   "both": 87,
+   "compseg": 8576,
+   "tenk": 278
+  },
+  {
+   "year": 2019,
+   "universe_only": 363,
+   "widened": 8630,
+   "both": 98,
+   "compseg": 8265,
+   "tenk": 267
+  },
+  {
+   "year": 2020,
+   "universe_only": 447,
+   "widened": 8451,
+   "both": 116,
+   "compseg": 8002,
+   "tenk": 333
+  },
+  {
+   "year": 2021,
+   "universe_only": 449,
+   "widened": 8411,
+   "both": 126,
+   "compseg": 7960,
+   "tenk": 325
+  },
+  {
+   "year": 2022,
+   "universe_only": 448,
+   "widened": 8340,
+   "both": 113,
+   "compseg": 7891,
+   "tenk": 336
+  },
+  {
+   "year": 2023,
+   "universe_only": 437,
+   "widened": 8363,
+   "both": 116,
+   "compseg": 7925,
+   "tenk": 322
+  }
+ ],
+ "compseg_vs_10k_text": {
+  "on_10ks_the_text_parser_read": {
+   "compseg": 5387,
+   "tenk": 1487,
+   "both": 910
+  },
+  "all_named_links": {
+   "compseg": 64319,
+   "tenk": 1487,
+   "both": 910
+  },
+  "compseg_links_naming_a_cik_customer_missed_by_text": 3069,
+  "skyworks_to_apple": [
+   {
+    "fiscal_year_end": "2018-09-30",
+    "source": "compseg",
+    "usable_from": "2018-11-14 18:44:35",
+    "revenue_share": 0.47
+   },
+   {
+    "fiscal_year_end": "2019-09-27",
+    "source": "both",
+    "usable_from": "2019-11-14 08:21:35",
+    "revenue_share": 0.51
+   },
+   {
+    "fiscal_year_end": "2020-10-02",
+    "source": "both",
+    "usable_from": "2020-11-16 20:05:07",
+    "revenue_share": 0.56
+   },
+   {
+    "fiscal_year_end": "2021-10-01",
+    "source": "both",
+    "usable_from": "2021-11-24 16:48:16",
+    "revenue_share": 0.59
+   },
+   {
+    "fiscal_year_end": "2022-09-30",
+    "source": "both",
+    "usable_from": "2022-11-22 20:03:09",
+    "revenue_share": 0.58
+   },
+   {
+    "fiscal_year_end": "2023-09-29",
+    "source": "both",
+    "usable_from": "2023-11-17 16:42:37",
+    "revenue_share": 0.66
+   }
+  ]
+ },
+ "build": {
+  "compustat_aliases_added": 86669,
+  "compseg_company_rows": 98669,
+  "compseg_rows_by_kind": {
+   "unresolved": 33909,
+   "anonymous": 33440,
+   "named": 31320
+  },
+  "compseg_rows_with_share": 70844,
+  "compseg_pit_source": {
+   "edgar_10k": 74629,
+   "datadate+90": 24040
+  },
+  "named_links_tenk_only": 1487,
+  "named_links_compseg_only": 64319,
+  "named_links_both": 910,
+  "anonymous_links_tenk": 1163,
+  "anonymous_links_compseg": 32554,
+  "links_total_wide": 100433,
+  "matching": "strict",
+  "no_fallback": false,
+  "fallback_rows_dropped": 0
+ },
+ "crsp": {
+  "events": 7631,
+  "events_by_period": {
+   "fit": 5819,
+   "choose": 1812
+  },
+  "events_with_seed_in_graph": 2365,
+  "companies": 704,
+  "market_filter": "crsp.dsi sprtrn",
+  "H1": {
+   "pairs_raw": 1645,
+   "events_with_linked": 743,
+   "events_with_5plus_raw": 70,
+   "median_linked_per_event": 1.0,
+   "car_0_5": {
+    "pairs_raw": 1645,
+    "pairs_with_car": 1624,
+    "dropped_contaminated": 721,
+    "dropped_overlap": 122,
+    "pairs_used": 781,
+    "used_fit": 578,
+    "used_choose": 203,
+    "events_with_5plus_after_cleaning": 20
+   },
+   "car_1_20": {
+    "pairs_raw": 1645,
+    "pairs_with_car": 1622,
+    "dropped_contaminated": 1216,
+    "dropped_overlap": 66,
+    "pairs_used": 340,
+    "used_fit": 251,
+    "used_choose": 89,
+    "events_with_5plus_after_cleaning": 11
+   }
+  },
+  "H2": {
+   "pairs_raw": 1989,
+   "events_with_linked": 748,
+   "events_with_5plus_raw": 106,
+   "median_linked_per_event": 1.0,
+   "pairs_added_by_this_hop": 344,
+   "car_0_5": {
+    "pairs_raw": 1989,
+    "pairs_with_car": 1948,
+    "dropped_contaminated": 849,
+    "dropped_overlap": 172,
+    "pairs_used": 927,
+    "used_fit": 669,
+    "used_choose": 258,
+    "events_with_5plus_after_cleaning": 37
+   },
+   "car_1_20": {
+    "pairs_raw": 1989,
+    "pairs_with_car": 1948,
+    "dropped_contaminated": 1451,
+    "dropped_overlap": 108,
+    "pairs_used": 389,
+    "used_fit": 280,
+    "used_choose": 109,
+    "events_with_5plus_after_cleaning": 15
+   }
+  },
+  "H3": {
+   "pairs_raw": 2002,
+   "events_with_linked": 748,
+   "events_with_5plus_raw": 109,
+   "median_linked_per_event": 1.0,
+   "pairs_added_by_this_hop": 13,
+   "car_0_5": {
+    "pairs_raw": 2002,
+    "pairs_with_car": 1961,
+    "dropped_contaminated": 857,
+    "dropped_overlap": 176,
+    "pairs_used": 928,
+    "used_fit": 670,
+    "used_choose": 258,
+    "events_with_5plus_after_cleaning": 37
+   },
+   "car_1_20": {
+    "pairs_raw": 2002,
+    "pairs_with_car": 1961,
+    "dropped_contaminated": 1461,
+    "dropped_overlap": 111,
+    "pairs_used": 389,
+    "used_fit": 280,
+    "used_choose": 109,
+    "events_with_5plus_after_cleaning": 15
+   }
+  },
+  "graph_paths": [
+   {
+    "year_end": "2015-12-31",
+    "direct_links_priced": 127,
+    "two_hop_paths": 13,
+    "two_hop_pairs": 13,
+    "three_hop_paths": 9
+   },
+   {
+    "year_end": "2016-12-31",
+    "direct_links_priced": 120,
+    "two_hop_paths": 19,
+    "two_hop_pairs": 19,
+    "three_hop_paths": 7
+   },
+   {
+    "year_end": "2017-12-31",
+    "direct_links_priced": 129,
+    "two_hop_paths": 23,
+    "two_hop_pairs": 23,
+    "three_hop_paths": 6
+   },
+   {
+    "year_end": "2018-12-31",
+    "direct_links_priced": 123,
+    "two_hop_paths": 24,
+    "two_hop_pairs": 24,
+    "three_hop_paths": 5
+   },
+   {
+    "year_end": "2019-12-31",
+    "direct_links_priced": 133,
+    "two_hop_paths": 36,
+    "two_hop_pairs": 36,
+    "three_hop_paths": 6
+   },
+   {
+    "year_end": "2020-12-31",
+    "direct_links_priced": 161,
+    "two_hop_paths": 54,
+    "two_hop_pairs": 48,
+    "three_hop_paths": 11
+   },
+   {
+    "year_end": "2021-12-31",
+    "direct_links_priced": 172,
+    "two_hop_paths": 70,
+    "two_hop_pairs": 61,
+    "three_hop_paths": 18
+   },
+   {
+    "year_end": "2022-12-31",
+    "direct_links_priced": 160,
+    "two_hop_paths": 63,
+    "two_hop_pairs": 55,
+    "three_hop_paths": 10
+   },
+   {
+    "year_end": "2023-12-31",
+    "direct_links_priced": 150,
+    "two_hop_paths": 48,
+    "two_hop_pairs": 42,
+    "three_hop_paths": 10
+   }
+  ]
+ },
+ "wide": {
+  "events": 7631,
+  "events_by_period": {
+   "fit": 5819,
+   "choose": 1812
+  },
+  "events_with_seed_in_graph": 5004,
+  "companies": 3779,
+  "market_filter": "crsp.dsi sprtrn",
+  "H1": {
+   "pairs_raw": 14468,
+   "events_with_linked": 3055,
+   "events_with_5plus_raw": 778,
+   "median_linked_per_event": 2.0,
+   "car_0_5": {
+    "pairs_raw": 14468,
+    "pairs_with_car": 14106,
+    "dropped_contaminated": 5799,
+    "dropped_overlap": 1399,
+    "pairs_used": 6908,
+    "used_fit": 5326,
+    "used_choose": 1582,
+    "events_with_5plus_after_cleaning": 387
+   },
+   "car_1_20": {
+    "pairs_raw": 14468,
+    "pairs_with_car": 14063,
+    "dropped_contaminated": 10437,
+    "dropped_overlap": 829,
+    "pairs_used": 2797,
+    "used_fit": 2146,
+    "used_choose": 651,
+    "events_with_5plus_after_cleaning": 126
+   }
+  },
+  "H2": {
+   "pairs_raw": 21560,
+   "events_with_linked": 3110,
+   "events_with_5plus_raw": 899,
+   "median_linked_per_event": 2.0,
+   "pairs_added_by_this_hop": 7092,
+   "car_0_5": {
+    "pairs_raw": 21560,
+    "pairs_with_car": 20938,
+    "dropped_contaminated": 9118,
+    "dropped_overlap": 2304,
+    "pairs_used": 9516,
+    "used_fit": 7357,
+    "used_choose": 2159,
+    "events_with_5plus_after_cleaning": 492
+   },
+   "car_1_20": {
+    "pairs_raw": 21560,
+    "pairs_with_car": 20876,
+    "dropped_contaminated": 15760,
+    "dropped_overlap": 1336,
+    "pairs_used": 3780,
+    "used_fit": 2901,
+    "used_choose": 879,
+    "events_with_5plus_after_cleaning": 193
+   }
+  },
+  "H3": {
+   "pairs_raw": 25282,
+   "events_with_linked": 3110,
+   "events_with_5plus_raw": 901,
+   "median_linked_per_event": 2.0,
+   "pairs_added_by_this_hop": 3722,
+   "car_0_5": {
+    "pairs_raw": 25282,
+    "pairs_with_car": 24483,
+    "dropped_contaminated": 10693,
+    "dropped_overlap": 2882,
+    "pairs_used": 10908,
+    "used_fit": 8310,
+    "used_choose": 2598,
+    "events_with_5plus_after_cleaning": 495
+   },
+   "car_1_20": {
+    "pairs_raw": 25282,
+    "pairs_with_car": 24408,
+    "dropped_contaminated": 18425,
+    "dropped_overlap": 1705,
+    "pairs_used": 4278,
+    "used_fit": 3245,
+    "used_choose": 1033,
+    "events_with_5plus_after_cleaning": 204
+   }
+  },
+  "graph_paths": [
+   {
+    "year_end": "2015-12-31",
+    "direct_links_priced": 1214,
+    "two_hop_paths": 636,
+    "two_hop_pairs": 542,
+    "three_hop_paths": 514
+   },
+   {
+    "year_end": "2016-12-31",
+    "direct_links_priced": 1249,
+    "two_hop_paths": 580,
+    "two_hop_pairs": 502,
+    "three_hop_paths": 446
+   },
+   {
+    "year_end": "2017-12-31",
+    "direct_links_priced": 1232,
+    "two_hop_paths": 626,
+    "two_hop_pairs": 551,
+    "three_hop_paths": 509
+   },
+   {
+    "year_end": "2018-12-31",
+    "direct_links_priced": 1221,
+    "two_hop_paths": 707,
+    "two_hop_pairs": 591,
+    "three_hop_paths": 720
+   },
+   {
+    "year_end": "2019-12-31",
+    "direct_links_priced": 1178,
+    "two_hop_paths": 692,
+    "two_hop_pairs": 587,
+    "three_hop_paths": 660
+   },
+   {
+    "year_end": "2020-12-31",
+    "direct_links_priced": 1176,
+    "two_hop_paths": 711,
+    "two_hop_pairs": 617,
+    "three_hop_paths": 746
+   },
+   {
+    "year_end": "2021-12-31",
+    "direct_links_priced": 1164,
+    "two_hop_paths": 727,
+    "two_hop_pairs": 627,
+    "three_hop_paths": 783
+   },
+   {
+    "year_end": "2022-12-31",
+    "direct_links_priced": 1089,
+    "two_hop_paths": 699,
+    "two_hop_pairs": 610,
+    "three_hop_paths": 765
+   },
+   {
+    "year_end": "2023-12-31",
+    "direct_links_priced": 1016,
+    "two_hop_paths": 645,
+    "two_hop_pairs": 569,
+    "three_hop_paths": 688
+   }
+  ]
+ },
+ "wide_nf": {
+  "events": 7631,
+  "events_by_period": {
+   "fit": 5819,
+   "choose": 1812
+  },
+  "events_with_seed_in_graph": 4861,
+  "companies": 3779,
+  "market_filter": "crsp.dsi sprtrn",
+  "H1": {
+   "pairs_raw": 14047,
+   "events_with_linked": 3000,
+   "events_with_5plus_raw": 759,
+   "median_linked_per_event": 2.0,
+   "car_0_5": {
+    "pairs_raw": 14047,
+    "pairs_with_car": 13884,
+    "dropped_contaminated": 5724,
+    "dropped_overlap": 1378,
+    "pairs_used": 6782,
+    "used_fit": 5217,
+    "used_choose": 1565,
+    "events_with_5plus_after_cleaning": 381
+   },
+   "car_1_20": {
+    "pairs_raw": 14047,
+    "pairs_with_car": 13841,
+    "dropped_contaminated": 10314,
+    "dropped_overlap": 813,
+    "pairs_used": 2714,
+    "used_fit": 2076,
+    "used_choose": 638,
+    "events_with_5plus_after_cleaning": 121
+   }
+  },
+  "H2": {
+   "pairs_raw": 20383,
+   "events_with_linked": 3052,
+   "events_with_5plus_raw": 877,
+   "median_linked_per_event": 2.0,
+   "pairs_added_by_this_hop": 6336,
+   "car_0_5": {
+    "pairs_raw": 20383,
+    "pairs_with_car": 20097,
+    "dropped_contaminated": 8719,
+    "dropped_overlap": 2213,
+    "pairs_used": 9165,
+    "used_fit": 7073,
+    "used_choose": 2092,
+    "events_with_5plus_after_cleaning": 480
+   },
+   "car_1_20": {
+    "pairs_raw": 20383,
+    "pairs_with_car": 20035,
+    "dropped_contaminated": 15165,
+    "dropped_overlap": 1273,
+    "pairs_used": 3597,
+    "used_fit": 2756,
+    "used_choose": 841,
+    "events_with_5plus_after_cleaning": 184
+   }
+  },
+  "H3": {
+   "pairs_raw": 23342,
+   "events_with_linked": 3052,
+   "events_with_5plus_raw": 881,
+   "median_linked_per_event": 2.0,
+   "pairs_added_by_this_hop": 2959,
+   "car_0_5": {
+    "pairs_raw": 23342,
+    "pairs_with_car": 22975,
+    "dropped_contaminated": 9953,
+    "dropped_overlap": 2712,
+    "pairs_used": 10310,
+    "used_fit": 7893,
+    "used_choose": 2417,
+    "events_with_5plus_after_cleaning": 482
+   },
+   "car_1_20": {
+    "pairs_raw": 23342,
+    "pairs_with_car": 22900,
+    "dropped_contaminated": 17293,
+    "dropped_overlap": 1591,
+    "pairs_used": 4016,
+    "used_fit": 3057,
+    "used_choose": 959,
+    "events_with_5plus_after_cleaning": 193
+   }
+  },
+  "graph_paths": [
+   {
+    "year_end": "2015-12-31",
+    "direct_links_priced": 1149,
+    "two_hop_paths": 560,
+    "two_hop_pairs": 483,
+    "three_hop_paths": 442
+   },
+   {
+    "year_end": "2016-12-31",
+    "direct_links_priced": 1175,
+    "two_hop_paths": 500,
+    "two_hop_pairs": 438,
+    "three_hop_paths": 370
+   },
+   {
+    "year_end": "2017-12-31",
+    "direct_links_priced": 1162,
+    "two_hop_paths": 553,
+    "two_hop_pairs": 490,
+    "three_hop_paths": 416
+   },
+   {
+    "year_end": "2018-12-31",
+    "direct_links_priced": 1160,
+    "two_hop_paths": 602,
+    "two_hop_pairs": 503,
+    "three_hop_paths": 527
+   },
+   {
+    "year_end": "2019-12-31",
+    "direct_links_priced": 1103,
+    "two_hop_paths": 588,
+    "two_hop_pairs": 506,
+    "three_hop_paths": 482
+   },
+   {
+    "year_end": "2020-12-31",
+    "direct_links_priced": 1103,
+    "two_hop_paths": 614,
+    "two_hop_pairs": 536,
+    "three_hop_paths": 559
+   },
+   {
+    "year_end": "2021-12-31",
+    "direct_links_priced": 1114,
+    "two_hop_paths": 624,
+    "two_hop_pairs": 542,
+    "three_hop_paths": 587
+   },
+   {
+    "year_end": "2022-12-31",
+    "direct_links_priced": 1072,
+    "two_hop_paths": 615,
+    "two_hop_pairs": 538,
+    "three_hop_paths": 569
+   },
+   {
+    "year_end": "2023-12-31",
+    "direct_links_priced": 1002,
+    "two_hop_paths": 568,
+    "two_hop_pairs": 507,
+    "three_hop_paths": 515
+   }
+  ]
+ }
+}

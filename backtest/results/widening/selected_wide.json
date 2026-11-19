@@ -1,0 +1,8 @@
+{
+ "variant": "M1",
+ "delta": 0.3,
+ "H": 1,
+ "choose_mae_skill": 0.003656027545811069,
+ "choose_r2": 0.010262989150066848,
+ "rule": "max choosing-period MAE skill on [0,+5] plain CAR, then R^2"
+}
