@@ -70,9 +70,9 @@ def own_day_flags(U, filings, earn_days=None):
 
 
 def main(arm):
-    if arm == "crsp":
+    if arm in ("crsp", "wide"):
         from .universe_crsp import CrspUniverse
-        U = CrspUniverse()
+        U = CrspUniverse(widen=(arm == "wide"))
     elif arm == "yahoo":
         from .universe import Universe
         U = Universe()
@@ -84,7 +84,7 @@ def main(arm):
     filings = fetch_sec_index.load_filings()
     any_f, earn = events.filing_flags(filings, U.calendar, U.sym_of_cik, U.symbols)
     rdq_days = None
-    if arm == "crsp":
+    if arm in ("crsp", "wide"):
         rdq_days = U.earnings_days()
         win = np.zeros_like(rdq_days)
         for d in range(-events.FILING_WINDOW, events.FILING_WINDOW + 1):
@@ -95,7 +95,14 @@ def main(arm):
     ev["cik"] = ev["symbol"].map(U.cik_of_sym)
     pit.check_frame(ev, ["date"], what="events")
 
-    links, ti = seed_graph.load()
+    if arm == "wide":
+        from . import compseg
+        links, ti = compseg.load()
+        eligible = ~np.isnan(y.values)              # any CRSP common stock with a return that day
+    else:
+        links = pd.read_parquet(CACHE / "seed_links_universe.parquet")
+        ti = pd.read_parquet(CACHE / "tenk_index_universe.parquet")
+        eligible = U.member
     G = seed_graph.SeedGraph(links, ti)
     own_any, own_earn = own_day_flags(U, filings, rdq_days)
     T = len(U.calendar)
@@ -104,7 +111,7 @@ def main(arm):
         g = cache.get(r.date)
         if g is None:
             g = cache[r.date] = G.at(r.date)
-        mem = {U.cik_of_sym[U.symbols[k]] for k in np.flatnonzero(U.member[r.t])}
+        mem = {U.cik_of_sym[U.symbols[k]] for k in np.flatnonzero(eligible[r.t])}
         l1 = linked_firms(g, r.cik, mem, 1)
         n1.append(len(l1))
         n4.append(len(linked_firms(g, r.cik, mem, 4)))

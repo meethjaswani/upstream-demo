@@ -1,13 +1,18 @@
 """Shared evaluation panel for one data arm.
 
-For every E2 event: CARs of all universe firms over [0,+5] and [+1,+20] (FF3 with the event-day
-fit), industry-adjusted CARs, own 8-K/earnings flags in each window, controls (same GICS
-sub-industry as the seed, market beta, log size) and the point-in-time seed graph of the day
-before (10-Ks accepted before the event day).
+Arms: 'crsp' (index firms, 10-K graph), 'wide' (CRSP common stocks incl. firms outside the index,
+10-K + Compustat customer-segment graph), 'yahoo' (index firms, Yahoo prices, 10-K graph).
+Seeds are always E2 events at index firms. Linked firms: index members on the event day
+('crsp', 'yahoo') or any firm with a CRSP return that day ('wide').
 
-Industry-adjusted CAR (amendment 8): firm CAR minus the mean CAR of firms in its GICS
-sub-industry that are not linked to the shocked company (not within 6 hops downstream of the
-seed, not a direct customer of the seed), excluding the seed and the firm itself.
+Per event (computed on demand): CARs of all firms over [0,+5] and [+1,+20] (FF3 with the
+event-day fit), industry-adjusted CARs, own 8-K/earnings flags, controls (same GICS sub-industry
+as the seed on that day, market beta, log size) and the graph known before the event day.
+
+Industry-adjusted CAR (amendment 8): firm CAR minus the mean CAR of eligible firms in its GICS
+sub-industry (historical GICS on the event day, CRSP arms) that are not linked to the shocked
+company (not within 6 hops downstream of the seed, not a direct customer), the seed and the firm
+itself excluded.
 """
 import numpy as np
 import pandas as pd
@@ -21,41 +26,54 @@ MAX_H = 6
 
 
 class Panel:
-    def __init__(self, arm):
+    def __init__(self, arm, graph=None):
         self.arm = arm
-        if arm == "crsp":
+        if arm in ("crsp", "wide"):
             from .universe_crsp import CrspUniverse
-            U = CrspUniverse()
+            U = CrspUniverse(widen=(arm == "wide"))
         else:
             from .universe import Universe
             U = Universe()
         self.U = U
         self.y, self.X = U.excess_returns()
-        f = np.load(CACHE / f"ff3_fit_{arm}.npz")
-        self.B, self.sig = f["B"], f["sig"]
+        self.Y = self.y.values
+        self.B, self.sig, _ = events.rolling_ff3(self.y, self.X)
         self.ev = pd.read_parquet(CACHE / f"events_{arm}.parquet")
         filings = fetch_sec_index.load_filings()
-        self.own_any, self.own_earn = own_day_flags(U, filings, U.earnings_days() if arm == "crsp" else None)
+        self.own_any, self.own_earn = own_day_flags(U, filings, U.earnings_days() if arm != "yahoo" else None)
         self.mcap = U.market_caps()
         self.logsize = np.log(self.mcap.shift(1).values)                 # day t-1
+        self.eligible = U.member if arm != "wide" else ~np.isnan(self.Y)
         self._industry()
-        links, ti = seed_graph.load()
+        self.graph = graph or ("wide" if arm == "wide" else "universe")
+        if self.graph == "wide":
+            from . import compseg
+            links, ti = compseg.load()
+        else:
+            links = pd.read_parquet(CACHE / "seed_links_universe.parquet")
+            ti = pd.read_parquet(CACHE / "tenk_index_universe.parquet")
+        self.links, self.ti = links, ti
         self.G = seed_graph.SeedGraph(links, ti)
         self._snap = {}
-        self.T, self.S = self.y.shape
-        Y = self.y.values
-        self.car = {w: np.full((len(self.ev), self.S), np.nan) for w in WINDOWS}
-        for k, t in enumerate(self.ev["t"].values):
-            for w, (k0, k1) in WINDOWS.items():
-                self.car[w][k] = events.car(Y, self.X, self.B, t, k0, k1)
+        self.T, self.S = self.Y.shape
 
     def _industry(self):
-        pm = crsp.permno_map().dropna(subset=["cik"])
-        g = {}
-        for c, s in zip(pm["cik"], pm["gsubind"]):
-            if isinstance(s, str) and s:
-                g.setdefault(int(c), s)
-        self.gsub = np.array([g.get(self.U.cik_of_sym[s], "") for s in self.U.symbols], dtype=object)
+        if hasattr(self.U, "gics_matrix"):
+            self.gics = self.U.gics_matrix()                             # T x S codes, -1 unknown
+        else:
+            pm = crsp.permno_map().dropna(subset=["cik"])
+            g = {}
+            for c, s in zip(pm["cik"], pm["gsubind"]):
+                if isinstance(s, str) and s:
+                    g.setdefault(int(c), s)
+            codes, row = {}, []
+            for s in self.U.symbols:
+                v = g.get(self.U.cik_of_sym[s])
+                row.append(codes.setdefault(v, len(codes)) if v else -1)
+            self.gics = np.tile(np.array(row, dtype=np.int32), (len(self.U.calendar), 1))
+
+    def gsub_at(self, t):
+        return self.gics[t]
 
     # ------------------------------------------------------------------ graph snapshot
     def snapshot(self, date):
@@ -65,19 +83,19 @@ class Panel:
             return s
         g = self.G.at(date)
         if g.empty:
-            s = {"nodes": [], "idx": {}, "W": None}
+            s = {"nodes": [], "idx": {}, "W": None, "links": g}
         else:
             recs = [{"seller": r.seller, "buyer": r.buyer if isinstance(r.buyer, str) else None,
                      "share": float(r.revenue_share) if pd.notna(r.revenue_share) else None, "tier": r.tier}
                     for r in g.itertuples()]
             w = engine.weights(recs, {}, beta=0.0)
             nodes = sorted({n for k in w for n in k})
-            s = {"nodes": nodes, "idx": {n: i for i, n in enumerate(nodes)}, "W": engine.matrix(w, nodes)}
+            s = {"nodes": nodes, "idx": {n: i for i, n in enumerate(nodes)}, "W": engine.matrix(w, nodes), "links": g}
         self._snap[date] = s
         return s
 
     def node_cols(self, snap):
-        """Universe column of each snapshot node (-1 if not a priced universe company)."""
+        """Universe column of each snapshot node (-1 if not a priced company)."""
         cols = np.full(len(snap["nodes"]), -1)
         for i, n in enumerate(snap["nodes"]):
             if n.startswith("cik:"):
@@ -87,7 +105,7 @@ class Panel:
         return cols
 
     def linked_mask(self, k):
-        """Universe firms linked to event k's seed: within MAX_H hops downstream or a direct customer."""
+        """Firms linked to event k's seed: within MAX_H hops downstream or a direct customer."""
         r = self.ev.iloc[k]
         snap = self.snapshot(r["date"])
         mask = np.zeros(self.S, dtype=bool)
@@ -111,43 +129,41 @@ class Panel:
         mask[c[c >= 0]] = True
         return mask
 
-    # ------------------------------------------------------------------ industry-adjusted CAR
-    def adjusted_all(self):
-        """Industry-adjusted CARs for every event and window (cached on disk)."""
-        f = CACHE / f"panel_adj_{self.arm}.npz"
-        if f.exists():
-            z = np.load(f)
-            if z[list(WINDOWS)[0]].shape == (len(self.ev), self.S):
-                self.adj = {w: z[w] for w in WINDOWS}
-                return self.adj
-        codes, uniq = pd.factorize(pd.Series(self.gsub).replace("", np.nan))
-        G = len(uniq)
+    # ------------------------------------------------------------------ CARs on demand
+    def car_vec(self, k):
+        t = int(self.ev.iloc[k]["t"])
+        return {w: events.car(self.Y, self.X, self.B, t, k0, k1) for w, (k0, k1) in WINDOWS.items()}
+
+    def adj_vec(self, k, car=None):
+        """Industry-adjusted CARs (all firms) for event k."""
+        r = self.ev.iloc[k]
+        t = int(r["t"])
+        car = car or self.car_vec(k)
+        codes = self.gsub_at(t)
+        G = int(codes.max()) + 1 if codes.max() >= 0 else 1
         has_g = codes >= 0
-        self.adj = {w: np.full((len(self.ev), self.S), np.nan) for w in WINDOWS}
-        for k in range(len(self.ev)):
-            r = self.ev.iloc[k]
-            t = int(r["t"])
-            excl = self.linked_mask(k)
-            excl[self.U.col[r["symbol"]]] = True
-            for w in WINDOWS:
-                car = self.car[w][k]
-                ok = self.U.member[t] & ~excl & ~np.isnan(car) & has_g
-                sums = np.bincount(codes[ok], weights=car[ok], minlength=G)
-                cnt = np.bincount(codes[ok], minlength=G).astype(float)
-                s = np.where(has_g, sums[np.maximum(codes, 0)], np.nan) - np.where(ok, car, 0.0)
-                n = np.where(has_g, cnt[np.maximum(codes, 0)], 0.0) - ok
-                with np.errstate(invalid="ignore", divide="ignore"):
-                    a = car - s / n
-                a[(n <= 0) | ~has_g | np.isnan(car)] = np.nan
-                self.adj[w][k] = a
-        np.savez_compressed(f, **self.adj)
-        return self.adj
+        excl = self.linked_mask(k)
+        excl[self.U.col[r["symbol"]]] = True
+        out = {}
+        for w in WINDOWS:
+            c = car[w]
+            ok = self.eligible[t] & ~excl & ~np.isnan(c) & has_g
+            sums = np.bincount(codes[ok], weights=c[ok], minlength=G)
+            cnt = np.bincount(codes[ok], minlength=G).astype(float)
+            s = np.where(has_g, sums[np.maximum(codes, 0)], np.nan) - np.where(ok, c, 0.0)
+            n = np.where(has_g, cnt[np.maximum(codes, 0)], 0.0) - ok
+            with np.errstate(invalid="ignore", divide="ignore"):
+                a = c - s / n
+            a[(n <= 0) | ~has_g | np.isnan(c)] = np.nan
+            out[w] = a
+        return out
 
     def controls(self, k, cols):
         r = self.ev.iloc[k]
         t = int(r["t"])
         sc = self.U.col[r["symbol"]]
-        same = (self.gsub[cols] == self.gsub[sc]) & (self.gsub[cols] != "")
+        g = self.gsub_at(t)
+        same = (g[cols] == g[sc]) & (g[cols] >= 0)
         return same.astype(float), self.B[t, cols, 1], self.logsize[t, cols]
 
     def own_in_window(self, k, cols, w, which="any"):

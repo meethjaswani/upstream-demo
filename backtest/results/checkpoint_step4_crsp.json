@@ -5,19 +5,19 @@
  "seed_links_both_ends_in_universe": 1279,
  "seed_pairs_both_ends_in_universe": 337,
  "universe_companies": 704,
- "events_total": 7636,
+ "events_total": 7631,
  "events_by_period": {
-  "fit": 5823,
-  "choose": 1813
+  "fit": 5819,
+  "choose": 1812
  },
- "events_negative": 3904,
- "events_positive": 3732,
+ "events_negative": 3900,
+ "events_positive": 3731,
  "events_earnings": 5570,
  "event_funnel": {
   "stock_days_in_index_with_fit": 979203,
   "abs_z_ge_3": 18658,
-  "and_filing_within_1d": 9031,
-  "and_spx_within_2pct": 7636
+  "and_filing_within_1d": 9021,
+  "and_spx_within_2pct": 7631
  },
  "events_with_linked_h1": 743,
  "event_firm_pairs_h1": 1652,
@@ -44,7 +44,7 @@
  },
  "clean_pairs_drop_any_car_1_20": {
   "choose": 103,
-  "fit": 307
+  "fit": 308
  },
  "clean_pairs_drop_earn_car_1_20": {
   "choose": 222,

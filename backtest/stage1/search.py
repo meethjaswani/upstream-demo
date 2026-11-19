@@ -62,7 +62,6 @@ def seeded_events(P):
 
 def search(arm="crsp"):
     P = Panel(arm)
-    P.adjusted_all()
     ks = seeded_events(P)
     print("events whose seed is a customer in the graph:", len(ks), flush=True)
     base_rows, base_preds = run_baselines(P, arm)
@@ -101,7 +100,6 @@ def final(choice, arms=("crsp", "yahoo")):
     out = []
     for arm in arms:
         P = Panel(arm)
-        P.adjusted_all()
         ks = seeded_events(P)
         n_runs = 10_000 if choice["variant"] == "M3" else 1000
         preds = model_preds(P, ks, choice["variant"], choice["delta"], choice["H"], n_runs)

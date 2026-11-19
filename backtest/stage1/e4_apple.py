@@ -36,8 +36,8 @@ def run(arm, sel):
     meta = json.loads((RESULTS.parent / "cache" / "sec" / "entity_meta.json").read_text())
     nm = {m["cik"]: m["name"] for m in meta}
     rows = []
-    g = P.gsub[sc]
-    b1 = [c for c in np.flatnonzero((P.gsub == g) & P.U.member[t]) if c != sc]
+    gs = P.gsub_at(t)
+    b1 = [c for c in np.flatnonzero((gs == gs[sc]) & P.eligible[t]) if c != sc] if gs[sc] >= 0 else []
     corr = correlations(P, t, sc)
     b3 = list(np.argsort(-np.nan_to_num(corr, nan=-np.inf))[:B3_N])
     for c in sorted(set(pred) | set(b1) | set(b3)):

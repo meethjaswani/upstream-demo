@@ -24,7 +24,7 @@ def model(P, k, variant, delta, H, n_runs=1000):
     out = {}
     for i in np.flatnonzero(x):
         c = cols[i]
-        if c >= 0 and c != sc and P.U.member[t, c]:
+        if c >= 0 and c != sc and P.eligible[t, c]:
             out[int(c)] = float(x[i])
     return out
 
@@ -32,10 +32,11 @@ def model(P, k, variant, delta, H, n_runs=1000):
 def b1_industry(P, k):
     r = P.ev.iloc[k]
     t, sc = int(r["t"]), P.U.col[r["symbol"]]
-    g = P.gsub[sc]
-    if not g:
+    gs = P.gsub_at(t)
+    g = gs[sc]
+    if g < 0:
         return {}
-    cols = np.flatnonzero((P.gsub == g) & P.U.member[t])
+    cols = np.flatnonzero((gs == g) & P.eligible[t])
     return {int(c): float(r["ar"]) for c in cols if c != sc}
 
 
@@ -52,7 +53,7 @@ def b2_neighbours(P, k):
     nb = set(W.indices[W.indptr[s0]:W.indptr[s0 + 1]]) | set(WT.indices[WT.indptr[s0]:WT.indptr[s0 + 1]])
     cols = P.node_cols(snap)
     t, sc = int(r["t"]), P.U.col[r["symbol"]]
-    return {int(cols[i]): float(r["ar"]) for i in nb if cols[i] >= 0 and cols[i] != sc and P.U.member[t, cols[i]]}
+    return {int(cols[i]): float(r["ar"]) for i in nb if cols[i] >= 0 and cols[i] != sc and P.eligible[t, cols[i]]}
 
 
 def correlations(P, t, sc):
@@ -73,7 +74,7 @@ def correlations(P, t, sc):
     sz = (s - s.mean()) / s.std()
     with np.errstate(invalid="ignore", divide="ignore"):
         corr = np.nanmean(((M - mu) / sd) * sz[:, None], axis=0)
-    corr[~valid | ~P.U.member[t]] = np.nan
+    corr[~valid | ~P.eligible[t]] = np.nan
     corr[sc] = np.nan
     return corr
 

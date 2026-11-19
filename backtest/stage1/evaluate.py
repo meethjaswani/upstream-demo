@@ -31,7 +31,6 @@ OUTCOMES = {"plain": "car", "adj": "adj"}
 def pairs(P, preds):
     """preds: {event k: {col: pred}} -> DataFrame."""
     rows = []
-    adj = P.adjusted_all()
     for k, d in preds.items():
         if not d:
             continue
@@ -41,9 +40,11 @@ def pairs(P, preds):
         r = P.ev.iloc[k]
         base = {"k": k, "t": int(r["t"]), "date": r["date"], "period": r["period"]}
         df = pd.DataFrame({"col": cols, "pred": pr, "same_ind": same, "beta": beta, "size": size})
+        car = P.car_vec(k)
+        adj = P.adj_vec(k, car)
         for w in WINDOWS:
-            df[f"car_{w}"] = P.car[w][k][cols]
-            df[f"adj_{w}"] = adj[w][k][cols]
+            df[f"car_{w}"] = car[w][cols]
+            df[f"adj_{w}"] = adj[w][cols]
             df[f"own_{w}"] = P.own_in_window(k, cols, w)
             df[f"ownearn_{w}"] = P.own_in_window(k, cols, w, which="earn")
         for c, v in base.items():

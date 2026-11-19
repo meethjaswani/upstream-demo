@@ -66,7 +66,7 @@ def run(arm, delta, H, label):
             continue
         cols = P.node_cols(snap)
         sig = signal(snap, cols, mret.loc[m].values, delta, H)
-        sig = {c: s for c, s in sig.items() if P.U.member[t, c] and not np.isnan(mret.loc[nxt].values[c])}
+        sig = {c: s for c, s in sig.items() if P.eligible[t, c] and not np.isnan(mret.loc[nxt].values[c])}
         if len(sig) < MIN_FIRMS:
             continue
         s = pd.Series(sig)

@@ -17,6 +17,7 @@ _wrds_default = CACHE / "wrds"
 if not _wrds_default.exists():
     _wrds_default = Path.home() / "upstream-v3" / "backtest" / "cache" / "wrds"
 WRDS = Path(os.environ.get("BACKTEST_WRDS", _wrds_default))
+WRDS2 = Path(os.environ.get("BACKTEST_WRDS2", WRDS.parent / "wrds2"))
 
 for p in (CACHE, RESULTS, FIGURES):
     p.mkdir(parents=True, exist_ok=True)

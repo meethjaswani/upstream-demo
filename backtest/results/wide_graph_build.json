@@ -1,0 +1,20 @@
+{
+ "compustat_aliases_added": 81492,
+ "compseg_company_rows": 98617,
+ "compseg_rows_by_kind": {
+  "named": 40251,
+  "anonymous": 33440,
+  "unresolved": 24926
+ },
+ "compseg_rows_with_share": 70796,
+ "compseg_pit_source": {
+  "edgar_10k": 74586,
+  "datadate+90": 24031
+ },
+ "named_links_tenk_only": 1148,
+ "named_links_compseg_only": 63926,
+ "named_links_both": 1251,
+ "anonymous_links_tenk": 1163,
+ "anonymous_links_compseg": 32554,
+ "links_total_wide": 100042
+}
