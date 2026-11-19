@@ -1,0 +1,32 @@
+{
+ "delta": 0.7,
+ "H": 1,
+ "fit_ew": {
+  "months": 72,
+  "mean_monthly": 0.003761993386171313,
+  "alpha_monthly": 0.00475093222881076,
+  "alpha_t": 1.1329843547287959,
+  "median_firms": 63.0
+ },
+ "fit_vw": {
+  "months": 72,
+  "mean_monthly": -0.0019434060659116196,
+  "alpha_monthly": -0.0006613306968475978,
+  "alpha_t": -0.13008763227950415,
+  "median_firms": 63.0
+ },
+ "choose_ew": {
+  "months": 24,
+  "mean_monthly": 0.0011324820780498894,
+  "alpha_monthly": 0.0018382501092039589,
+  "alpha_t": 0.2752644060186461,
+  "median_firms": 74.0
+ },
+ "choose_vw": {
+  "months": 24,
+  "mean_monthly": 0.003115855913418543,
+  "alpha_monthly": 0.0048499210647856925,
+  "alpha_t": 0.7159617254709592,
+  "median_firms": 74.0
+ }
+}

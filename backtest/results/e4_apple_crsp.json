@@ -1,0 +1,18 @@
+{
+ "arm": "crsp",
+ "apple_ar": -0.06339669734468373,
+ "apple_z": -5.494363632540835,
+ "config": {
+  "variant": "M3",
+  "delta": 0.7,
+  "H": 1,
+  "choose_mae_skill": 0.0018036808299869422,
+  "choose_r2": 0.05173802772517333,
+  "rule": "max choosing-period MAE skill on [0,+5] plain CAR, then R^2"
+ },
+ "linked_firms": 4,
+ "linked_mean_car_0_5": -0.01898480447407914,
+ "linked_mean_car_1_20": -0.01284491673604803,
+ "b1_mean_car_0_5": -0.0020811593421101444,
+ "b3_mean_car_0_5": 0.0005226659606348399
+}

@@ -1,5 +1,8 @@
 cache/
 .venv/
+# firm-level outputs derived from licensed CRSP data stay local
+results/e4_apple_crsp.csv
+results/e3_longshort_crsp.csv
 __pycache__/
 *.pyc
 .pytest_cache/
